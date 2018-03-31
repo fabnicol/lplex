@@ -1,0 +1,25 @@
+lplex version 0.3.1-rc2-x64 (GNU GPL License)
+build: x86_64-pc-linux-gnu 
+     : flac 1.3.2  dvdread 50300
+feedback: <audioplex-lpcm@lists.sourceforge.net>
+
+STAT: Scanning '/home/fab/Dev/dvda-author/Docs/ex/ex'.
+    : /home/fab/Dev/dvda-author/Docs/ex/a2_16_44.wav
+    :    16 bit 44 khz 2 ch
+
+*ERR: 44 khz lpcm is not allowed in dvd-video
+    : /home/fab/Dev/dvda-author/Docs/ex/a2_16_44_2.wav
+    :    16 bit 44 khz 2 ch
+
+*ERR: 44 khz lpcm is not allowed in dvd-video
+    : /home/fab/Dev/dvda-author/Docs/ex/a2_16_48.wav
+    :    16 bit 48 khz 2 ch
+    : /home/fab/Dev/dvda-author/Docs/ex/a2_16_48_2.wav
+    :    16 bit 48 khz 2 ch
+STAT: Checking custom screen jpegs...
+    : black
+    :    720x480
+
+*ERR: jpeg2yuv|mpeg2enc failed. See Lplex.log for details.
+
+
