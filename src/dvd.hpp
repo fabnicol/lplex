@@ -213,7 +213,7 @@ public:
 //      if( ! ( state & opened ) )
 //      {
 			if( lpcm_video_ts::open(
-                    VIDEO_TS ? VIDEO_TS : job->inPath.generic_string().c_str(), fatal ) )
+                    VIDEO_TS ? VIDEO_TS : job->inPath.string().c_str(), fatal ) )
 			{
 				if( ! ( state & singleStep ) )
 					traverse();

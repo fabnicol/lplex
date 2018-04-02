@@ -221,7 +221,7 @@ int logCopy( const fs::path& filename )
 {
 	if( ! filename.empty() )
 	{
-		INFO( _f( "Saving log file to \'%s\'\n", filename.generic_string() ) );
+		INFO( _f( "Saving log file to \'%s\'\n", filename.string() ) );
 		fs::copy_file( xlogName, filename );
 	}
 	return 0;

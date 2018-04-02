@@ -217,7 +217,7 @@ inline bool initPlatform()
 
 inline string volumeLabel( const char * path, bool mustBeRoot=false )
 {
-    return fs::path(path).root_path().generic_string();
+    return fs::path(path).root_path().string();
 }
 
 

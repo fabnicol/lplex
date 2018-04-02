@@ -290,7 +290,10 @@ void setcolors( int scheme = bright );
 #define ERR(t) do{ _xcode=2; _ERR( (string(ERR_TAG) + string(t)).c_str() ); }while(0);
 
 #ifdef lplex_console
-#define FATAL(t) { _ERR( (string(ERR_TAG) + string(t) + string("\n\n")).c_str() ); exit(-1); }//must follow 'if' statement
+#define FATAL(t) {  \
+    cerr << ERR_TAG << t << endl;\
+    throw;}//must follow 'if' statement
+
 #else
 #define FATAL(t) { gui_mode(messenger::_fatal); ERR(t); }//must follow 'if' statement
 #endif
@@ -359,8 +362,9 @@ static inline void blip( counter<T> *ct,
 		blip_ct++;
 }
 
-long execute( const string& command, int verbose=_verbose);
-long executeViaScript( const string& command, int verbose=_verbose,
-	int (*filter)( const char *, bool )=NULL );
+long execute( const string& application, const vector<const char*>& command, int verbose = _verbose);
 
+long execute( const string& application,  const vector<const char*>& args,
+              const string& application2, const vector<const char*>& args2,
+              int verbose);
 #endif

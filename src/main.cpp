@@ -113,9 +113,9 @@ int main( int argc, char *argv[] )
 		{
 #ifdef lgzip_support
 			if( dvd.isOpen() )
-				return udfZip( dvd, true, job.outPath.generic_string() ) ? 0 : 1;
+				return udfZip( dvd, true, job.outPath.string() ) ? 0 : 1;
 			else if( gzFile != "" )
-				return udfUnzip( gzFile, job.outPath.generic_string() );
+				return udfUnzip( gzFile, job.outPath.string() );
 			FATAL( "Gzip uninitialized." );
 #else
 			udfError( "Unsupported feature." );
@@ -215,7 +215,7 @@ uint16_t init( int argc, char *argv[] )
 											//set defaults
 	initPlatform();
     fs_MakeDirs( fs::path(configDir) );
-    logInit( (configDir / "lplex.log").generic_string() );
+    logInit( (configDir / "lplex.log").string() );
     projectDotLplex = configDir / "project.lplex";
     cwd = fs::current_path();
 	job.tempPath = tempDir;
@@ -261,10 +261,10 @@ uint16_t init( int argc, char *argv[] )
 	optindl = -1;
 
 											// ...write a default config file if none exists
-    if( ! fs::exists(lplexConfig.generic_string() ) )
+    if( ! fs::exists(lplexConfig.string() ) )
 	{
 
-        configFile.open(lplexConfig.generic_string());
+        configFile.open(lplexConfig.string());
 
         configFile <<  "formatout = wav"  << endl;
         configFile <<   "video = ntsc" << endl;
@@ -284,8 +284,8 @@ uint16_t init( int argc, char *argv[] )
         configFile << "dvdpath = adjacent"  << endl;
         configFile << "isopath = adjacent"  << endl;
         configFile << "extractpath = adjacent"  << endl;
-        configFile << "workpath = " << job.tempPath.generic_string()  << endl;
-        configFile << "readonlypath = " << readOnlyPath.generic_string() << endl;
+        configFile << "workpath = " << job.tempPath.string()  << endl;
+        configFile << "readonlypath = " << readOnlyPath.string() << endl;
         configFile <<  "verbose = no"  << endl;
         configFile.flush();
 	}
@@ -324,7 +324,7 @@ uint16_t init( int argc, char *argv[] )
 
 	getOpts( argc, argv );
 
-    dirs.push_back( job.inPath.parent_path().generic_string() );
+    dirs.push_back( job.inPath.parent_path().string() );
 	if( ! ( job.params & ( unauth | gzip ) ) )
 		splitPaths();
 	setJobTargets();
@@ -362,7 +362,7 @@ uint16_t addFiles( fs::path filespec )
 	{
         filespec = fs::absolute( filespec );
 
-        if( Right(filespec.generic_string(), 1) == "."  )
+        if( Right(filespec.string(), 1) == "."  )
 		{
             filespec = filespec.parent_path();
 			isDot = true;
@@ -372,10 +372,10 @@ uint16_t addFiles( fs::path filespec )
 											//if filespec is a directory, open it...
     if( fs::exists( filespec) )
 	{
-		STAT( _f("Scanning '%s'.\n", filespec.generic_string().c_str()));
+		STAT( _f("Scanning '%s'.\n", filespec.string().c_str()));
 											//...or its parent if VIDEO_TS folder
 
-        string comp = filespec.filename().generic_string();
+        string comp = filespec.filename().string();
 
         if (  toUpper(comp) !=  "VIDEO_TS" )
         {
@@ -386,7 +386,7 @@ uint16_t addFiles( fs::path filespec )
 
 //        for(auto& p: fs::directory_iterator(dir))
 //        {
-//            if (p.path().filename().generic_string() == "VIDEO_TS")
+//            if (p.path().filename().string() == "VIDEO_TS")
 //            {
 //                has_vts_subdir = true;
 //                break;
@@ -399,7 +399,7 @@ uint16_t addFiles( fs::path filespec )
             if( ! job.extractTo.empty())
 				job.outPath = job.extractTo;
 
-            dvd.open( filespec.generic_string().c_str() );
+            dvd.open( filespec.string().c_str() );
 			job.tv = dvd.tv;
 			clearbits( job.params, jobMode );
 #ifdef dvdread_udflist
@@ -421,8 +421,8 @@ uint16_t addFiles( fs::path filespec )
 	{
 		if( Lfiles.size() == 0 )
 		{
-            dirs.push_back( filespec.parent_path().generic_string() );
-			if( job.inPath.generic_string() == "" )
+            dirs.push_back( filespec.parent_path().string() );
+			if( job.inPath.string() == "" )
                 job.inPath = filespec.parent_path();
 		}
 				
@@ -431,12 +431,12 @@ uint16_t addFiles( fs::path filespec )
         cerr << "filespec.GetFullPath(): " << filespec << endl;
         
         //check if it's an image file
-        if( dvd.open( filespec.generic_string().c_str(), false ) )
+        if( dvd.open( filespec.string().c_str(), false ) )
 		{
             specPath = specPath / filespec.stem();
 			job.media = imagefile;
 			job.inPath = filespec;
-            job.name = filespec.stem().generic_string();
+            job.name = filespec.stem().string();
 			job.tv = dvd.tv;
 			clearbits( job.params, jobMode );
 #ifndef dvdread_udflist
@@ -463,20 +463,20 @@ uint16_t addFiles( fs::path filespec )
 #endif											//else not found.
 	else
 	{
-        FATAL( "Can't find '" + filespec.generic_string() + "'." );
+        FATAL( "Can't find '" + filespec.string() + "'." );
 	}
 
 											//if unauthoring, change spec to find any info files
 	if( job.params & unauth )
 	{
-        setName( specPath.generic_string().c_str() );
+        setName( specPath.string().c_str() );
 		if( job.media & imagefile )
 			return 0;
 	}
 											//if authoring, check if project
 	else
 	{
-        string comp = toUpper(Right(filespec.generic_string(), 6));
+        string comp = toUpper(Right(filespec.string(), 6));
 
         if( projectFile &&  comp ==  ".LPLEX")
 		{
@@ -489,7 +489,7 @@ uint16_t addFiles( fs::path filespec )
 		else
 			projectFile = false;
 
-        comp = toUpper(Right(filespec.generic_string(), 4));
+        comp = toUpper(Right(filespec.string(), 4));
         if( comp  ==  ".LGZ" )
 		{
 			if( Lfiles.size() == 0 )
@@ -497,7 +497,7 @@ uint16_t addFiles( fs::path filespec )
 #ifdef lgzip_support
 				job.params |= ( auth | gzip );
 				job.name = filespec.stem();
-				gzFile = filespec.generic_string();
+				gzFile = filespec.string();
                 job.outPath = job.inPath.parent_path();
 				job.isoPath = job.outPath;
 //            job.projectPath = filespec;
@@ -511,16 +511,16 @@ uint16_t addFiles( fs::path filespec )
 		if( ! ( job.now & isNamed ) )
 		{
 			if( projectFile || isDot )
-                setName( filespec.generic_string().c_str(), isDot ? true : false );
+                setName( filespec.string().c_str(), isDot ? true : false );
 												//or if reauthoring
 //			else
-//                reauthoring = setName( specPath.generic_string().c_str() );
+//                reauthoring = setName( specPath.string().c_str() );
 		}
 
 		if( projectFile )
 		{
 			projectFile = false;
-            getOpts( filespec.generic_string().c_str() );
+            getOpts( filespec.string().c_str() );
 			return 1;
 		}
 	}
@@ -529,8 +529,8 @@ uint16_t addFiles( fs::path filespec )
     cerr << "specPath=" << (specPath /*= "/home/fab/Dev/dvda-author/Docs/ex/"*/) << endl;
     cerr << "filespec=" << (filespec /*= "/home/fab/Dev/dvda-author/Docs/ex/a2_16_48.wav"*/) << endl;
     //throw;
-    const string& curPath = selector.setRoot( specPath.generic_string().c_str(), job.params & unauth ? 0 : reauthoring ? 0 : 1 );
-    selector.Traverse(fs::absolute(filespec).generic_string().substr( specPath.generic_string().length()));
+    const string& curPath = selector.setRoot( specPath.string().c_str(), job.params & unauth ? 0 : reauthoring ? 0 : 1 );
+    selector.Traverse(fs::absolute(filespec).string().substr( specPath.string().length()));
 	selector.processFiles();
     //chdir(curPath.c_str());
 
@@ -603,7 +603,7 @@ uint16_t setName( const char *namePath, bool isDir )
 	fs::path fName( namePath );
     if (! fs::exists(fName))
     {
-        ERR("Path " + fName.generic_string() + " does not exist.")
+        ERR("Path " + fName.string() + " does not exist.")
         throw;
     }
 											//if as yet unspecified, resolve
@@ -612,9 +612,9 @@ uint16_t setName( const char *namePath, bool isDir )
 											//target name...
         if( ! job.projectPath.empty() &&
             job.projectPath != projectDotLplex )
-                job.name = job.projectPath.stem().generic_string();
+                job.name = job.projectPath.stem().string();
         if( job.name.empty())
-            job.name = fName.filename().generic_string();
+            job.name = fName.filename().string();
         if( job.name.empty())
 			job.name = volumeLabel( namePath, true );
         if( job.name.empty())
@@ -681,7 +681,7 @@ uint16_t setName( const char *namePath, bool isDir )
 
 void setJobTargets()
 {
-	if( job.projectPath.generic_string() == "" )
+	if( job.projectPath.string() == "" )
 		job.projectPath = ( ( edit & dot ) || editing ) && job.outPath != readOnlyPath ?
             job.inPath / (job.name + ".lplex") :
 			projectDotLplex;
@@ -766,7 +766,7 @@ int validatePath( const fs::path& path )
 {
 	if( ! fs_validPath( path )  )
 	{
-        ERR( _f( "Invalid path '%s'.\n", path.generic_string().c_str() ) );
+        ERR( _f( "Invalid path '%s'.\n", path.string().c_str() ) );
 		return 0;
 	}
 	return 1;
@@ -815,7 +815,7 @@ void splitPaths()
 
 	for( int i=0; i < Lfiles.size(); i++ )
 	{
-		string dir = Lfiles[i].fName.generic_string();
+		string dir = Lfiles[i].fName.string();
 		for( int j=0; j < dirs.size(); j++ )
 		{
 			if( isSubStr( dirs[j], dir ) )
@@ -850,9 +850,9 @@ string  lFileTraverser::setRoot( const char *rootPath, int fromParent )
     const fs::path&  curPath = fs::current_path();
     chdir(rootPath);
     cerr << "changing dir from " << curPath << " to " << fs::current_path()<<  endl;
-    root = rootDir.generic_string().length();
-	dirs.push_back( rootDir.generic_string() );
-    return curPath.generic_string();
+    root = rootDir.string().length();
+	dirs.push_back( rootDir.string() );
+    return curPath.string();
 }
 
 
@@ -899,20 +899,20 @@ void lFileTraverser::Traverse(const string &path)
        
        if (fs::is_directory(p))
        {
-          res = OnDir(p.path().generic_string());   
+          res = OnDir(p.path().string());   
        }
        else
        if (fs::is_regular_file(p))
        {
-         OnFile(p.path().generic_string());
-         cerr << "Traversing " << _path << ". Adding: " << p.path().generic_string() << endl;
+         OnFile(p.path().string());
+         cerr << "Traversing " << _path << ". Adding: " << p.path().string() << endl;
          continue;
        }
        
        if (res == DIR_IGNORE) continue;
        else
        if (res == DIR_CONTINUE)
-           Traverse(p.path().generic_string());
+           Traverse(p.path().string());
     }
    
 }
@@ -940,11 +940,11 @@ void lFileTraverser::processFiles()
 	{
 		string& filename = filenames[i];
 		lFile.fName = filename;
-        cerr << "Auditing file "<< filename << " with extension " << lFile.fName.extension().generic_string().c_str() << endl;
+        cerr << "Auditing file "<< filename << " with extension " << lFile.fName.extension().string().c_str() << endl;
 		bool ok = true;
 
 		LOG(filename << "\n");
-        if( ( lFile.format = isLfile( lFile.fName.extension().generic_string().c_str() ) )
+        if( ( lFile.format = isLfile( lFile.fName.extension().string().c_str() ) )
 			&& ( lFile.format == wavef || lFile.format == flacf ) )
 		{
 			lFile.group = job.group;
@@ -956,11 +956,11 @@ void lFileTraverser::processFiles()
 
 			if( lFile.format == wavef )
             {
-                ok = waveHeader::audit( lFile.fName.generic_string().c_str(), &lFile.fmeta );
+                ok = waveHeader::audit( lFile.fName.string().c_str(), &lFile.fmeta );
                 cerr << "Found wav file: " << (ok ? "OK" : "ERR") << endl;
             }
 			else if( lFile.format == flacf )
-                ok = flacHeader::audit( lFile.fName.generic_string().c_str(), &lFile.fmeta );
+                ok = flacHeader::audit( lFile.fName.string().c_str(), &lFile.fmeta );
 
 			if( ! ok )
 				err |= invalid;
@@ -1422,7 +1422,7 @@ uint16_t setopt( uint16_t opt, const char *optarg )
             if (fs::is_directory(job.outPath))
             {
               fs::path parent = job.outPath.parent_path();
-              job.name = job.outPath.generic_string().substr(parent.generic_string().length() + 1);
+              job.name = job.outPath.string().substr(parent.string().length() + 1);
               job.outPath = parent;
               cerr << "[MSG] job.outPath: " << job.outPath << endl;
               cerr << "[MSG] job.name: " << job.name << endl;
@@ -1627,7 +1627,7 @@ uint16_t setopt( uint16_t opt, const char *optarg )
 		case 'E':
 			if( ! stricmp( optarg, "adjacent" ) ) break;
 			ok = validatePath( optarg );
-            job.extractTo = fs::path(optarg);
+            job.extractTo = optarg;
 			break;
 
 		case 'D':
@@ -1773,12 +1773,12 @@ bool saveOpts( dvdLayout *layout )
 	if( generating = ! editing )
 	{
 		editing = absolute;
-        projectFile = projectDotLplex.generic_string();
+        projectFile = projectDotLplex.string();
 	}
 	else
 	{
 		if( job.projectPath == projectDotLplex ) editing = absolute;
-		projectFile = job.projectPath.generic_string();
+		projectFile = job.projectPath.string();
 	}
 
 	ofstream optFile;
@@ -1825,7 +1825,7 @@ bool saveOpts( dvdLayout *layout )
 		"# Settings:\n\n";
 
 	if( job.params & redirect && editing == absolute ) dotLplex <<
-        "--dir="         << QUOTE( (job.outPath.parent_path() /  job.name).generic_string() ) << endl; // -d
+        "--dir="         << QUOTE( (job.outPath.parent_path() /  job.name).string() ) << endl; // -d
 	else dotLplex <<
 		"--name="        << QUOTE( job.name ) << endl; // -n
 
@@ -1846,16 +1846,16 @@ bool saveOpts( dvdLayout *layout )
 
 	if( jpegs.size() == 1 ) dotLplex <<
 		"--jpeg="        << ( alias( jpegs[0].fName ) ?
-			jpegs[0].fName.generic_string() : QUOTE( jpegs[0].fName.generic_string() ) ) << endl; // -j
+			jpegs[0].fName.string() : QUOTE( jpegs[0].fName.string() ) ) << endl; // -j
 
 	if( editing == absolute )
 	{
 		dotLplex <<
 		"--video="       << ( job.tv == NTSC ? "ntsc" : "pal" ) << endl << // -t
-//      "--jpeg="        << QUOTE( job.jpeg.generic_string() ) << endl << // -j
-        "--dvdpath="     << QUOTE( job.dvdPath.parent_path().generic_string() ) << endl << // -p
-        "--workpath="    << QUOTE(  job.tempPath.parent_path().generic_string()  ) << endl << // -w
-        "--isopath="     << QUOTE( job.isoPath.parent_path().generic_string() ) << endl; // -a
+//      "--jpeg="        << QUOTE( job.jpeg.string() ) << endl << // -j
+        "--dvdpath="     << QUOTE( job.dvdPath.parent_path().string() ) << endl << // -p
+        "--workpath="    << QUOTE(  job.tempPath.parent_path().string()  ) << endl << // -w
+        "--isopath="     << QUOTE( job.isoPath.parent_path().string() ) << endl; // -a
 //      "--extractPath=" << QUOTE( job.extractPath.parent_path() ) << endl << // -e
 	}
 
@@ -1881,7 +1881,7 @@ bool saveOpts( dvdLayout *layout )
 				fs::path fName( menuPath );
                 //fName.MakeRelativeTo( job.projectPath.parent_path() );
                 fName = fs::canonical(fName);
-				menuPath = fName.generic_string();
+				menuPath = fName.string();
 			}
 			dotLplex << "\n--menu" << ( menuForce ? "force=" : "=" ) << QUOTE( menuPath.c_str() ) << "\n";
 
@@ -1894,7 +1894,7 @@ bool saveOpts( dvdLayout *layout )
 						fs::path fName( menufiles[i] );
                         //fName.MakeRelativeTo( job.projectPath.parent_path() );
                         fName = fs::canonical(fName);
-						menufiles[i] = fName.generic_string();
+						menufiles[i] = fName.string();
 					}
 					dotLplex << "# " << QUOTE( menufiles[i].c_str() ) << "\n";
 				}
@@ -1933,8 +1933,8 @@ bool saveOpts( dvdLayout *layout )
 				jpgIndex = lFile->jpgIndex;
 				dotLplex << ( jpegs[ jpgIndex ].ar == dvdJpeg::_16x9 ? "jpgw=" : "jpg=" )
 					<< ( alias( jpegs[ jpgIndex ].fName ) ?
-						jpegs[ jpgIndex ].fName.generic_string() :
-						QUOTE( jpegs[ jpgIndex ].fName.generic_string() ) );
+						jpegs[ jpgIndex ].fName.string() :
+						QUOTE( jpegs[ jpgIndex ].fName.string() ) );
 				dotLplex << endl;
 			}
 
@@ -1944,10 +1944,10 @@ bool saveOpts( dvdLayout *layout )
                  lFile->fName == fs::absolute(lFile->fName);
             }
 
-			dotLplex << QUOTE( lFile->fName.generic_string() );
+			dotLplex << QUOTE( lFile->fName.string() );
 			if( edit & editVerbose )
 			{
-				for( int s=lFile->fName.generic_string().length(); s < 50; s++ )
+				for( int s=lFile->fName.string().length(); s < 50; s++ )
 					dotLplex << ' ';
 				dotLplex << _f("   # %4d MB %7s",
 					(uint32_t) (dvdUtil::sizeOnDvd( lFile, job.tv == NTSC ) / MEGABYTE),
@@ -1968,7 +1968,7 @@ bool saveOpts( dvdLayout *layout )
 				fs::path fName( infofiles[i].fName );
                 //fName = fs::relative(fName, job.projectPath.parent_path());
                 fName = fs::canonical(fName);  // pas de relative
-				infofiles[i].fName = fName.generic_string();
+				infofiles[i].fName = fName.string();
 			}
 			if( infofiles[i].reject )
 				continue;

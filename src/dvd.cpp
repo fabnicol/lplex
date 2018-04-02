@@ -460,7 +460,7 @@ int lpcm_video_ts::open( const char * VIDEO_TS, bool fatal )
 	tv = TVformat( ifo );
 	fName = VIDEO_TS;
 
-    label = fName.stem().generic_string();
+    label = fName.stem().string();
 	if( label == "" || label == "VIDEO_TS" )
 		label = volumeLabel( VIDEO_TS, true );
 
@@ -830,7 +830,7 @@ lpcmWriter* lpcmPGextractor::getWriter( int writeIndex, int context )
 
 
 				if( editing )
-                    lFile->writer->fName = lFile->writer->fName.generic_string() +
+                    lFile->writer->fName = lFile->writer->fName.string() +
 						((char*[]){ ".wav", ".flac ", ".lpcm" }) [ lFile->format-1 ];
 				else
 					lFile->writer->open();
@@ -843,7 +843,7 @@ lpcmWriter* lpcmPGextractor::getWriter( int writeIndex, int context )
 			txt = "Continuing ";
 
 		ECHO( "\n" );
-        STAT( txt << lFile->fName.generic_string().substr( lFile->root ) << endl );
+        STAT( txt << lFile->fName.string().substr( lFile->root ) << endl );
 
 		if( state & lplexAuthored )
 		{
@@ -853,7 +853,7 @@ lpcmWriter* lpcmPGextractor::getWriter( int writeIndex, int context )
 
 		SCRN( "\n" );
         SCRN( string(STAT_TAG) + txt)
-        SCRN(TINT( lFile->writer->fName.filename().generic_string().c_str() ))
+        SCRN(TINT( lFile->writer->fName.filename().string().c_str() ))
         SCRN( "... " )
 
 		lastIndex = audioCells[writeIndex].xIndex;
@@ -1184,9 +1184,9 @@ void lpcmPGextractor::udfCopyInfoFiles( const char * path )
 	if( ! infofiles->size() )
 		return;
 
-    outPath = ( path ? path : (const char*)job->extractPath.generic_string() );
+    outPath = ( path ? path : (const char*)job->extractPath.string() );
 
-    img.open( job->inPath.generic_string(), ios::binary | ios::in );
+    img.open( job->inPath.string(), ios::binary | ios::in );
 	if( ! img )
 	{
 		ERR( "Could not open image file.\n" );

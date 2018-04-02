@@ -54,10 +54,10 @@ int dvdLayout::readerNext()
 	}
 
 	if( lFile->format == wavef )
-        reader = new waveReader( lFile->fName.generic_string(), bigBlock,
+        reader = new waveReader( lFile->fName.string(), bigBlock,
 			sizeof( bigBlock ), dvdSampleSeam );
 	else if( lFile->format == flacf )
-        reader = new flacReader( lFile->fName.generic_string(), bigBlock,
+        reader = new flacReader( lFile->fName.string(), bigBlock,
 			sizeof( bigBlock ), dvdSampleSeam );
 
 	if( ! reader )
@@ -405,7 +405,7 @@ int dvdLayout::checkSpace()
             LOG( _f( " -editing %s\n", lplexConfig.filename().c_str() ) );
 			LOG( " -or using the -w, -a, and -p command line options.\n" );
             if( job->projectPath != projectDotLplex )
-                LOG( _f( " -or editing %s\n", job->projectPath.generic_string().c_str() ) );
+                LOG( _f( " -or editing %s\n", job->projectPath.string().c_str() ) );
 		}
 
 		ECHO( endl << endl );
@@ -599,7 +599,7 @@ int dvdLayout::configure()
 			lFile->jpgIndex );
 
 // 		LOG( lFile->details << " : " <<
-//             ( editing ? lFile->fName.generic_string() : lFile->fName.filename() ) << endl );
+//             ( editing ? lFile->fName.string() : lFile->fName.filename() ) << endl );
 
 		if( lFile->type & lpcmFile::titleEnd )
 		{
@@ -630,7 +630,7 @@ int dvdLayout::configure()
 			jpegs[i].rescale ? "rescaled to " : "",
 			( job->tv == NTSC ? "NTSC " : "PAL " ), jpegs[i].sizeStr(),
 			jpegs[i].aspStr(),
-            jpegs[i].fName.generic_string().c_str() ) );
+            jpegs[i].fName.string().c_str() ) );
 	}
 	ECHO( "\n\n" );
 
@@ -675,7 +675,7 @@ int dvdLayout::getNext()
 		clearbits( job->now, appending );
 
 	if( writeFile->type & lpcmFile::seqStart )
-        nameNow = _f( "%s/%s_title_%02d-%02d", job->tempPath.generic_string().c_str(),
+        nameNow = _f( "%s/%s_title_%02d-%02d", job->tempPath.string().c_str(),
             job->name.c_str(), writeFile->group + 1, writeFile->index );
 
 	if( writeFile->type & lpcmFile::titleStart )
@@ -691,7 +691,7 @@ int dvdLayout::getNext()
 
 	string txt;
 
-    txt = writeFile->fName.filename().generic_string();
+    txt = writeFile->fName.filename().string();
 	INFO( "Processing " << txt << "\n" );
 	INFO( lpcmEntity::audioInfo( writeFile ) << " : formatting audio...\n" );
     SCRN( TINT( txt.c_str() ) )

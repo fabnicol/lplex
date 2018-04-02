@@ -306,11 +306,11 @@ uint16_t rawWriter::open()
 	if( rawFile.is_open() )
 		rawFile.close();
 
-    fName = fName.generic_string() + ".lpcm";
-    rawFile.open( fName.generic_string(), ios::binary );
+    fName = fName.string() + ".lpcm";
+    rawFile.open( fName.string(), ios::binary );
 
 	if( ! rawFile.is_open() )
-        FATAL( "Can't open output file " + fName.generic_string() );
+        FATAL( "Can't open output file " + fName.string() );
 
 	md5_init( &md5 );
 	md5_init( &md5raw );
@@ -425,11 +425,11 @@ uint16_t waveWriter::open()
 	if( waveFile.is_open() )
 		waveFile.close();
 
-    fName = fName.generic_string() + ".wav";
-    waveFile.open( fName.generic_string(), ios::binary );
+    fName = fName.string() + ".wav";
+    waveFile.open( fName.string(), ios::binary );
 
 	if( ! waveFile.is_open() )
-        FATAL( "Can't open output file " + fName.generic_string() );
+        FATAL( "Can't open output file " + fName.string() );
 
 	waveHeader::tag( waveFile, &fmeta );
 	md5_init( &md5 );
@@ -539,10 +539,10 @@ uint16_t flacWriter::open()
 	interSamp = fmeta.data.stream_info.channels *
 		fmeta.data.stream_info.bits_per_sample / 8;
 
-    fName = fName.generic_string() + ".flac";
+    fName = fName.string() + ".flac";
 
 #if !defined(FLAC_API_VERSION_CURRENT) || FLAC_API_VERSION_CURRENT <= 7
-    set_filename( fName.generic_string() );
+    set_filename( fName.string() );
 #endif
 	set_channels( fmeta.data.stream_info.channels );
 	set_bits_per_sample( fmeta.data.stream_info.bits_per_sample );
@@ -593,7 +593,7 @@ uint16_t flacWriter::open()
 #if !defined(FLAC_API_VERSION_CURRENT) || FLAC_API_VERSION_CURRENT <= 7
 	if( ( err = init() ) != FLAC__FILE_ENCODER_OK )
 #else // flac 1.1.3+
-    if( ( err = init( fName.generic_string() ) ) != FLAC__STREAM_ENCODER_INIT_STATUS_OK )
+    if( ( err = init( fName.string() ) ) != FLAC__STREAM_ENCODER_INIT_STATUS_OK )
 #endif
 	{
 		showState( err, "initialization" );
@@ -698,10 +698,10 @@ uint16_t flacWriter::md5Report()
 	if( ! isOpen() )
 		return false;
 
-    ifstream flacFile( fName.generic_string(), ios::binary );
+    ifstream flacFile( fName.string(), ios::binary );
 	if( ! flacFile.is_open() )
 	{
-        ERR( "Can't open input file \'" + fName.generic_string() + "\'\n" );
+        ERR( "Can't open input file \'" + fName.string() + "\'\n" );
 		return 1;
 	}
 	flacFile.seekg( 0 );

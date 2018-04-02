@@ -36,7 +36,7 @@ using namespace std;
 
 string fs_GetTempDir()
 {
-    string temp = (fs::temp_directory_path() / "dummy").generic_string();
+    string temp = (fs::temp_directory_path() / "dummy").string();
     remove(temp.c_str());
     return temp;
 }
@@ -108,7 +108,7 @@ size_t fs_GetAllDirs( const string& dirName, vector<string>& dirs )
 	 {
         if (fs::is_directory(p.path()))
 		{
-            dirs.emplace_back(p.path().generic_string());
+            dirs.emplace_back(p.path().string());
 		    ++n;
 		}
 	 }

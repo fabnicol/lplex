@@ -120,7 +120,7 @@ struct dvdJpeg
 
 	enum { _4x3, _16x9 };
 	dvdJpeg(int asprat=_4x3) : rescale(0), ar(asprat) {}
-	string getName() { return rescale ? tName.generic_string() : fName.generic_string(); }
+	string getName() { return rescale ? tName.string() : fName.string(); }
 	int getDim() { return dim + ( rescale ? ( dim < 4 ? 4 : -4 ) : 0 ); }
 
 	const char *sizeStr( bool outputSize = true )
