@@ -696,10 +696,7 @@ int dvdLayout::getNext()
 	INFO( lpcmEntity::audioInfo( writeFile ) << " : formatting audio...\n" );
     SCRN( TINT( txt.c_str() ) )
 	BLIP( " ...formatting audio " );
-    //nameNow = string("/home/fab/temp/out/out_title_01-00");
-    
-    cerr << "nameNow=" << nameNow << endl;
-    
+        
 	out.open( nameNow + ".lpcm", job->now & appending ?
 		( writeFile->type & lpcmFile::titleStart ?
 			ios::binary : ios::binary | ios::app ) :
@@ -848,7 +845,7 @@ int dvdauthorXml::write( xmlContext context, const string& str, int flag )
             xml.open(str, ofstream::out | ofstream::app);
 
 			if (! xml.is_open ())
-                cerr << "Could not open xml" << endl;
+                cerr << "[ERR] Could not open xml" << endl;
 			break;
 
 		case setDest:

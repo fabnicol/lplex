@@ -141,7 +141,7 @@ inline bool initPlatform()
     fs::path appdata = fs::path(getenv("APPDATA"));
 #else
     fs::path home = fs::path(getenv(HOME));
-    fs::path appdata = home / ".local";
+    fs::path appdata = home / "lplex";
 #endif
 
     configDir = appdata / string("lplex");

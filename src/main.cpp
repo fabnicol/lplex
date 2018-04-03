@@ -252,16 +252,14 @@ uint16_t init( int argc, char *argv[] )
 #endif
 #endif
 
-	string arg;
 											// check config file
 
     ofstream configFile;
 	optSrc = lplexConfig.filename().c_str();
 	optContext = inif;
 	optindl = -1;
-
 											// ...write a default config file if none exists
-    if( ! fs::exists(lplexConfig.string() ) )
+    if( ! fs::exists(lplexConfig) )
 	{
 
         configFile.open(lplexConfig.string());
@@ -526,13 +524,9 @@ uint16_t addFiles( fs::path filespec )
 	}
 											//go through and select matching files
     
-    cerr << "specPath=" << (specPath /*= "/home/fab/Dev/dvda-author/Docs/ex/"*/) << endl;
-    cerr << "filespec=" << (filespec /*= "/home/fab/Dev/dvda-author/Docs/ex/a2_16_48.wav"*/) << endl;
-    //throw;
-    const string& curPath = selector.setRoot( specPath.string().c_str(), job.params & unauth ? 0 : reauthoring ? 0 : 1 );
+        
     selector.Traverse(fs::absolute(filespec).string().substr( specPath.string().length()));
 	selector.processFiles();
-    //chdir(curPath.c_str());
 
 	if( selector.err & lFileTraverser::mismatchA )
 	{
@@ -694,10 +688,12 @@ void setJobTargets()
 	if( ! ( job.params & gzip ) )
         job.outPath = job.outPath / job.name;
     job.tempPath = job.tempPath / job.name;
-    fs::remove_all(job.outPath);
-    fs::remove_all(job.tempPath);
+        
+    if (fs::exists(job.outPath)) fs::remove_all(job.outPath);
+    if (fs::exists(job.tempPath))fs::remove_all(job.tempPath);
     fs_MakeDirs(job.outPath);
     fs_MakeDirs(job.tempPath);
+ 
 }
 
 
@@ -849,7 +845,7 @@ string  lFileTraverser::setRoot( const char *rootPath, int fromParent )
         rootDir = rootDir.parent_path();
     const fs::path&  curPath = fs::current_path();
     chdir(rootPath);
-    cerr << "changing dir from " << curPath << " to " << fs::current_path()<<  endl;
+
     root = rootDir.string().length();
 	dirs.push_back( rootDir.string() );
     return curPath.string();
@@ -882,15 +878,11 @@ void lFileTraverser::Traverse(const string &path)
          }
          else return;
     }
-    
-    cerr << "curpath: " << fs::current_path() << " path: " << _path << endl;
-    cerr << fs::current_path() / _path <<endl;
-            
-            
+                            
     if (fs::is_regular_file(_path))
     {
       OnFile(_path);
-      cerr << "Adding " << _path << endl;
+      cerr << "[INF] Adding " << _path << endl;
     }
     else
     for (auto &p:  fs::directory_iterator(_path))
@@ -905,7 +897,6 @@ void lFileTraverser::Traverse(const string &path)
        if (fs::is_regular_file(p))
        {
          OnFile(p.path().string());
-         cerr << "Traversing " << _path << ". Adding: " << p.path().string() << endl;
          continue;
        }
        
@@ -940,7 +931,7 @@ void lFileTraverser::processFiles()
 	{
 		string& filename = filenames[i];
 		lFile.fName = filename;
-        cerr << "Auditing file "<< filename << " with extension " << lFile.fName.extension().string().c_str() << endl;
+        
 		bool ok = true;
 
 		LOG(filename << "\n");
@@ -1409,7 +1400,6 @@ uint16_t setopt( uint16_t opt, const char *optarg )
 
 		case 'd':
 			
-            cerr << "[MSG] optarg: " << optarg << endl; 
             job.outPath = fs::path(optarg);
             
             if (! fs::is_directory(job.outPath))
@@ -1424,8 +1414,6 @@ uint16_t setopt( uint16_t opt, const char *optarg )
               fs::path parent = job.outPath.parent_path();
               job.name = job.outPath.string().substr(parent.string().length() + 1);
               job.outPath = parent;
-              cerr << "[MSG] job.outPath: " << job.outPath << endl;
-              cerr << "[MSG] job.name: " << job.name << endl;
             }
             else
             {

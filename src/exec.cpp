@@ -68,15 +68,17 @@ int run(const char* application, const vector<const char*>&  Args, const int opt
 {
 errno=0;
 
-const char* const* args =  Args.data();
+auto _Args = Args;
+_Args.insert(_Args.begin(), fs::path(application).filename().string().c_str());
+_Args.insert(_Args.end(), NULL);
 
-#if ! defined (__WIN32__)  && ! defined(__WIN64) && ! defined(__w64)
+const char* const* args =  _Args.data();
+
+//#if ! defined (__WIN32__)  && ! defined(__WIN64) && ! defined(__w64)
+#ifdef __linux__
     int pid;
     int tube[2];
     char c;
-
-    char mesg[strlen(application)+1+7];
-    memset(mesg, '0', sizeof(mesg));
 
     if (pipe(tube))
     {
@@ -87,14 +89,14 @@ const char* const* args =  Args.data();
     switch (pid = fork())
     {
         case -1:
-            std::cerr << "[ERR] Could not launch " << application <<endl;
+            cerr << "[ERR] Could not launch " << application <<endl;
             break;
         case 0:
             close(tube[0]);
             dup2(tube[1], STDERR_FILENO);
             execv(application, (char* const*) args);
-            std::cerr << "[ERR] Runtime failure in " <<  application << " child process" << endl;
-    
+            cerr << "[ERR] Runtime failure in " <<  application << " child process" << endl;
+            
             return errno;
     
         default:
@@ -162,8 +164,19 @@ char c;
 int tube[2];
 int tubeerr[2];
 int tubeerr2[2];
-const char* const* args =  Args.data();
-const char* const* args2 =  Args2.data();
+
+// execv conventions
+
+auto _Args = Args;
+auto _Args2 = Args2;
+_Args.insert(_Args.begin(), fs::path(application).filename().string().c_str());
+_Args.insert(_Args.end(), nullptr);
+
+_Args2.insert(_Args2.begin(), fs::path(application2).filename().string().c_str());
+_Args2.insert(_Args2.end(), nullptr);
+        
+const char* const* args =  _Args.data();
+const char* const* args2 = _Args2.data();
 
 // Two extra tubes are in order to redirect jpeg2yuv and mpeg2enc stdout messages and realign them with overall stdout messages, otherwise they fall out of sync
 // with one another and dvda-author messages.
@@ -195,7 +208,7 @@ case 0:
     dup2(tubeerr[1], STDERR_FILENO);
     execv(application, (char* const*) args);
     cerr << "[ERR] Runtime failure in jpeg2yuv child process" << endl;
-    
+   
     return errno;
 
 
@@ -238,6 +251,7 @@ default:
     }
     close(tube[0]);
 }
+return errno;
 #endif
 }
 
@@ -298,8 +312,8 @@ long execute( const string& application,  const vector<const char*>& args,
          for(const auto& s: args2)  cerr << s << " ";
     }
      
-   // run(application.c_str(), args, application2.c_str(), args2, 0);
-	run(application.c_str(), args,0);
+    run(application.c_str(), args, application2.c_str(), args2, 0);
+
 	return errno;
 }
 

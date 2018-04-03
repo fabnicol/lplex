@@ -87,7 +87,10 @@ int author( dvdLayout &layout )
     }
     
     if ( ! fs::exists( job.tempPath ) )
+    {
         fs_MakeDirs( job.tempPath );
+        job.name;
+    }
 
     if (job.outPath.empty())
     {
@@ -171,7 +174,7 @@ int author( dvdLayout &layout )
 			job.now & appending,
             ! ( Lfiles[i].trim.type & jobs::continuous ),
             ! ( Lfiles[i].trim.type & jobs::continuous ) );
-
+        
         xml.write(dvdauthorXml::open, xml.name);
 		xml.write( dvdauthorXml::addChapter, job.now & appending ?
 			dvdauthorXml::timestampFractional( vFrames, job.tv == NTSC, .001 ) : "0" );
@@ -195,19 +198,25 @@ int author( dvdLayout &layout )
 
 		_progress.max = vFrames;
         
+        string o1 = layout.nameNow + string(".mpg");
+        string o2 = layout.nameNow + string(".m2v");
+        string o3 = layout.nameNow + string(".lpcm");
+        string Larg = _f( "%d:%d:%d",
+                          Lfiles[i].fmeta.data.stream_info.sample_rate,
+                          Lfiles[i].fmeta.data.stream_info.channels,
+                          Lfiles[i].fmeta.data.stream_info.bits_per_sample) ;
+        
+             
         const vector<const char*>&  cmdline =  
                  {"-f",
                   "8",
-                  job.mplexArg.c_str(),
+                  //job.mplexArg.c_str(),
  				  "-L",
-                  _f( "%d:%d:%d ",
-					Lfiles[i].fmeta.data.stream_info.sample_rate,
-					Lfiles[i].fmeta.data.stream_info.channels,
-					Lfiles[i].fmeta.data.stream_info.bits_per_sample ).c_str(),
+                  Larg.c_str(),
 				  "-o",
-                  (layout.nameNow + ".mpg" ).c_str(),
-				  (layout.nameNow + ".m2v" ).c_str(),
-                  (layout.nameNow + ".lpcm").c_str()
+                  o1.c_str(),
+                  o2.c_str(),
+                  o3.c_str()
                  };
         
         cerr << "[MSG] Now launching: \n\n";
@@ -216,8 +225,17 @@ int author( dvdLayout &layout )
 
 		if( execute(
                     (binDir / "mplex").string(),
-                    cmdline,
-            _verbose))
+                    {"-f",
+                     "8",
+                   // job.mplexArg.c_str(),
+                     "-L",
+                     Larg.c_str(),
+                     "-o",
+                     o1.c_str(),
+                     o2.c_str(),
+                     o3.c_str()
+                    },
+                    _verbose))
         {
 			FATAL( "mplex failed. See lplex.log for details.\n" );
         }

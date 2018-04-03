@@ -95,9 +95,7 @@ ofstream* m2v( uint32_t vFrames, const char *jpeg, const char *m2vName,
 
 	_progress.max = 2 * framesPerGOP + endFrames;
             
-
-    const char* fpgop = to_string(framesPerGOP).c_str();    
-    
+            
 	if( execute((binDir / "jpeg2yuv").string(),
                         {"-v",
                          "1",
@@ -109,9 +107,9 @@ ofstream* m2v( uint32_t vFrames, const char *jpeg, const char *m2vName,
                          _f("%d", 2 * framesPerGOP + endFrames).c_str(),
                          "-j",
                          jpeg,
-                         "|",
-                        (binDir / "mpeg2enc").string().c_str(), 
-                         "-v",
+                         },
+                        (binDir / "mpeg2enc").string(), 
+                        {"-v",
                          "1",
                          "-b",
                          "3800",
@@ -124,9 +122,9 @@ ofstream* m2v( uint32_t vFrames, const char *jpeg, const char *m2vName,
                          "-a",
                          (ws ? "3" : "2" ),        // 1=1:1, 2=4:3, 3=16:9, 4=2.21:1
                          "-G",
-                         fpgop,
+                         to_string(framesPerGOP).c_str(),
                          "-g",
-                         fpgop, 
+                         to_string(framesPerGOP).c_str(), 
                          "-o",
                          (m2vPath / "mini.m2v").string().c_str()
                         },          
@@ -196,7 +194,6 @@ ofstream* m2v( uint32_t vFrames, const char *jpeg, const char *m2vName,
 	fph = fps * 3600;
 	uint8_t *midGOP = bigBlock + GOP[1];
 #endif
-cerr << "Writing to m2vFile" << endl;
 
 	if( userData && sizeofUData )
 	{
@@ -210,7 +207,6 @@ cerr << "Writing to m2vFile" << endl;
 	else
 		m2vFile.write( (char*)bigBlock, seq[1] );
 
-    cerr << "End of m2vFile processing 1" << endl; 
 	INFO( _f( "-expanding mini m2v (%d GOP=%d+%d+%d=%df) to %d GOP=%d+%dx%d+%d=%d frames\n",
 		endFrames ? 3 : 2, framesPerGOP, framesPerGOP, endFrames, 2 * framesPerGOP + endFrames,
 		GOPct, framesPerGOP, GOPct - (( vFrames % framesPerGOP ) ? 2 : 1 ),
@@ -257,7 +253,7 @@ cerr << "Writing to m2vFile" << endl;
 	}
 	else
 		m2vFile.seekp( uDataPos, ios::beg );
-        cerr << "End of m2vFile processing 2" << endl; 
+
 	return &m2vFile;
 
 }
@@ -612,8 +608,6 @@ uint32_t roughGOP( dvdJpeg &jpegfile, const char *m2vName, bool ntsc )
 	string jpeg = jpegfile.getName();
 	uint16_t testFrames = 7, framesPerGOP = ntsc ? 18 : 15;
 	uint32_t IPPPPPP;
-
-    const char* fpgop  = to_string(framesPerGOP).c_str();
     
 	if( execute(
         (binDir / "jpeg2yuv").string(),  // app1 name
@@ -644,9 +638,9 @@ uint32_t roughGOP( dvdJpeg &jpegfile, const char *m2vName, bool ntsc )
               "-n",    
 			  (ntsc ? "n" : "p" ),
               "-G",   
-			  fpgop, 
+			  ntsc ? "18" : "15", 
               "-g",
-              fpgop,
+              ntsc ? "18" : "15",
 			  "-o",
               m2vName
             },
@@ -654,6 +648,7 @@ uint32_t roughGOP( dvdJpeg &jpegfile, const char *m2vName, bool ntsc )
 
 	) FATAL( "jpeg2yuv|mpeg2enc failed. See Lplex.log for details.\n" );
 
+    
 	ifstream mini2File( m2vName, ios::binary | ios::ate );
 	if( ! mini2File.is_open() )
         FATAL( "Can't find input file " + string(m2vName) );
