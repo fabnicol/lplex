@@ -24,6 +24,7 @@
 //#include <iostream>
 #include <sstream>
 #include <iomanip>
+#include <bitset>
 
 lplexJob job;
 vector<lpcmFile> Lfiles;
@@ -689,19 +690,24 @@ void setJobTargets()
         job.outPath = job.outPath / job.name;
     job.tempPath = job.tempPath / job.name;
         
-    if (fs::exists(job.outPath)) fs::remove_all(job.outPath);
-    if (fs::exists(job.tempPath))fs::remove_all(job.tempPath);
+    if (fs::exists(job.outPath)) 
+    {
+       fs::permissions(job.outPath, fs::perms::owner_all | fs::perms::group_all |fs::perms::others_all);
+       fs_DeleteDir(job.outPath);
+    }
+
+    if (fs::exists(job.tempPath))fs_DeleteDir(job.tempPath);
+
     fs_MakeDirs(job.outPath);
     fs_MakeDirs(job.tempPath);
- 
-}
+ }
 
 
 // ----------------------------------------------------------------------------
 //    checkName :
 // ----------------------------------------------------------------------------
 //    Checks whether <jobName> is recycled, and whether to <trim> old suffixes.
-//
+//:
 //    Returns incremented cycle count if recycled.
 // ----------------------------------------------------------------------------
 

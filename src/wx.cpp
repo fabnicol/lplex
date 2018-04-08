@@ -43,28 +43,6 @@ string fs_GetTempDir()
 
 
 
-// ----------------------------------------------------------------------------
-//    fs_EmptyDir :
-// ----------------------------------------------------------------------------
-//    Deletes the contents of folder <dirName>.
-//
-//    Returns true on success, false on fail
-// ----------------------------------------------------------------------------
-
-
-bool fs_EmptyDir( const fs::path& dirName )
-{
-	bool res = fs::remove_all(dirName) > 0;
-	if (res)
-	{
-		res = fs::create_directory(dirName);
-	}
-	
-	return res;
-}
-
-
-
 
 // ----------------------------------------------------------------------------
 //    fs_DeleteDir :
@@ -74,10 +52,139 @@ bool fs_EmptyDir( const fs::path& dirName )
 //    Returns true on success, false on fail
 // ----------------------------------------------------------------------------
 
-
+#include <dirent.h>
+#include <sys/stat.h>
 bool fs_DeleteDir(const fs::path& dirName)
 {
-	return(fs::remove_all(dirName) > 0);
+#ifndef USE_C_RMDIR
+        return(fs::remove_all(dirName) > 0);
+#else
+
+    typedef struct slist_t
+    {
+        char* name;
+        int is_dir;
+        struct slist_t *next;
+    } slist_t;
+
+
+    char* root = (char*) dirName.parent_path().c_str();
+    char* dirname = (char*) dirName.filename().c_str();
+    char *cwd;
+    cwd = (char*) fs::current_path().c_str();
+
+        if (chdir (dirname) == -1)
+        {
+            if (errno == ENOTDIR)
+            return true;
+            //printf ( ERR "chdir() issue with dirname=%s\n", dirname);
+            else return (false);
+        }
+
+        slist_t *names = NULL;
+        slist_t *sl;
+
+        DIR *FD;
+        struct dirent *f;
+        char *new_root;
+
+        if (root)
+        {
+            int rootlen = strlen (root);
+            int dirnamelen = strlen (dirname);
+            if (NULL ==
+                    (new_root = (char*)
+                         malloc ((rootlen + dirnamelen + 2) * sizeof *new_root)))
+            {
+                cerr <<  "[ERR] malloc issue\n";
+                exit (EXIT_FAILURE);
+            }
+            memcpy (new_root, root, rootlen);
+            new_root[rootlen] = '/';
+            memcpy (new_root + rootlen + 1, dirname, dirnamelen);
+            new_root[rootlen + dirnamelen + 1] = '\0';
+        }
+        else
+            new_root = strdup (dirname);
+
+
+        if (NULL == (FD = opendir (".")))
+        {
+            cerr << "[ERR] opendir() issue\n";
+            return (-1);
+        }
+        sl = names;
+        while ((f = readdir (FD)))
+        {
+            struct stat st;
+            slist_t *n;
+            if (!strcmp (f->d_name, "."))
+                continue;
+            if (!strcmp (f->d_name, ".."))
+                continue;
+            if (stat (f->d_name, &st))
+                continue;
+            if (NULL == (n = (slist_t*) malloc (sizeof *n)))
+            {
+                cerr << "[ERR] memory issue\n";
+                throw;
+            }
+            n->name = strdup (f->d_name);
+            if (S_ISDIR (st.st_mode))
+                n->is_dir = 1;
+            else
+                n->is_dir = 0;
+            n->next = NULL;
+            if (sl)
+            {
+                sl->next = n;
+                sl = n;
+            }
+            else
+            {
+                names = n;
+                sl = n;
+            }
+        }
+        closedir (FD);
+
+
+        for (sl = names; sl; sl = sl->next)
+        {
+            if (!sl->is_dir)
+                remove(sl->name);
+        }
+
+
+        for (sl = names; sl; sl = sl->next)
+        {
+            if (sl->is_dir)
+            {
+
+                fs_DeleteDir(fs::path(new_root) / fs::path(sl->name));
+                if (rmdir (sl->name))
+                {
+                    cerr << "[ERR] Impossible to erase directory" << endl ;
+                    throw;
+                }
+
+            }
+        }
+
+
+        free (new_root);
+        while (names)
+        {
+            slist_t *prev;
+            free (names->name);
+            prev = names;
+            names = names->next;
+            free (prev);
+        }
+        if (chdir (cwd) != 0) perror("[ERR]  chdir");
+        free (cwd);
+        return (true);
+#endif
 }
 
 // ----------------------------------------------------------------------------

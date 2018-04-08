@@ -198,12 +198,12 @@ inline bool initPlatform()
 
     configDir = appdata + string(SEPARATOR  "lplex"  SEPARATOR);
     lplexConfig = configDir / "lplex.ini";
-    binDir = fs::current_path() / fs::path("local") / fs::path("bin");
+    binDir = fs::path("C:/Users/Public/Dev/msys2/usr/bin"); //fs::path("/usr/bin"); //fs::current_path() / fs::path("local") / fs::path("bin");
     dataDir = appdata /  fs::path("data");
     readOnlyPath = home;
     tempDir = fs::temp_directory_path();
-	shebang = "#!/usr/local/bin/lplex -P 1\n";
-	endPause = true;
+    shebang = "#!/usr/local/bin/lplex -P 1\n";
+    endPause = true;
     return true;
 }
 

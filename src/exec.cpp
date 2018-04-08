@@ -24,7 +24,7 @@
 #include <fstream>
 #include <cerrno>
 #include <fstream>
-
+#include <cstdlib>
 #if defined (__WIN32__)  || defined(__WIN64)|| defined(__w64)
 #include <windows.h>
 #include <cstdio>
@@ -90,23 +90,28 @@ extern ofstream xlog;
 
 inline string quote(const string& path)
 {
-  return (string("\"") + path + string("\""));
+      	return (string("\"") + path + string("\""));
 }
 
-string get_cl(const vector<const char*>& Args, uint16_t start)
+string get_cl(const char* application, const vector<const char*>& Args, uint16_t start)
 {
     string cmd;
     auto it = Args.begin() + start;
     while (it != Args.end()) 
     {
-        bool do_quote=((*it[0] != '"') && (*it[0] != '-') && (*it[0] != '|')) ;
-        
-        cmd += ((do_quote)? quote(string(*it)): string(*it));
-        cmd += " ";
+        string s = *it;
+	bool do_quote=((s[0] != '"') && (s[0] != '-') && (s[0] != '|')) ;
+	do_quote=false;
+        cmd += ((do_quote)? quote(s): s);
+        if (it + 1 != Args.end()) cmd += " ";
         ++it;
     }
+    cmd = string(application) + ".exe "  + cmd;
+    replace(cmd.begin(), cmd.end(), '/', '\\');
+    //replace(cmd.begin(), cmd.end(), '/', '\\');
 
-    return cmd;
+
+return cmd;
 }
 
 int run(const char* application, const vector<const char*>&  Args, const int option)
@@ -160,18 +165,21 @@ const char* const* args =  _Args.data();
     }
 #else
 
-    STARTUPINFO si;
+    STARTUPINFOA si;
     PROCESS_INFORMATION pi;
     
     ZeroMemory( &si, sizeof(si) );
     si.cb = sizeof(si);
     ZeroMemory( &pi, sizeof(pi) );
 
-    LPTSTR cmdline = (LPTSTR) get_cl(Args, 1).c_str();
+    string _application = string(application) + ".exe";
+    string cmdline = get_cl(application, Args, 0);
+cerr <<endl<<_application.c_str()<<endl;
+cerr << cmdline.c_str() << endl;
     
     // Start the child process. 
-    if( !CreateProcess( application,   // No module name (use command line)
-        cmdline,        // Command line
+    if( !CreateProcessA( _application.c_str(),   // No module name (use command line)
+        const_cast<char*>(cmdline.c_str()),        // Command line
         NULL,           // Process handle not inheritable
         NULL,           // Thread handle not inheritable
         FALSE,          // Set handle inheritance to FALSE
@@ -297,198 +305,24 @@ default:
     close(tube[0]);
 }
 return errno;
-#else
-    
-    
-    
-    SECURITY_ATTRIBUTES saAttr; 
-        
-  // Set the bInheritHandle flag so pipe handles are inherited. 
-   
-     saAttr.nLength = sizeof(SECURITY_ATTRIBUTES); 
-     saAttr.bInheritHandle = TRUE; 
-     saAttr.lpSecurityDescriptor = NULL; 
-  
-  // Create a pipe for the child process's STDOUT. 
-   
-     if ( ! CreatePipe(&g_hChildStd_OUT_Rd, &g_hChildStd_OUT_Wr, &saAttr, 0) ) 
-        ErrorExit(TEXT("StdoutRd CreatePipe")); 
-  
-  // Ensure the read handle to the pipe for STDOUT is not inherited.
-  
-     if ( ! SetHandleInformation(g_hChildStd_OUT_Rd, HANDLE_FLAG_INHERIT, 0) )
-        ErrorExit(TEXT("Stdout SetHandleInformation")); 
-     
-  // Create the child process. 
-     
 
-       PROCESS_INFORMATION piProcInfo; 
-       STARTUPINFO siStartInfo;
-       BOOL bSuccess = FALSE; 
-     
-   // Set up members of the PROCESS_INFORMATION structure. 
-     
-       ZeroMemory( &piProcInfo, sizeof(PROCESS_INFORMATION) );
-     
-    // Set up members of the STARTUPINFO structure. 
-    // This structure specifies the STDIN and STDOUT handles for redirection.
-     
-       ZeroMemory( &siStartInfo, sizeof(STARTUPINFO) );
-       siStartInfo.cb = sizeof(STARTUPINFO); 
-       siStartInfo.hStdError = g_hChildStd_OUT_Wr;
-       siStartInfo.hStdOutput = g_hChildStd_OUT_Wr;
-       siStartInfo.dwFlags |= STARTF_USESTDHANDLES;
-     
-    // Create the child process. 
+#else
        
-      LPTSTR cmdline = (LPTSTR) get_cl(Args, 1).c_str();
-        
-       bSuccess = CreateProcess(application, 
-          cmdline,     // command line 
-          NULL,          // process security attributes 
-          NULL,          // primary thread security attributes 
-          TRUE,          // handles are inherited 
-          0,             // creation flags 
-          NULL,          // use parent's environment 
-          NULL,          // use parent's current directory 
-          &siStartInfo,  // STARTUPINFO pointer 
-          &piProcInfo);  // receives PROCESS_INFORMATION 
-       
-    // If an error occurs, exit the application. 
-       
-       if ( ! bSuccess ) 
-          ErrorExit(TEXT("CreateProcess"));
-       else 
-       {
-          // Close handles to the child process and its primary thread.
-          // Some applications might keep these handles to monitor the status
-          // of the child process, for example. 
-    
-          CloseHandle(piProcInfo.hProcess);
-          CloseHandle(piProcInfo.hThread);
-       }
-  
-    // Read from pipe that is the standard output for child process. 
-       
-       DWORD dwRead, dwWritten; 
-       CHAR chBuf[BUFSIZE]; 
-      
-       HANDLE hParentStdOut = GetStdHandle(STD_OUTPUT_HANDLE);
-       
-          for (;;) 
-          { 
-             bSuccess = ReadFile( g_hChildStd_OUT_Rd, chBuf, BUFSIZE, &dwRead, NULL);
-             if( ! bSuccess || dwRead == 0 ) break; 
-       
-             bSuccess = WriteFile(hParentStdOut, chBuf, 
-                                  dwRead, &dwWritten, NULL);
-             if (! bSuccess ) break; 
-          } 
-  
-  // The remaining open handles are cleaned up when this process terminates. 
-  // To avoid resource leaks in a larger application, close handles explicitly. 
-  // Close the pipe handle so the child process stops reading. 
-           
-       if ( ! CloseHandle(g_hChildStd_IN_Wr) ) 
-           ErrorExit(TEXT("StdInWr CloseHandle")); 
- 
-  // Create the child process 2. 
-       
-       SECURITY_ATTRIBUTES saAttr2; 
-     
-  // Set the bInheritHandle flag so pipe handles are inherited. 
-        
-       saAttr2.nLength = sizeof(SECURITY_ATTRIBUTES); 
-       saAttr2.bInheritHandle = TRUE; 
-       saAttr2.lpSecurityDescriptor = NULL; 
-       
-       PROCESS_INFORMATION piProcInfo2; 
-       STARTUPINFO siStartInfo2;
-       
-  // Set up members of the PROCESS_INFORMATION structure. 
-       
-       ZeroMemory( &piProcInfo2, sizeof(PROCESS_INFORMATION) );
-       
-  // Set up members of the STARTUPINFO structure. 
-  // This structure specifies the STDIN and STDOUT handles for redirection.
-       
-       ZeroMemory( &siStartInfo2, sizeof(STARTUPINFO) );
-       siStartInfo2.cb = sizeof(STARTUPINFO); 
-       siStartInfo2.hStdError = g_hChildStd_OUT_Wr2;
-       siStartInfo2.hStdOutput = g_hChildStd_OUT_Wr2;
-       siStartInfo2.hStdInput = g_hChildStd_IN_Rd2;
-       siStartInfo2.dwFlags |= STARTF_USESTDHANDLES;
-          
-  // Create a pipe for the child process's STDIN. 
-          
-       if (! CreatePipe(&g_hChildStd_IN_Rd2, &g_hChildStd_IN_Wr2, &saAttr2, 0)) 
-               ErrorExit(TEXT("Stdin CreatePipe 2")); 
-         
-  // Ensure the write handle to the pipe for STDIN is not inherited. 
-          
-  //       if ( ! SetHandleInformation(g_hChildStd_IN_Wr2, HANDLE_FLAG_INHERIT, 0) )
-  //             ErrorExit(TEXT("Stdin SetHandleInformation 2")); 
-    
-           
-         LPTSTR cmdline2 = (LPTSTR) get_cl(Args2, 1).c_str();
-         
-         bSuccess = CreateProcess(application2, 
-            cmdline2,     // command line 
-            NULL,          // process security attributes 
-            NULL,          // primary thread security attributes 
-            TRUE,          // handles are inherited 
-            0,             // creation flags 
-            NULL,          // use parent's environment 
-            NULL,          // use parent's current directory 
-            &siStartInfo2,  // STARTUPINFO pointer 
-            &piProcInfo2);  // receives PROCESS_INFORMATION 
-    
-         
-   // Read from a file and write its contents to the pipe for the child's STDIN.
-   // Stop when there is no more data. 
-         
-         for (;;) 
-           { 
-              bSuccess = ReadFile(g_hChildStd_OUT_Rd, chBuf, BUFSIZE, &dwRead, NULL);
-              if ( ! bSuccess || dwRead == 0 ) break; 
-              
-              bSuccess = WriteFile(g_hChildStd_IN_Wr2, chBuf, dwRead, &dwWritten, NULL);
-              if ( ! bSuccess ) break; 
-           } 
-         
-  // Close the pipe handle so the child process stops reading. 
-         
-         if ( ! CloseHandle(g_hChildStd_IN_Wr) ) 
-              ErrorExit(TEXT("StdInWr CloseHandle")); 
-          
-  // If an error occurs, exit the application. 
-         
-         if ( ! bSuccess ) 
-            ErrorExit(TEXT("CreateProcess 2"));
-         else 
-         {
-  // Close handles to the child process and its primary thread.
-  // Some applications might keep these handles to monitor the status
-  // of the child process, for example. 
-      
-            CloseHandle(piProcInfo2.hProcess);
-            CloseHandle(piProcInfo2.hThread);
-         }
-         
-          DWORD dwRead2, dwWritten2; 
-          HANDLE hParentStdOut2 = GetStdHandle(STD_OUTPUT_HANDLE);
-       
-          for (;;) 
-          { 
-             bSuccess = ReadFile( g_hChildStd_OUT_Rd2, chBuf, BUFSIZE, &dwRead2, NULL);
-             if( ! bSuccess || dwRead2 == 0 ) break; 
-       
-             bSuccess = WriteFile(hParentStdOut2, chBuf, 
-                                  dwRead2, &dwWritten2, NULL);
-             if (! bSuccess ) break; 
-          } 
-       
-   return 0; 
+       string cmdline = get_cl(application, Args, 0);
+       string cmdline2 = get_cl(application2, Args2, 0);
+
+	   cerr <<"###" << cmdline << "###" << endl;
+
+	   cerr <<"###" << cmdline2 << "###" << endl;
+	   
+       string command =  cmdline + string(" | ") + cmdline2;
+	   
+	   cerr << "!!!" << command << "!!!"  << endl;
+	   
+       cerr << "***" <<  command << "***" << endl;
+	   
+       int res = system(command.c_str());
+return 0;
 #endif
 }
 
@@ -512,7 +346,11 @@ long execute( const string& application, const vector<const char*>& args, int ve
         for(const auto& s: args)  cerr << s << " ";
     }
     
-    run(application.c_str(), args, 0);
+#ifndef __linux__
+    string _application = application;
+    replace(_application.begin(), _application.end(), '/', '\\');
+#endif    
+    run(_application.c_str(), args, 0);
 	
 	return errno;
 }

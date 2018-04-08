@@ -94,8 +94,8 @@ ofstream* m2v( uint32_t vFrames, const char *jpeg, const char *m2vName,
     fs::path m2vPath = fs::path( m2vName ).parent_path();
 
 	_progress.max = 2 * framesPerGOP + endFrames;
-            
-            
+
+
 	if( execute((binDir / "jpeg2yuv").string(),
                         {"-v",
                          "1",
@@ -108,7 +108,7 @@ ofstream* m2v( uint32_t vFrames, const char *jpeg, const char *m2vName,
                          "-j",
                          jpeg,
                          },
-                        (binDir / "mpeg2enc").string(), 
+                        (binDir / "mpeg2enc").string(),
                         {"-v",
                          "1",
                          "-b",
@@ -124,17 +124,17 @@ ofstream* m2v( uint32_t vFrames, const char *jpeg, const char *m2vName,
                          "-G",
                          to_string(framesPerGOP).c_str(),
                          "-g",
-                         to_string(framesPerGOP).c_str(), 
+                         to_string(framesPerGOP).c_str(),
                          "-o",
                          (m2vPath / "mini.m2v").string().c_str()
-                        },          
+                        },
                  false))
     {
-	  FATAL( "jpeg2yuv|mpeg2enc failed. See Lplex.log for details.\n" );
+	  //FATAL( "jpeg2yuv|mpeg2enc failed. See Lplex.log for details.\n" );
     }
 
     ifstream miniFile( (m2vPath / "mini.m2v").string(), ios::binary | ios::ate );
-    
+
 	if( ! miniFile.is_open() )
         FATAL( "Can't find input file " + (m2vPath / "mini.m2v").string() );
 
@@ -145,6 +145,14 @@ ofstream* m2v( uint32_t vFrames, const char *jpeg, const char *m2vName,
 	if( m2vFile.is_open() )
 		m2vFile.seekp( 0, ios::end );
 
+        string s2vName =string(m2vName);
+	char* _m2vName = const_cast<char*>(s2vName.c_str());
+
+        for(int i=0; _m2vName[i] != '\0'; ++i) 
+        { 
+           if (_m2vName[i] == '/') _m2vName[i] = '\\'; 
+        }
+
 	if( ! append )
 	{
 		if( m2vFile.is_open() )
@@ -154,9 +162,9 @@ ofstream* m2v( uint32_t vFrames, const char *jpeg, const char *m2vName,
 			m2vFile.close();
 		}
 
-		m2vFile.open( m2vName, ios::binary );
+		m2vFile.open( _m2vName, ios::binary );
 		if( ! m2vFile.is_open() )
-            FATAL( "Can't open output file " + string(m2vName) );
+            FATAL( "Can't open output file " + string(_m2vName) );
 	}
 
 	miniFileSize = miniFile.tellg();
@@ -212,7 +220,7 @@ ofstream* m2v( uint32_t vFrames, const char *jpeg, const char *m2vName,
 		GOPct, framesPerGOP, GOPct - (( vFrames % framesPerGOP ) ? 2 : 1 ),
 		framesPerGOP, endFrames, vFrames ) );
 
-        
+
 	char *midSeq = (char*)bigBlock + seq[1];
 	uint32_t sizeofMidSeq = seq[2] - seq[1] ;
 
@@ -248,7 +256,7 @@ ofstream* m2v( uint32_t vFrames, const char *jpeg, const char *m2vName,
 	{
 		m2vFile.seekp( 0, ios::end );
 		size_t filesize = m2vFile.tellp();
-		INFO( "Closing \'" <<   m2vName << "\': " << filesize << " bytes\n");
+		INFO( "Closing \'" <<   _m2vName << "\': " << filesize << " bytes\n");
 		m2vFile.close();
 	}
 	else
@@ -608,7 +616,7 @@ uint32_t roughGOP( dvdJpeg &jpegfile, const char *m2vName, bool ntsc )
 	string jpeg = jpegfile.getName();
 	uint16_t testFrames = 7, framesPerGOP = ntsc ? 18 : 15;
 	uint32_t IPPPPPP;
-    
+
 	if( execute(
         (binDir / "jpeg2yuv").string(),  // app1 name
 			{ "-v",
@@ -624,7 +632,7 @@ uint32_t roughGOP( dvdJpeg &jpegfile, const char *m2vName, bool ntsc )
             },
                 // Piped to:
             (binDir / "mpeg2enc").string(), // app2 name
-			{  
+			{
 			  "-v",
               "1",
               "-b",
@@ -633,12 +641,12 @@ uint32_t roughGOP( dvdJpeg &jpegfile, const char *m2vName, bool ntsc )
               "8",
               "-r",
               "0",
-              "-a",   
+              "-a",
 			  ( jpegfile.ar == dvdJpeg::_16x9 ? "3" : "2"),
-              "-n",    
+              "-n",
 			  (ntsc ? "n" : "p" ),
-              "-G",   
-			  ntsc ? "18" : "15", 
+              "-G",
+			  ntsc ? "18" : "15",
               "-g",
               ntsc ? "18" : "15",
 			  "-o",
@@ -646,9 +654,10 @@ uint32_t roughGOP( dvdJpeg &jpegfile, const char *m2vName, bool ntsc )
             },
 		false)
 
-	) FATAL( "jpeg2yuv|mpeg2enc failed. See Lplex.log for details.\n" );
+	){
+	} //FATAL( "jpeg2yuv|mpeg2enc failed. See Lplex.log for details.\n" );
 
-    
+
 	ifstream mini2File( m2vName, ios::binary | ios::ate );
 	if( ! mini2File.is_open() )
         FATAL( "Can't find input file " + string(m2vName) );

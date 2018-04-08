@@ -35,6 +35,7 @@ using namespace std;
 #  define SEPARATOR  "/"
 #  define USER  "USERNAME"
 #  define HOME  "C:\\Users"
+#  define USE_C_RMDIR  // as of Apr. 2018, mingw64 port of g++-7.3.0 has a permissions file bug for fs::remove_all
 #else
 #  define SEPARATOR "\\"
 #  define USER "USER"
@@ -44,7 +45,6 @@ using namespace std;
 bool fs_MakeDirs( const fs::path& dirName );
 string fs_GetTempDir();
 bool fs_DeleteDir( const fs::path& dirName );
-bool fs_EmptyDir( const fs::path& dirName );
 size_t fs_GetAllDirs( const string& dirName, vector<string>& dirs );
 size_t fs_DirSize( const fs::path& dirName );
 bool fs_validPath( const fs::path&  filename );

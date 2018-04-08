@@ -85,12 +85,17 @@ int author( dvdLayout &layout )
         cerr << "[ERR] Working path is empty." << endl;
         throw;
     }
-    
+
+    string  tmppath = job.tempPath.string();
+
+    replace(tmppath.begin(), tmppath.end(),'/','\\'); 
+    job.tempPath = fs::path(tmppath);
     if ( ! fs::exists( job.tempPath ) )
     {
         fs_MakeDirs( job.tempPath );
         job.name;
     }
+
 
     if (job.outPath.empty())
     {
@@ -165,15 +170,19 @@ int author( dvdLayout &layout )
 			Lfiles[i].type & lpcmFile::readComplete ? -1 : i : -1;
 
 		BLIP( " ...creating video " );
+		cerr << "m2v" << " " << layout.nameNow << ".m2v" << endl;
 
 		m2vFile = m2v( Lfiles[i].videoFrames,
 			jpegs[ Lfiles[i].jpgIndex ].getName().c_str(),
-            string(layout.nameNow + ".m2v").c_str(), job.tv,
+                        string(layout.nameNow + ".m2v").c_str(),
+		       	job.tv,
 			jpegs[ Lfiles[i].jpgIndex ].ar == dvdJpeg::_16x9 ? true : false,
-			userData, uDataLen, ( job.tv == NTSC ? 18 : 15 ),
+			userData,
+		       	uDataLen,
+		       	( job.tv == NTSC ? 18 : 15 ),
 			job.now & appending,
-            ! ( Lfiles[i].trim.type & jobs::continuous ),
-            ! ( Lfiles[i].trim.type & jobs::continuous ) );
+                       ! ( Lfiles[i].trim.type & jobs::continuous ),
+                       ! ( Lfiles[i].trim.type & jobs::continuous ) );
         
         xml.write(dvdauthorXml::open, xml.name);
 		xml.write( dvdauthorXml::addChapter, job.now & appending ?
@@ -192,7 +201,6 @@ int author( dvdLayout &layout )
 
 		if( job.prepare < mpegf )
 			continue;
-
 		ECHO( "----------------------------------- MPLEX -------------------------------------\n\n"  );
 		BLIP( " ...multiplexing " );
 
