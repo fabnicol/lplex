@@ -481,7 +481,7 @@ uint64_t flacReader::fillBuf( uint64_t limit, counter<uint64_t> *midCount )
 ::FLAC__StreamDecoderWriteStatus flacReader::write_callback(
 	const ::FLAC__Frame *frame, const FLAC__int32 * const buf[] )
 {
-	int samp, chan;
+	
 	uint64_t i;
 	uint32_t frameLen = frame->header.blocksize * frame->header.channels *
 		frame->header.bits_per_sample / 8;
@@ -492,16 +492,16 @@ uint64_t flacReader::fillBuf( uint64_t limit, counter<uint64_t> *midCount )
 	i = ct.now;
 
 	if( frame->header.bits_per_sample == 24 )
-		for( samp = 0; samp < frame->header.blocksize; samp++ )
-			for( chan = 0; chan < frame->header.channels; chan++ )
+		for( uint samp = 0; samp < frame->header.blocksize; samp++ )
+			for( uint chan = 0; chan < frame->header.channels; chan++ )
 			{
 				bigBuf[i++] = ( buf[chan][samp] & 0xff );
 				bigBuf[i++] = ( buf[chan][samp] & 0xff00 ) >> 8;
 				bigBuf[i++] = ( buf[chan][samp] & 0xff0000 ) >> 16;
 			}
 	else
-		for( samp = 0; samp < frame->header.blocksize; samp++ )
-			for( chan = 0; chan < frame->header.channels; chan++ )
+		for( uint samp = 0; samp < frame->header.blocksize; samp++ )
+			for( uint chan = 0; chan < frame->header.channels; chan++ )
 			{
 				bigBuf[i++] = ( buf[chan][samp] & 0xff );
 				bigBuf[i++] = ( buf[chan][samp] & 0xff00 ) >> 8;
@@ -544,7 +544,7 @@ void flacReader::metadata_callback( const ::FLAC__StreamMetadata *meta )
 void flacReader::error_callback( ::FLAC__StreamDecoderErrorStatus status )
 {
 	ERR( _f( "flac %s API error %d: '%s'\n", FLAC__VERSION_STRING, status,
-		(char*[]){
+		(const char*[]){
 			// from FLAC/stream_decoder.h
 			"FLAC__STREAM_DECODER_ERROR_STATUS_LOST_SYNC",
 			"FLAC__STREAM_DECODER_ERROR_STATUS_BAD_HEADER",

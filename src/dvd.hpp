@@ -45,7 +45,10 @@ class lpcmPGextractor;
 
 #include "lplex.hpp"
 
+#ifndef __STDC_LIMIT_MACROS
 #define __STDC_LIMIT_MACROS 1
+#endif
+
 #include <stdint.h>
 											// prevents #error from dvdread/ifo_types.h
 #ifndef INT32_MAX
@@ -92,13 +95,14 @@ public:
 	enum { opened = 0x01 };
 
     fs::path fName;
-	int state, tv, titleset, lpcm_id, audioStream, pgc, pg, pgcCell, c;
+    int state, tv, titleset, lpcm_id, audioStream, pgc, pg, pgcCell, c;
 	int menuFmt, numTitlesets, numAudioStreams, numCells, numPGCs, numPGs, numPGCcells;
+  	int audioframe;
+    
+  	dvd_reader_t *libdvdReader;
+  	bool verbose, isImage;
 	FLAC__StreamMetadata fmeta;
-	int audioframe;
-	bool verbose, isImage;
 
-	dvd_reader_t *libdvdReader;
 	ifo_handle_t *ifo;
 	pgc_t *pgct;
 	cell_adr_t *cells, *cell;
@@ -126,10 +130,13 @@ public:
 	int getPGC();
 
 	virtual int configurePGC() { return 1; }
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 	virtual int configureCell( int context ) { return 1; }
 	virtual int configureAudioStream() { return 1; }
 	virtual int getCell( bool searchBeyond = true ) { return 0; }
-
+#pragma GCC diagnostic pop
+    
 	cell_adr_t* cellAt( cell_position_t *pos );
 	cell_adr_t* cellAt( int vob_id, int cell_id );
 	int cellIndex( cell_position_t *pos );
@@ -162,15 +169,17 @@ public:
 		lplexAuthored = 0x80
 	};
 
-	int16_t readIndex, writeIndex, pgcIndex;
-	lplexJob *job;
 	lpcmFile *lFile;
 	vector<lpcmFile> *Lfiles;
 	vector<infoFile> *infofiles;
+  	lplexJob *job;
+  	audio_adr_t *audioCells;
+    int16_t readIndex, writeIndex;
+    int16_t pgcIndex;
 	lpcmWriter *writer;
 	md5_state_t md5sum;
 	counter<uint64_t> ct;
-	audio_adr_t *audioCells;
+
 
 	typedef struct
 	{
@@ -200,7 +209,7 @@ public:
 
 	~lpcmPGextractor()
 	{
-		for( int i=0; i < audioTables.size(); i++ )
+		for( uint i=0; i < audioTables.size(); ++i )
 			delete[] audioTables[i].audioCells;
 	}
 

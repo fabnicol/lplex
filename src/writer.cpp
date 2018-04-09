@@ -137,6 +137,7 @@ bool lpcmEntity::soundCheck( lpcmEntity *l, bool mute )
 #endif
 				if( ch <= maxDvdChans[( bps-16)/4][(khz/48)-1] ) break;
 				else bpsOk = khzOk = 0;
+                [[fallthrough]];
 			default: chOk = 0; notAllowed = 1;
 		}
 
@@ -383,6 +384,7 @@ uint16_t rawWriter::close()
 	rawFile.close();
 	md5_finish( &md5raw, md5strRaw );
 	md5_finish( &md5, md5str );
+    return 0;
 }
 
 
@@ -953,7 +955,7 @@ void flacWriter::showState( int initcode, const char *msg )
 #else // flac 1.1.3+
 
 	if( initcode )
-		LOG( _f( " %2d: '%s'\n", initcode, (char*[]){
+		LOG( _f( " %2d: '%s'\n", initcode, (const char*[]){
 				"FLAC__STREAM_ENCODER_INIT_STATUS_OK",
 				"FLAC__STREAM_ENCODER_INIT_STATUS_ENCODER_ERROR",
 				"FLAC__STREAM_ENCODER_INIT_STATUS_UNSUPPORTED_CONTAINER",
@@ -971,7 +973,7 @@ void flacWriter::showState( int initcode, const char *msg )
 			} [initcode] ) );
 
 	FLAC__StreamEncoderState status = get_state();
-	LOG( _f( " %2d: '%s'\n", status, (char*[]){
+	LOG( _f( " %2d: '%s'\n", status, (const char*[]){
 			"FLAC__STREAM_ENCODER_OK",
 			"FLAC__STREAM_ENCODER_UNINITIALIZED",
 			"FLAC__STREAM_ENCODER_OGG_ERROR",

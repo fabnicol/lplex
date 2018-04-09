@@ -41,11 +41,11 @@ int dvdLayout::readerNext()
 		lFile = &Lfiles->at( readIndex - 1 );
 		memcpy( &lFile->md5str, &reader->fmeta.data.stream_info.md5sum, 16 );
 		lFile->type |= lpcmFile::readComplete;
-		delete reader;
+		//delete reader;
 		reader = NULL;
 	}
 
-	if( readIndex < Lfiles->size() )
+	if( readIndex < (int) Lfiles->size() )
 		lFile = &Lfiles->at( readIndex );
 	else
 	{
@@ -194,7 +194,7 @@ int dvdUtil::AVseam( int audioFrameLen, bool ntsc )
 // ----------------------------------------------------------------------------
 
 
-int dvdLayout::setAudioUnits( FLAC__StreamMetadata *fmeta )
+void dvdLayout::setAudioUnits( FLAC__StreamMetadata *fmeta )
 {
 	dvdSampleSeam = sampleSeam( fmeta );
 	dvdAudioFrame = audioFrame( fmeta );
@@ -455,7 +455,7 @@ int dvdLayout::configure()
 
 	total.audio = total.video = total.info = 0;
 
-	for( i=0; i < Lfiles->size(); i++ )
+	for( uint i=0; i < Lfiles->size(); ++i )
 	{
 		lFile = &Lfiles->at(i);
 		lFile->index = i;
@@ -624,7 +624,7 @@ int dvdLayout::configure()
 	ECHO( "\n" );
 
 	INFO( "Screen Jpeg" << ( jpegs.size() > 1 ? "s" : "" ) << "\n" );
-	for( i=0; i < jpegs.size(); i++ )
+	for( uint i=0; i < jpegs.size(); ++i )
 	{
 		LOG( _f( "%2d (%s%s%s %s) : %s\n", i,
 			jpegs[i].rescale ? "rescaled to " : "",
@@ -634,11 +634,11 @@ int dvdLayout::configure()
 	}
 	ECHO( "\n\n" );
 
-	for( i=0; i < infofiles->size(); i++ )
+	for( uint i=0; i < infofiles->size(); ++i )
 		if( ! infofiles->at(i).reject )
             total.info += filesize( infofiles->at(i).fName.c_str() );
 
-	for( i=0; i < menufiles->size(); i++ )
+	for( uint i=0; i < menufiles->size(); ++i )
         total.info += filesize( menufiles->at(i).c_str() );
 
 	checkSpace();

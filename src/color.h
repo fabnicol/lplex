@@ -31,7 +31,7 @@
 enum{ ansi=1, win32=2 };
 typedef int colorval;
 extern colorval consoleColorReset;
-typedef struct{ char *ansiStr; int winVal; } colorIndex;
+typedef struct{ const char *ansiStr; int winVal; } colorIndex;
 extern colorIndex colorTable[];
 extern int colorMode;
 

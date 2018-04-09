@@ -297,8 +297,10 @@ uint16_t init( int argc, char *argv[] )
 	}
 #endif											// check for unresolved options
 
-    if( ! ( job.trim & ( jobs::backward | jobs::nearest | jobs::forward ) ) )
+    if ( ! ( job.trim & ( jobs::backward | jobs::nearest | jobs::forward ) ) )
+    {
         job.trim |= jobs::backward;
+    }
 											// parse the command line
 	startNewTitleset = true;
 	projectFile = true;
@@ -348,7 +350,7 @@ uint16_t init( int argc, char *argv[] )
 
 uint16_t addFiles( fs::path filespec )
 {
-	int reauthoring = 0, rel = 0;
+	//int reauthoring = 0, rel = 0;
     fs::path specPath;
 
 	lFileTraverser selector( editing ? edit & strict : true );
@@ -588,6 +590,8 @@ uint16_t addFiles( fs::path filespec )
 //    Returns 0 on success.
 // ----------------------------------------------------------------------------
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 
 uint16_t setName( const char *namePath, bool isDir )
 {
@@ -664,6 +668,8 @@ uint16_t setName( const char *namePath, bool isDir )
 	job.now |= isNamed;
 	return reauthoring;
 }
+#pragma GCC diagnostic pop
+
 
 
 
@@ -692,11 +698,13 @@ void setJobTargets()
         
     if (fs::exists(job.outPath)) 
     {
-       fs::permissions(job.outPath, fs::perms::owner_all | fs::perms::group_all |fs::perms::others_all);
        fs_DeleteDir(job.outPath);
     }
 
-    if (fs::exists(job.tempPath))fs_DeleteDir(job.tempPath);
+    if (fs::exists(job.tempPath))
+    {
+        fs_DeleteDir(job.tempPath);
+    }
 
     fs_MakeDirs(job.outPath);
     fs_MakeDirs(job.tempPath);
@@ -803,9 +811,9 @@ void splitPaths()
 	sortUnique<infoFile>( infofiles );
 
 
-	for( int i=0; i < infofiles.size(); i++ )
+	for( uint i=0; i < infofiles.size(); ++i )
 	{
-		for( int j=0; j < dirs.size(); j++ )
+		for( uint j=0; j < dirs.size(); ++j )
 		{
 			if( isSubStr( dirs[j], infofiles[i].fName ) )
 			{
@@ -815,10 +823,10 @@ void splitPaths()
 		}
 	}
 
-	for( int i=0; i < Lfiles.size(); i++ )
+	for( uint i=0; i < Lfiles.size(); ++i )
 	{
 		string dir = Lfiles[i].fName.string();
-		for( int j=0; j < dirs.size(); j++ )
+		for( uint j=0; j < dirs.size(); ++j )
 		{
 			if( isSubStr( dirs[j], dir ) )
 			{
@@ -933,7 +941,7 @@ void lFileTraverser::processFiles()
 	if( filenames.size() > 1 )
 		std::sort( filenames.begin(), filenames.end() );
 
-	for( int i=0; i < filenames.size(); i++ )
+	for( uint i=0; i < filenames.size(); ++i )
 	{
 		string& filename = filenames[i];
 		lFile.fName = filename;
@@ -1127,8 +1135,10 @@ void getOpts( const char *filename )
 	else if( argc == 1 )
 	{
 		editing = true;
-                char *tab[]={ "", "." };
+        char *tab[]={ strdup(""), strdup(".") };
 		getOpts( 2, tab );
+        free(tab[0]);
+        free(tab[1]);
 	}
 	else
 	{
@@ -1301,7 +1311,7 @@ bool stdArgs( int &argc, char** &argv, char *args, size_t size )
 	argc = 1;
 	bool enquoted = false, inComment=false, firstChar=true;
 
-	for( int i=0; i < size; i++ )
+	for( uint i=0; i < size; ++i )
 	{
 		bool whitespace = true;
 		switch( args[i] )
@@ -1349,7 +1359,7 @@ bool stdArgs( int &argc, char** &argv, char *args, size_t size )
 	argv[0] = NULL;
 	firstChar = true;
 
-	for( int i=0, j=0; i < size; i++ )
+	for( uint i=0, j=0; i < size; ++i )
 	{
 		if( args[i] == '\0' )
 			firstChar = true;
@@ -1536,6 +1546,8 @@ uint16_t setopt( uint16_t opt, const char *optarg )
 
 			case 'N':
 			menuForce = true;
+            [[fallthrough]];
+            
 			case 'M':
 			addMenus( optarg, job.tv, menuForce );
 //         menuForce = false;
@@ -1646,9 +1658,9 @@ uint16_t setopt( uint16_t opt, const char *optarg )
 			GPL_notice();
 			exit(0);
 
-		case '?':
+		case '?': [[fallthrough]];
 		case 'h':
-			usage();
+			usage(); [[fallthrough]];
 
 		case 'e':
 			if( comma )
@@ -1762,9 +1774,9 @@ bool saveOpts( dvdLayout *layout )
 	vector<infoFile> &infofiles = *layout->infofiles;
 	string projectFile;
 
-	bool generating;
+	bool generating = true;  // = false?
 
-	if( generating = ! editing )
+	if( generating == ! editing )  // = ! editing
 	{
 		editing = absolute;
         projectFile = projectDotLplex.string();
@@ -1808,7 +1820,7 @@ bool saveOpts( dvdLayout *layout )
 	}
 
 
-	char *T = "yes", *F = "no";
+	constexpr const char *T = "yes", *F = "no";
 	int bitPos[] = { 0,1,2,0,3,0,0,0,4 };
 
 	dotLplex << shebang << endl <<
@@ -1834,8 +1846,8 @@ bool saveOpts( dvdLayout *layout )
             job.trim0 & jobs::nearest ? "nearest" :
             job.trim0 & jobs::forward ? "forward" : "" ) << endl << // -s
 		"--create="      << ( job.params & dvdStyler ? "dvdStyler" :
-			((char*[]){ "lpcm", "m2v", "mpeg", "dvd", "iso", "lgz" }) [ job.prepare-3 ] ) << endl << // -c
-		"--media="       << ((char*[]){ "dvd+r", "dvd-r", "dl", "none"  } ) [ bitPos[ job.media ] ] << endl << // -z
+			((const char*[]){ "lpcm", "m2v", "mpeg", "dvd", "iso", "lgz" }) [ job.prepare-3 ] ) << endl << // -c
+		"--media="       << ((const char*[]){ "dvd+r", "dvd-r", "dl", "none"  } ) [ bitPos[ job.media ] ] << endl << // -z
 		"--cleanup="     << ( job.params & cleanup ? T:F ) << endl; // -C
 
 	if( jpegs.size() == 1 ) dotLplex <<
@@ -1856,13 +1868,13 @@ bool saveOpts( dvdLayout *layout )
 	dotLplex <<
 		"--verbose="     << ( _verbose ? T:F ) << endl << // -v
 		( generating ? "#" : "" ) <<
-		"--editing="     << ((char*[]){ "false", "relative", "absolute" }) [ editing ]
+		"--editing="     << ((const char*[]){ "false", "relative", "absolute" }) [ editing ]
 			<< ( edit & editVerbose ? ",v" : "" ) << endl; // -Y
 
 	if( Lfiles.size() )
 	{
 		if( editing == relative  )
-			for( int i=0; i < jpegs.size(); i++ )
+			for( uint i=0; i < jpegs.size(); ++i )
             {
                 //jpegs[i].fName.MakeRelativeTo( job.projectPath.parent_path() );
                 jpegs[i].fName = fs::canonical(jpegs[i].fName);
@@ -1881,7 +1893,7 @@ bool saveOpts( dvdLayout *layout )
 
 			if( ! generating )
 			{
-				for( int i=0; i < menufiles.size(); i++ )
+				for( uint i=0; i < menufiles.size(); ++i )
 				{
 					if( editing == relative )
 					{
@@ -1901,7 +1913,7 @@ bool saveOpts( dvdLayout *layout )
 		uint16_t trimType = job.trimCt ? 0 : job.trim0 & 0x0F;
 		lpcmFile *lFile;
 
-		for( int i=0; i < Lfiles.size(); i++ )
+		for( uint i=0; i < Lfiles.size(); ++i )
 		{
 			lFile = &Lfiles.at(i);
 
@@ -1955,7 +1967,7 @@ bool saveOpts( dvdLayout *layout )
 	{
 		dotLplex << "\n# XTRA - Info files\n" << endl;
 
-		for( int i=0; i < infofiles.size(); i++ )
+		for( uint i=0; i < infofiles.size(); ++i )
 		{
 			if( editing == relative )
 			{
@@ -1968,7 +1980,7 @@ bool saveOpts( dvdLayout *layout )
 				continue;
 			dotLplex << QUOTE( infofiles[i].fName ) << "\n";
 		}
-		for( int i=0; i < infofiles.size(); i++ )
+		for( uint i=0; i < infofiles.size(); ++i )
 		{
 			if( infofiles[i].reject )
 				dotLplex << "#" << QUOTE( infofiles[i].fName ) << "\n";
@@ -1979,6 +1991,8 @@ bool saveOpts( dvdLayout *layout )
 
 	if( ! ( edit & piped ) )
 		dotLplex.close();
+    
+    return true;
 }
 
 

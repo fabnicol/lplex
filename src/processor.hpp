@@ -227,10 +227,14 @@ public:
 	virtual uint16_t md5Report();
 
 	// from FLAC::Encoder::File
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 	virtual void progress_callback (FLAC__uint64 bytes_written,
 		FLAC__uint64 samples_written,
 		unsigned frames_written,
 		unsigned total_frames_estimate) {}
+#pragma GCC diagnostic pop
+    
 };
 
 

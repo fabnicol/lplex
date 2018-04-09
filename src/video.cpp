@@ -145,13 +145,7 @@ ofstream* m2v( uint32_t vFrames, const char *jpeg, const char *m2vName,
 	if( m2vFile.is_open() )
 		m2vFile.seekp( 0, ios::end );
 
-        string s2vName =string(m2vName);
-	char* _m2vName = const_cast<char*>(s2vName.c_str());
-
-        for(int i=0; _m2vName[i] != '\0'; ++i) 
-        { 
-           if (_m2vName[i] == '/') _m2vName[i] = '\\'; 
-        }
+    char* _m2vName = normalize_windows_paths(m2vName);   
 
 	if( ! append )
 	{
@@ -262,8 +256,11 @@ ofstream* m2v( uint32_t vFrames, const char *jpeg, const char *m2vName,
 	else
 		m2vFile.seekp( uDataPos, ios::beg );
 
+#ifndef __linux__
+    free(_m2vName);
+#endif
+    
 	return &m2vFile;
-
 }
 
 
@@ -391,7 +388,7 @@ int addJpeg( const char * fname, lplexJob &job, bool zero, bool ws )
 
 	// check if previously added
 	bool prev = false;
-	for( int i=0; i < jpegs.size(); i++ )
+	for( uint i=0; i < jpegs.size(); ++i )
 	{
 		if( jpeg.fName == jpegs[i].fName )
 		{
@@ -496,10 +493,12 @@ bool alias( fs::path &jpeg )
 //    Returns index of dvd screen type on success, fatal on fail
 // ----------------------------------------------------------------------------
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 
 int jpegCheck( dvdJpeg &jpeg, bool ntsc, bool rescale )
 {
-	uint16_t width, height, ok = false;
+//	uint16_t width, height, ok = false;
 
 #if 0 // libjpeg version : no rescaling
 
@@ -596,6 +595,8 @@ int jpegCheck( dvdJpeg &jpeg, bool ntsc, bool rescale )
     return 0;
     //return --ok;
 }
+#pragma GCC diagnostic pop
+
 
 
 

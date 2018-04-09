@@ -66,7 +66,7 @@ int author( dvdLayout &layout )
         SCRN( "\n\n" )
 
     INFOv( string("Creating ")
-        + string(((char*[]){ "LPCM", "M2V", "MPEG", "DVD", "ISO", "LGZ" }) [ job.prepare-3 ])
+        + string(((const char*[]){ "LPCM", "M2V", "MPEG", "DVD", "ISO", "LGZ" }) [ job.prepare-3 ])
         + string(" : [ ")
         + string(( job.tv == NTSC ? "NTSC" : "PAL" ))
         + string(( job.params & md5 ? " md5aware" : "" ))
@@ -86,10 +86,8 @@ int author( dvdLayout &layout )
         throw;
     }
 
-    string  tmppath = job.tempPath.string();
-
-    replace(tmppath.begin(), tmppath.end(),'/','\\'); 
-    job.tempPath = fs::path(tmppath);
+    normalize_windows_paths(job.tempPath);
+        
     if ( ! fs::exists( job.tempPath ) )
     {
         fs_MakeDirs( job.tempPath );
@@ -313,7 +311,7 @@ int author( dvdLayout &layout )
 	if( job.params & md5 )
 	{
 		INFO( "Input wave-data signatures:\n" );
-		for( int i=0; i < Lfiles.size(); i++ )
+		for( uint i=0; i < Lfiles.size(); ++i )
 			LOG( "md5 : " << hexStr( Lfiles[i].md5str, 16 )
 				<< " : " << Lfiles[i].fName.stem() << endl );
 		ECHO( "\n" );
@@ -507,7 +505,7 @@ int unauthor( lpcmPGextractor &dvd )
 	lpcmFile *lFile;
 	lpcmWriter *writer;
 	dvd_file_t *vobs;
-	md5_byte_t md5str[16];
+	//md5_byte_t md5str[16];
 	uint64_t ptsBoundary;
 	counter<uint64_t> total;
 
@@ -918,7 +916,7 @@ uint16_t readUserData( lpcmEntity *lFile, uint8_t* userData )
 
 int tagEmbed()
 {
-	int i, c, s, v, L=-1, titleset=-1;
+	int c, s, v, L=-1, titleset=-1;
 	uint64_t addr, _SOF, _EOF;
 	uint16_t uDataLen;
 	uint8_t userData[512];
@@ -1401,13 +1399,13 @@ void copyMenufiles( int *map )
 
 	}
 
-	for( int i=0; i < xobs.size(); i++ )
+	for( uint i=0; i < xobs.size(); ++i )
         fs::rename(VIDEO_TS / (xobs[i] + ".XOB"), VIDEO_TS / (xobs[i] + ".VOB") );
 
-	for( int i=0; i < menufiles.size(); i++ )
+	for( uint i=0; i < menufiles.size(); ++i )
 	{
 		bool skip = false;
-		for( int j=0; j < xobs.size(); j++ )
+		for( uint j=0; j < xobs.size(); ++j )
 		{
             if( Right(menufiles[i],12).Left(8) == xobs[j] )
 			{

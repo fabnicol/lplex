@@ -115,7 +115,7 @@ extern option long_opts[];
 struct dvdJpeg
 {
 	fs::path fName, tName;
-	int dim, ar, rescale;
+	int dim, rescale, ar;
 	uint32_t roughGOP, roughGOP2;
 
 	enum { _4x3, _16x9 };
@@ -131,7 +131,7 @@ struct dvdJpeg
 		} [ outputSize ? getDim() : dim ];
 	}
 
-	const char *aspStr( bool outputSize = true )
+	const char *aspStr()
 	{
 		return (const char*[]){ " 4:3", "16:9" } [ ar ];
 	}
@@ -256,6 +256,7 @@ uint16_t init( int argc, char *argv[] );
 uint16_t addFiles( fs::path filespec );
 string defaultName();
 int checkName( string &jobName, bool trim = false );
+
 uint16_t setName( const char *namePath, bool isDirPath=true );
 void setJobTargets();
 void splitPaths();
@@ -297,6 +298,7 @@ int* mapMenus();
 
 int addJpeg( const char * fname, lplexJob &job, bool zero=false, bool ws=false );
 int jpegCheck( dvdJpeg &jpeg, bool ntsc, bool rescale );
+
 uint32_t roughGOP( const char *jpeg, const char *m2vName, bool ntsc );
 uint32_t roughGOP( dvdJpeg &dvdJpeg, const char *m2vName, bool ntsc );
 bool alias( fs::path &jpeg );
@@ -309,7 +311,11 @@ ofstream* m2v( uint32_t vFrames, const char *jpeg, const char *m2vName,
 class wxLplexLog : public ofstream
 {
 public:
-	virtual void DoLog( int level, const char *msg, time_t timestamp )
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+	
+    virtual void DoLog( int level, const char *msg, time_t timestamp )
 	{
 		switch( level )
 		{
@@ -328,7 +334,10 @@ public:
 				break;
 		}
 	}
+    
+   
     virtual void DoLogString( const char* *msg, time_t timestamp ) {}
+#pragma GCC diagnostic pop    
 };
 
 
@@ -337,7 +346,7 @@ class lFileTraverser //: public wxDirTraverser
 public:
 
 	enum{ invalid=0x1, mismatchA=0x2, mismatchV=0x4, mismatchV_ar=0x8, notFound=0x10 };
-	uint16_t root, err, titleset, strict;
+	uint16_t root, titleset, err, strict;
 	bool dirSpecified;
 	struct lpcmFile lFile;
 	struct infoFile iFile;
@@ -404,16 +413,19 @@ class dvdLayout : public dvdUtil
 public:
 
 	uint16_t dvdAudioFrame, dvdSampleSeam;
-	int16_t readIndex, writeIndex;
-	uint32_t dvdVideoFrame, dvdAVseam;
+	uint32_t dvdVideoFrame;
+    uint32_t dvdAVseam;
 	struct{ uint64_t estimate, audio, video, info; } total;
 
 	alignment trim;
-	lplexJob *job;
+	
 	lpcmFile *lFile;
 	vector<lpcmFile> *Lfiles;
 	vector<string> *menufiles;
 	vector<infoFile> *infofiles;
+    lplexJob *job;
+  	int16_t readIndex;
+    int16_t writeIndex;
 	lpcmReader *reader;
 	md5_state_t md5sum;
 	counter<uint64_t> ct;
@@ -428,7 +440,7 @@ public:
 	int configure();
 	uint64_t vobEstimate();
 	int checkSpace();
-	int setAudioUnits( FLAC__StreamMetadata *fmeta );
+	void setAudioUnits( FLAC__StreamMetadata *fmeta );
 	int readerNext();
 	int getNext();
 };
@@ -437,9 +449,11 @@ public:
 class xmlAttr
 {
 public:
-	int i;
+
 	char *buf;
-	char *name, *val;
+	char *name;
+    char *val;
+    int i;
 
 	xmlAttr( char *buffer ) : buf(buffer), name(NULL), val(NULL), i(0) {}
 
