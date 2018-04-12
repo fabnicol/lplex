@@ -117,8 +117,11 @@ extern int endPause;
 inline void _pause() { cerr << "\npress <enter> to close..."; cin.get(); }
 //inline void _pause() { system( "echo press any key to close; read -n 1" ); }
 #define device(d) d
-inline string volumeLabel( const char * path, bool mustBeRoot )
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+inline string volumeLabel( const char *path, bool mustBeRoot )
 	{ return ""; }
+#pragma GCC diagnostic pop
 
 
 // inline bool initPlatform()

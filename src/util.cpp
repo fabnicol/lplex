@@ -118,7 +118,39 @@ void setcolors( int scheme )
 ofstream xlog;
 string xlogName;
 
+void normalize_windows_paths(string &path)
+{
+#ifndef __linux__
+    replace(path.begin(), path.end(), '/', '\\');
+#endif    
+}
 
+void normalize_windows_paths(fs::path &path)
+{
+#ifndef __linux__
+    string _path = path.string();
+    replace(_path.begin(), _path.end(), '/', '\\');
+    path = fs::path(_path);
+#endif    
+}
+
+
+char* normalize_windows_paths(const char* path)
+{
+#ifndef __linux__
+    string _path = string(path);
+    char* out = const_cast<char*>(_path.c_str());
+    
+    for(int i=0; out[i] != '\0'; ++i) 
+    { 
+       if (out[i] == '/') out[i] = '\\'; 
+    }
+    return (strdup(out));
+#else
+    return const_cast<char*>(path);
+#endif    
+}
+                              
 char * scrub()
 {
 	int l = blip_len;
@@ -190,7 +222,7 @@ void blip( const char *msg )
 //    Returns
 // ----------------------------------------------------------------------------
 
-int logInit( const string& filename )
+void logInit( const string& filename )
 {
 	if( xlog.is_open() )
 		xlog.close();

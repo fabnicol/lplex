@@ -107,10 +107,9 @@ string get_cl(const char* application, const vector<const char*>& Args, uint16_t
         ++it;
     }
     cmd = string(application) + ".exe "  + cmd;
-    replace(cmd.begin(), cmd.end(), '/', '\\');
-    //replace(cmd.begin(), cmd.end(), '/', '\\');
-
-
+    
+    normalize_windows_paths(cmd);
+    
 return cmd;
 }
 
@@ -345,11 +344,10 @@ long execute( const string& application, const vector<const char*>& args, int ve
         cerr << endl << STAT_TAG << "Running command : " << application << " ";
         for(const auto& s: args)  cerr << s << " ";
     }
-    
-#ifndef __linux__
+
     string _application = application;
-    replace(_application.begin(), _application.end(), '/', '\\');
-#endif    
+    normalize_windows_paths(_application);
+    
     run(_application.c_str(), args, 0);
 	
 	return errno;

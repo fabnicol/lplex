@@ -271,7 +271,7 @@ bool fs_validPath( const fs::path& p )
 
 void fs_fixSeparators( char * path )
 {
-    if( SEPARATOR == "\\" )
+    if( strcmp(SEPARATOR, "\\") == 0 )
     {
         int i = 0;
         while (path[i] != '\0')
