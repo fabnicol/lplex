@@ -185,9 +185,10 @@ extern int endPause;
 inline void _pause()
 	{ cerr << "\npress any key to close..."; system( "pause>nul" ); }
 //inline void _pause() { cerr << "\npress <enter> to close..."; cin.get(); }
+#if 0
 inline const char* device( dev_t device )
 	{ char dev[] = { 'A' + device, '\0' }; return dev; }
-
+#endif
 
 inline bool initPlatform()
 {

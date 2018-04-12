@@ -87,11 +87,10 @@ int author( dvdLayout &layout )
     }
 
     normalize_windows_paths(job.tempPath);
-        
+
     if ( ! fs::exists( job.tempPath ) )
     {
         fs_MakeDirs( job.tempPath );
-        job.name;
     }
 
 
@@ -100,7 +99,7 @@ int author( dvdLayout &layout )
         cerr << "[ERR] Output path is empty." << endl;
         throw;
     }
-    
+
     if ( ! fs::exists( job.outPath ) )
     {
         fs_MakeDirs( job.outPath);
@@ -110,7 +109,7 @@ int author( dvdLayout &layout )
 
 	dvdauthorXml xml( (job.tempPath / job.name).string(),
 		job.tv, job.group + 1, job.params & dvdStyler, job.prepare < mpegf );
-    
+
 	xml.write( dvdauthorXml::setDest, job.dvdPath.string(),
 		jpegs[ Lfiles[0].jpgIndex ].ar == dvdJpeg::_16x9 ? true : false );
 
@@ -140,9 +139,9 @@ int author( dvdLayout &layout )
 						jpegs[ Lfiles[i].jpgIndex ].ar == dvdJpeg::_16x9 ? true : false );
 			}
 			xml.write( dvdauthorXml::openVob, layout.nameNow + ".mpg" );
-            
+
 		}
-        
+
         // PATCH F. NICOL: lplex BUG ?
           xml.write(dvdauthorXml::fileclose);
         //
@@ -181,12 +180,12 @@ int author( dvdLayout &layout )
 			job.now & appending,
                        ! ( Lfiles[i].trim.type & jobs::continuous ),
                        ! ( Lfiles[i].trim.type & jobs::continuous ) );
-        
+
         xml.write(dvdauthorXml::open, xml.name);
 		xml.write( dvdauthorXml::addChapter, job.now & appending ?
 			dvdauthorXml::timestampFractional( vFrames, job.tv == NTSC, .001 ) : "0" );
         xml.write(dvdauthorXml::fileclose);
-        
+
 		vFrames += Lfiles[i].videoFrames;
 
         if( Lfiles[i].trim.type & jobs::continuous )
@@ -203,7 +202,7 @@ int author( dvdLayout &layout )
 		BLIP( " ...multiplexing " );
 
 		_progress.max = vFrames;
-        
+
         string o1 = layout.nameNow + string(".mpg");
         string o2 = layout.nameNow + string(".m2v");
         string o3 = layout.nameNow + string(".lpcm");
@@ -211,9 +210,9 @@ int author( dvdLayout &layout )
                           Lfiles[i].fmeta.data.stream_info.sample_rate,
                           Lfiles[i].fmeta.data.stream_info.channels,
                           Lfiles[i].fmeta.data.stream_info.bits_per_sample) ;
-        
-             
-        const vector<const char*>&  cmdline =  
+
+
+        const vector<const char*>&  cmdline =
                  {"-f",
                   "8",
                   //job.mplexArg.c_str(),
@@ -224,7 +223,7 @@ int author( dvdLayout &layout )
                   o2.c_str(),
                   o3.c_str()
                  };
-        
+
         cerr << "[MSG] Now launching: \n\n";
         for (const char* s: cmdline) cerr << s << " ";
         cerr << endl << endl;
@@ -261,11 +260,11 @@ int author( dvdLayout &layout )
 
 //    if( fs::exists( job.dvdPath) )
 //        fs_DeleteDir( job.dvdPath);
-    
+
     xml.write(dvdauthorXml::open, xml.name);
 	xml.write( dvdauthorXml::closeVob );
-   
-    
+
+
 	if( job.prepare >= mpegf )
 	{
 		done = mpegf;
@@ -292,9 +291,9 @@ int author( dvdLayout &layout )
 		_progress.start = _progress.now = 0;
 		_progress.max = 2 * (uint32_t) ( layout.vobEstimate() / MEGABYTE );
 
-        //vector<const char*> cmdline = 
+        //vector<const char*> cmdline =
         //{"-x", xml.name.c_str() };
-        
+
 		if( execute(
             (binDir / "dvdauthor").string(),
             {"-x", xml.name.c_str() },
@@ -316,7 +315,7 @@ int author( dvdLayout &layout )
 				<< " : " << Lfiles[i].fName.stem() << endl );
 		ECHO( "\n" );
 		INFO( "Output wave-data signatures:\n" );
-		for( int i=0; i < Lfiles.size(); i++ )
+		for( uint i=0; i < Lfiles.size(); ++i )
 			LOG( "md5 : " << hexStr( Lfiles[i].fmeta.data.stream_info.md5sum, 16 )
 				<< " : " << Lfiles[i].fName.stem() << endl );
 		ECHO( "\n" );
@@ -455,7 +454,9 @@ int mkisofs(const fs::path &isoPath, const fs::path &dvdPath, const string& name
     SCRN( STAT_TAG  "Creating iso image... " )
 
     if ( ! fs::exists( isoPath.parent_path() ) )
+    {
         fs_MakeDirs( isoPath.parent_path());
+    }
 
 	string volumeID = name;
     if( Right(volumeID, 4) == "_DVD" )
@@ -468,17 +469,17 @@ int mkisofs(const fs::path &isoPath, const fs::path &dvdPath, const string& name
     INFO( "Creating disc image \'" + isoPath.string() + string("\'\n") );
     INFO( "Using volume id \'" + volumeID + string("\'\n\n") );
 
-	if( exitCode = execute(
+	if( (exitCode = execute(
             (binDir / "mkisofs").string(),
 			{ "-dvd-video",
               "-udf"
-			  "-V", 
-              volumeID.c_str(), 
+			  "-V",
+              volumeID.c_str(),
 			  "-o",
               isoPath.string().c_str(),
 			  dvdPath.string().c_str()
              },
-        _verbose)
+        _verbose))
 	)
 		ERR( "mkisofs failed. No iso created, see lplex.log for details.\n" );
 
@@ -499,7 +500,7 @@ int mkisofs(const fs::path &isoPath, const fs::path &dvdPath, const string& name
 
 int unauthor( lpcmPGextractor &dvd )
 {
-	int i, c, context, titleset = 0, v, processErr, writeIndex, finish;
+	int c, context, titleset = 0, v, processErr, writeIndex, finish;
 	uint16_t s;
 	uint32_t b, blockCt, unfinishedBlock=0;
 	lpcmFile *lFile;
@@ -529,14 +530,16 @@ int unauthor( lpcmPGextractor &dvd )
 	editing = false;
 
     if ( ! editing && ! fs::exists( job.extractPath.string() ) )
+    {
         fs_MakeDirs( job.extractPath );
+    }
 
 	stopWatch.Start();
 	dvd.traverse();
 
 	/* TODO (#1#): check extraction free space */
-int test=0;
-	while( context = dvd.getCell() )
+
+	while( (context = dvd.getCell() ))
 	{
 		c = dvd.pgcCell;
 
@@ -700,13 +703,12 @@ continue;
 	_verbose = true;
 
 	ECHO( "\n" );
-	for( i=0; i < Lfiles.size(); i++ )
+	for( uint i=0; i < Lfiles.size(); ++i )
 	{
 		if( Lfiles[i].writer->isOpen() )
 			Lfiles[i].writer->close();
 		if( Lfiles[i].writer->state & lpcmEntity::specified )
 			Lfiles[i].writer->md5Report();
-		delete Lfiles[i].writer;
 	}
 	ECHO( "\n" );
 
@@ -916,7 +918,7 @@ uint16_t readUserData( lpcmEntity *lFile, uint8_t* userData )
 
 int tagEmbed()
 {
-	int c, s, v, L=-1, titleset=-1;
+	int c, v, L=-1, titleset=-1;
 	uint64_t addr, _SOF, _EOF;
 	uint16_t uDataLen;
 	uint8_t userData[512];
@@ -985,7 +987,7 @@ int tagEmbed()
 		vobFile.seekp( addr, ios::beg );
 
 		uDataLen = writeUserData( &Lfiles[L++], userData, sizeof( userData ) );
-        
+
 		if( uDataLen <= 0xBD ) // 0x400 - 0x343
 		{
 			INFO( "(" <<  dvd.nameNow << ") Inserting Lplex tags at offset 0x343 of LB "

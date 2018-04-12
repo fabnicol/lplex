@@ -308,7 +308,7 @@ extern uint16_t blip_len, blip_ct;
 extern string _blip, _affirm;
 extern char propellor[];
 
-char * scrub();
+const char * scrub();
 void blip( const char *msg = NULL );
 void blip(const string& msg);
 
@@ -349,19 +349,19 @@ static inline void blip( counter<T> *ct,
 		{
 			int val = (int)(( ct->now - ct->start ) * 1000 / ( ct->max - ct->start ));
 			blip( _f( "%s%2d.%d%% %s", pref, val / 10, val % 10, suffix ) );
-			
+
 		}
 
 		else
 		{
 			string msg = _f( "%s%d %s", pref, ct->now, suffix );
 			blip( msg );
-			
+
 		}
 	}
 	else
 		blip_ct++;
-    
+
     free(pref);
 }
 

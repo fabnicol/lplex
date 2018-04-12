@@ -31,7 +31,7 @@
 #include <tchar.h>
 #include <tchar.h>
 #include <strsafe.h>
-#define BUFSIZE 4096 
+#define BUFSIZE 4096
 HANDLE g_hChildStd_IN_Rd = NULL;
 HANDLE g_hChildStd_IN_Wr = NULL;
 HANDLE g_hChildStd_OUT_Rd = NULL;
@@ -42,17 +42,17 @@ HANDLE g_hChildStd_IN_Wr2 = NULL;
 HANDLE g_hChildStd_OUT_Rd2 = NULL;
 HANDLE g_hChildStd_OUT_Wr2 = NULL;
 
-void ErrorExit(PTSTR lpszFunction) 
+void ErrorExit(PTSTR lpszFunction)
 
-// Format a readable error message, display a message box, 
+// Format a readable error message, display a message box,
 // and exit from the application.
-{ 
+{
     LPVOID lpMsgBuf;
     LPVOID lpDisplayBuf;
-    DWORD dw = GetLastError(); 
+    DWORD dw = GetLastError();
 
     FormatMessage(
-        FORMAT_MESSAGE_ALLOCATE_BUFFER | 
+        FORMAT_MESSAGE_ALLOCATE_BUFFER |
         FORMAT_MESSAGE_FROM_SYSTEM |
         FORMAT_MESSAGE_IGNORE_INSERTS,
         NULL,
@@ -61,13 +61,13 @@ void ErrorExit(PTSTR lpszFunction)
         (LPTSTR) &lpMsgBuf,
         0, NULL );
 
-    lpDisplayBuf = (LPVOID)LocalAlloc(LMEM_ZEROINIT, 
-        (lstrlen((LPCTSTR)lpMsgBuf)+lstrlen((LPCTSTR)lpszFunction)+40)*sizeof(TCHAR)); 
-    StringCchPrintf((LPTSTR)lpDisplayBuf, 
+    lpDisplayBuf = (LPVOID)LocalAlloc(LMEM_ZEROINIT,
+        (lstrlen((LPCTSTR)lpMsgBuf)+lstrlen((LPCTSTR)lpszFunction)+40)*sizeof(TCHAR));
+    StringCchPrintf((LPTSTR)lpDisplayBuf,
         LocalSize(lpDisplayBuf) / sizeof(TCHAR),
-        TEXT("%s failed with error %d: %s"), 
-        lpszFunction, dw, lpMsgBuf); 
-    MessageBox(NULL, (LPCTSTR)lpDisplayBuf, TEXT("Error"), MB_OK); 
+        TEXT("%s failed with error %d: %s"),
+        lpszFunction, dw, lpMsgBuf);
+    MessageBox(NULL, (LPCTSTR)lpDisplayBuf, TEXT("Error"), MB_OK);
 
     LocalFree(lpMsgBuf);
     LocalFree(lpDisplayBuf);
@@ -97,7 +97,7 @@ string get_cl(const char* application, const vector<const char*>& Args, uint16_t
 {
     string cmd;
     auto it = Args.begin() + start;
-    while (it != Args.end()) 
+    while (it != Args.end())
     {
         string s = *it;
 	bool do_quote=((s[0] != '"') && (s[0] != '-') && (s[0] != '|')) ;
@@ -107,9 +107,9 @@ string get_cl(const char* application, const vector<const char*>& Args, uint16_t
         ++it;
     }
     cmd = string(application) + ".exe "  + cmd;
-    
+
     normalize_windows_paths(cmd);
-    
+
 return cmd;
 }
 
@@ -121,14 +121,14 @@ auto _Args = Args;
 _Args.insert(_Args.begin(), fs::path(application).filename().string().c_str());
 _Args.insert(_Args.end(), NULL);
 
-const char* const* args =  _Args.data();
+
 
 //#if ! defined (__WIN32__)  && ! defined(__WIN64) && ! defined(__w64)
 #ifdef __linux__
     int pid;
     int tube[2];
     char c;
-
+    const char* const* args =  _Args.data();
     if (pipe(tube))
     {
         perror("[ERR] pipe run\n");
@@ -145,20 +145,20 @@ const char* const* args =  _Args.data();
             dup2(tube[1], STDERR_FILENO);
             execv(application, (char* const*) args);
             cerr << "[ERR] Runtime failure in " <<  application << " child process" << endl;
-            
+
             return errno;
-    
+
         default:
             close(tube[1]);
             dup2(tube[0], STDIN_FILENO);
-            while (read(tube[0], &c, 1) == 1) 
+            while (read(tube[0], &c, 1) == 1)
             {
                 cerr <<  c;
 #               ifdef _ERR2LOG
                   xlog << c;
 #               endif
             }
-            
+
             if (option != NOWAIT) waitpid(pid, NULL, option);
             close(tube[0]);
     }
@@ -166,7 +166,7 @@ const char* const* args =  _Args.data();
 
     STARTUPINFOA si;
     PROCESS_INFORMATION pi;
-    
+
     ZeroMemory( &si, sizeof(si) );
     si.cb = sizeof(si);
     ZeroMemory( &pi, sizeof(pi) );
@@ -175,8 +175,8 @@ const char* const* args =  _Args.data();
     string cmdline = get_cl(application, Args, 0);
 cerr <<endl<<_application.c_str()<<endl;
 cerr << cmdline.c_str() << endl;
-    
-    // Start the child process. 
+
+    // Start the child process.
     if( !CreateProcessA( _application.c_str(),   // No module name (use command line)
         const_cast<char*>(cmdline.c_str()),        // Command line
         NULL,           // Process handle not inheritable
@@ -184,19 +184,19 @@ cerr << cmdline.c_str() << endl;
         FALSE,          // Set handle inheritance to FALSE
         0,              // No creation flags
         NULL,           // Use parent's environment block
-        NULL,           // Use parent's starting directory 
+        NULL,           // Use parent's starting directory
         &si,            // Pointer to STARTUPINFO structure
         &pi )           // Pointer to PROCESS_INFORMATION structure
-    ) 
+    )
     {
-        printf( "CreateProcess failed (%d).\n", GetLastError() );
+        cerr << "CreateProcess failed " << GetLastError() << endl;
         return -1;
     }
 
     // Wait until child process exits.
     if (option != NOWAIT) WaitForSingleObject( pi.hProcess, INFINITE );
 
-    // Close process and thread handles. 
+    // Close process and thread handles.
     CloseHandle( pi.hProcess );
     CloseHandle( pi.hThread );
 
@@ -226,7 +226,7 @@ _Args.insert(_Args.end(), nullptr);
 
 _Args2.insert(_Args2.begin(), fs::path(application2).filename().string().c_str());
 _Args2.insert(_Args2.end(), nullptr);
-        
+
 const char* const* args =  _Args.data();
 const char* const* args2 = _Args2.data();
 
@@ -260,7 +260,7 @@ case 0:
     dup2(tubeerr[1], STDERR_FILENO);
     execv(application, (char* const*) args);
     cerr << "[ERR] Runtime failure in jpeg2yuv child process" << endl;
-   
+
     return errno;
 
 
@@ -306,21 +306,22 @@ default:
 return errno;
 
 #else
-       
+
        string cmdline = get_cl(application, Args, 0);
        string cmdline2 = get_cl(application2, Args2, 0);
 
 	   cerr <<"###" << cmdline << "###" << endl;
 
 	   cerr <<"###" << cmdline2 << "###" << endl;
-	   
+
        string command =  cmdline + string(" | ") + cmdline2;
-	   
+
 	   cerr << "!!!" << command << "!!!"  << endl;
-	   
+
        cerr << "***" <<  command << "***" << endl;
-	   
-       int res = system(command.c_str());
+
+       //int res =
+        system(command.c_str());
 return 0;
 #endif
 }
@@ -334,11 +335,11 @@ long execute( const string& application, const vector<const char*>& args, int ve
         xlog << endl << STAT_TAG << "Running command : " << application << " ";
         for(const auto& s: args)  xlog << s << " ";
         xlog << endl;
-    }   
+    }
 	else
 		xlog.close();
 #endif
-   
+
     if (verbose > -1)
     {
         cerr << endl << STAT_TAG << "Running command : " << application << " ";
@@ -347,9 +348,9 @@ long execute( const string& application, const vector<const char*>& args, int ve
 
     string _application = application;
     normalize_windows_paths(_application);
-    
+
     run(_application.c_str(), args, 0);
-	
+
 	return errno;
 }
 
@@ -364,11 +365,11 @@ long execute( const string& application,  const vector<const char*>& args,
     {
         xlog << endl << STAT_TAG << "Running command : " << application << " ";
         for(const auto& s: args)  xlog << s << " ";
-    }   
+    }
 	else
 		xlog.close();
 #endif
-   
+
     if (verbose > -1)
     {
         xlog << " | ";
@@ -384,7 +385,7 @@ long execute( const string& application,  const vector<const char*>& args,
          cerr << application2 << " ";
          for(const auto& s: args2)  cerr << s << " ";
     }
-     
+
     run(application.c_str(), args, application2.c_str(), args2, 0);
 
 	return errno;

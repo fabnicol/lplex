@@ -607,9 +607,9 @@ int lpcmPGtraverser::getCell( bool searchBeyond )
 	{
 		idNow = titleset * 100000 + audioStream * 10000
 			+ ( pgc + 1 )* 100 + ( pg + 1 );
-        
+
 		nameNow =_f( "%02d_%d_%02d_%02d", titleset, audioStream, pgc + 1, pg + 1 );
-        
+
 		pg++;
 		context = _isNew;
 	}
@@ -646,7 +646,7 @@ int lpcmPGextractor::getCell( bool searchBeyond )
 	if( state & traversed )
 		return getCellTraversed();
 
-	while( context = lpcmPGtraverser::getCell( searchBeyond ) )
+	while( (context = lpcmPGtraverser::getCell( searchBeyond )) )
 	{
 		if( audioCells[ pgcCell ].xIndex != -1 )
 			return context;
@@ -699,7 +699,7 @@ int lpcmPGextractor::getCellTraversed()
 
 	if( ++pgcCell == numPGCcells )
 	{
-		if( ++pgcIndex < audioTables.size() )
+		if( ++pgcIndex < (int) audioTables.size() )
 		{
 			audioCells = audioTables.at( pgcIndex ).audioCells;
 			titleset = audioTables.at( pgcIndex ).titleset;
@@ -831,7 +831,7 @@ lpcmWriter* lpcmPGextractor::getWriter( int writeIndex, int context )
 
 				if( editing )
                     lFile->writer->fName = lFile->writer->fName.string() +
-						((char*[]){ ".wav", ".flac ", ".lpcm" }) [ lFile->format-1 ];
+						((const char*[]){ ".wav", ".flac ", ".lpcm" }) [ lFile->format-1 ];
 				else
 					lFile->writer->open();
 			}
@@ -916,7 +916,7 @@ int lpcmPGextractor::configurePGC()
 		return 0;
 
 											// for each cell in program...
-	while( context = getCell( false ) )
+	while( (context = getCell( false )) )
 		found |= configureCell( context );
 
 											// warn if ignoring restrictions
@@ -1018,7 +1018,7 @@ int lpcmPGextractor::configureCell( int context )
 
 		const char *tag = ( state & singleStep ? INFO_TAG : LOG_TAG );
 										// see if Lplex-authored...
-		if( found = readUserData( lFile, buf + 0x343 ) )
+		if( (found = readUserData( lFile, buf + 0x343 )) )
 		{
 			ECHO( _f( "%s(%s) Lplex tags found in nav packet PCI.RECI at LB %d::0x343\n",
                 tag, nameNow.c_str(), cell->start_sector ) );

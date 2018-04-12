@@ -122,7 +122,7 @@ void normalize_windows_paths(string &path)
 {
 #ifndef __linux__
     replace(path.begin(), path.end(), '/', '\\');
-#endif    
+#endif
 }
 
 void normalize_windows_paths(fs::path &path)
@@ -131,7 +131,7 @@ void normalize_windows_paths(fs::path &path)
     string _path = path.string();
     replace(_path.begin(), _path.end(), '/', '\\');
     path = fs::path(_path);
-#endif    
+#endif
 }
 
 
@@ -140,18 +140,18 @@ char* normalize_windows_paths(const char* path)
 #ifndef __linux__
     string _path = string(path);
     char* out = const_cast<char*>(_path.c_str());
-    
-    for(int i=0; out[i] != '\0'; ++i) 
-    { 
-       if (out[i] == '/') out[i] = '\\'; 
+
+    for(int i=0; out[i] != '\0'; ++i)
+    {
+       if (out[i] == '/') out[i] = '\\';
     }
     return (strdup(out));
 #else
     return const_cast<char*>(path);
-#endif    
+#endif
 }
-                              
-char * scrub()
+
+const char * scrub()
 {
 	int l = blip_len;
 	while( l )
@@ -229,10 +229,12 @@ void logInit( const string& filename )
 	xlogExists = 0;
 	xlog.clear();
     if (! filename.empty() )
+    {
         xlogName = filename;
-	
+    }
+
 	xlog.open( xlogName.c_str() );
-	
+
     if( ! xlog.is_open())
     {
         ERR( "Couldn't open log file \'" + string(xlogName) + "\'.\n" );

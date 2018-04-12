@@ -10,10 +10,10 @@
 
 1522802395 source:c:\users\public\dev\lplex\src\lgzip.cpp
 
-1522802395 source:c:\users\public\dev\lplex\src\dvd.cpp
+1523495933 source:c:\users\public\dev\lplex\src\dvd.cpp
 	"dvd.hpp"
 
-1522802395 c:\users\public\dev\lplex\src\dvd.hpp
+1523495044 c:\users\public\dev\lplex\src\dvd.hpp
 	"lplex_precompile.h"
 	<experimental/filesystem>
 	<cstdlib>
@@ -31,14 +31,14 @@
 	<dvdread/nav_read.h>
 	"../patch/udflist.h"
 
-1522802395 c:\users\public\dev\lplex\redist\lplex_precompile.h
+1523495197 c:\users\public\dev\lplex\redist\lplex_precompile.h
 	<cstdlib>
 	<iostream>
 	<fstream>
 	<iomanip>
 	<climits>
 	<streambuf>
-	<strstream>
+	<sstream>
 	<vector>
 	<algorithm>
 	<unistd.h>
@@ -62,7 +62,7 @@
 
 1522802395 c:\users\public\dev\lplex\redist\vlc_bits.h
 
-1522802395 c:\users\public\dev\lplex\src\util.h
+1523496041 c:\users\public\dev\lplex\src\util.h
 	"lplex_precompile.h"
 	<stdio.h>
 	<ctype.h>
@@ -84,7 +84,7 @@
 	<md5/md5.h>
 	"color.h"
 
-1522886838 c:\users\public\dev\lplex\src\platform.h
+1523495746 c:\users\public\dev\lplex\src\platform.h
 	"lplex_precompile.h"
 	<experimental/filesystem>
 	"wx.hpp"
@@ -94,11 +94,11 @@
 	"lplex_precompile.h"
 	"util.h"
 
-1522802395 c:\users\public\dev\lplex\src\color.h
+1523495043 c:\users\public\dev\lplex\src\color.h
 	<iostream>
 	<windows.h>
 
-1522802395 c:\users\public\dev\lplex\src\lplex.hpp
+1523495044 c:\users\public\dev\lplex\src\lplex.hpp
 	"lplex_precompile.h"
 	<cstdlib>
 	<iostream>
@@ -144,20 +144,20 @@
 	"util.h"
 	"lpcm.hpp"
 
-1522802395 c:\users\public\dev\lplex\src\processor.hpp
+1523495044 c:\users\public\dev\lplex\src\processor.hpp
 	"lplex_precompile.h"
 	<FLAC++/all.h>
 	"util.h"
 	"lpcm.hpp"
 	"flac.hpp"
 
-1522878393 c:\users\public\dev\lplex\lplex.def
+1523495043 c:\users\public\dev\lplex\lplex.def
 
 1522802395 c:\users\public\dev\lplex\patch\udflist.h
 	<dvdread/dvd_reader.h>
 	<vector>
 
-1523225933 source:c:\users\public\dev\lplex\src\exec.cpp
+1523495627 source:c:\users\public\dev\lplex\src\exec.cpp
 	"util.h"
 	<cstdio>
 	<fstream>
@@ -176,46 +176,46 @@
 1522802395 source:c:\users\public\dev\lplex\src\flac.cpp
 	"flac.hpp"
 
-1522802395 source:c:\users\public\dev\lplex\src\layout.cpp
+1523496570 source:c:\users\public\dev\lplex\src\layout.cpp
 	"lplex.hpp"
 	"jobs.hpp"
 	<strstream>
 
 1522802395 c:\users\public\dev\lplex\src\jobs.hpp
 
-1522802395 source:c:\users\public\dev\lplex\src\lpcm.cpp
+1523496132 source:c:\users\public\dev\lplex\src\lpcm.cpp
 	"lpcm.hpp"
 	"processor.hpp"
 
-1523224976 source:c:\users\public\dev\lplex\src\lplex.cpp
+1523496690 source:c:\users\public\dev\lplex\src\lplex.cpp
 	"lplex.hpp"
 	"jobs.hpp"
 
-1523064037 source:c:\users\public\dev\lplex\src\main.cpp
+1523495044 source:c:\users\public\dev\lplex\src\main.cpp
 	"lplex.hpp"
 	"jobs.hpp"
 	<sstream>
 	<iomanip>
 	<bitset>
 
-1522802395 source:c:\users\public\dev\lplex\src\reader.cpp
+1523496308 source:c:\users\public\dev\lplex\src\reader.cpp
 	"processor.hpp"
 	"multichannel.cpp"
 
-1522802395 source:c:\users\public\dev\lplex\src\util.cpp
+1523496358 source:c:\users\public\dev\lplex\src\util.cpp
 	"platform.h"
 	"util.h"
 	<sys/stat.h>
 
-1523224367 source:c:\users\public\dev\lplex\src\video.cpp
+1523495044 source:c:\users\public\dev\lplex\src\video.cpp
 	"lplex.hpp"
 	<jpeglib.h>
 
-1522802395 source:c:\users\public\dev\lplex\src\writer.cpp
+1523495044 source:c:\users\public\dev\lplex\src\writer.cpp
 	"processor.hpp"
 	"multichannel.cpp"
 
-1523064142 source:c:\users\public\dev\lplex\src\wx.cpp
+1523495044 source:c:\users\public\dev\lplex\src\wx.cpp
 	<iostream>
 	<experimental/filesystem>
 	"util.h"
@@ -247,7 +247,7 @@
 	<sys/types.h>
 	<inttypes.h>
 
-1522878372 c:\users\public\dev\lplex\config.h
+1523495043 c:\users\public\dev\lplex\config.h
 
 1516181553 c:\users\public\dev\msys2\mingw64\include\dvdread\ifo_types.h
 	<inttypes.h>

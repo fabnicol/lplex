@@ -431,7 +431,7 @@ int dvdLayout::checkSpace()
 //    Returns
 // ----------------------------------------------------------------------------
 
-#include <strstream>
+#include <sstream>
 
 int dvdLayout::configure()
 {
@@ -448,7 +448,7 @@ int dvdLayout::configure()
 		discon = 0x4
 	};
 
-	int i, titleset = 100, note = 0, titleStartIndex;
+	int titleset = 100, note = 0;
 	int32_t orphans = 0, audioFrames, audioLoss, audioGap, audioPadding;
 	uint64_t audioBytes;
 	uint32_t titleVframes;
@@ -473,7 +473,6 @@ int dvdLayout::configure()
 			titleset = lFile->group;
 			titleVframes = 0;
 			orphans = 0;
-			titleStartIndex = i;
 			lFile->type |= lpcmFile::titleStart;
 		}
 
@@ -547,7 +546,7 @@ int dvdLayout::configure()
 		}
 
 		audioFrames = lFile->trim.len / dvdAudioFrame;
-		if( audioLoss = lFile->trim.len % dvdAudioFrame )
+		if( (audioLoss = lFile->trim.len % dvdAudioFrame ))
 			note |= loss;
 
 												//One lpcm audio frame = 150 PTS ticks
@@ -579,7 +578,7 @@ int dvdLayout::configure()
 		}
 
 		char p[100];
-		strstream x;
+		stringstream x;
 		x << setw(10) << audioBytes << " :" << setw(10) << lFile->trim.len << endl;
 		x.getline( p, 100 );
 
@@ -642,6 +641,7 @@ int dvdLayout::configure()
         total.info += filesize( menufiles->at(i).c_str() );
 
 	checkSpace();
+	return 0;
 }
 
 
@@ -658,7 +658,7 @@ int dvdLayout::configure()
 
 int dvdLayout::getNext()
 {
-	if( ++writeIndex >= Lfiles->size() )
+	if( ++writeIndex >= (int) Lfiles->size() )
 			return 0;
 	if( readIndex == -1 )
 		readerNext();
@@ -696,7 +696,7 @@ int dvdLayout::getNext()
 	INFO( lpcmEntity::audioInfo( writeFile ) << " : formatting audio...\n" );
     SCRN( TINT( txt.c_str() ) )
 	BLIP( " ...formatting audio " );
-        
+
 	out.open( nameNow + ".lpcm", job->now & appending ?
 		( writeFile->type & lpcmFile::titleStart ?
 			ios::binary : ios::binary | ios::app ) :
@@ -730,8 +730,8 @@ int dvdLayout::getNext()
 			if( finished )
 			{
 				padding = writeFile->trim.len - ( total.now + reader->ct.now );
-				if( samplePadding = ( total.now + reader->ct.now ) %
-					sampleSeam( &reader->fmeta ) )
+				if( (samplePadding = ( total.now + reader->ct.now ) %
+					sampleSeam( &reader->fmeta ) ))
 				{
 					memset( bigBlock + reader->ct.now, '\0', samplePadding );
 					padding -= samplePadding;
@@ -999,7 +999,7 @@ int dvdauthorXml::write( xmlContext context, const string& str, int flag )
 			xml.flush();
             xml.close();
 			break;
-            
+
         case fileclose:
             xml.flush();
             xml.close();

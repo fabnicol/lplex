@@ -82,7 +82,7 @@ uint64_t lpcmReader::read( unsigned char *buf, uint64_t len )
 {
 	int64_t avail = ct.now - bufPos;
 
-	if( avail < len && ! ( state & _eoi ) )
+	if( avail < (int64_t) len && ! ( state & _eoi ) )
 	{
 		memmove( bigBuf, bigBuf + bufPos, avail );
 
@@ -128,7 +128,7 @@ uint64_t lpcmReader::read( unsigned char *buf, uint64_t len )
 		memmove( bigBuf, bigBuf + bufPos, surplus );
 	}
 
-	len = ( avail < len ) ? avail : len;
+	len = ( avail < (int64_t) len ) ? avail : len;
 	memcpy( buf, bigBuf + bufPos, len );
 	bufPos += len;
 	pos.now += len;
@@ -245,8 +245,9 @@ int lpcmReader::swap2dvd( unsigned char *data, uint32_t count,
 
 uint16_t waveReader::reset( const string& filename, int alignUnit )
 {
+#if 0
 	waveHeader::canonical header;
-
+#endif
 	if( waveFile.is_open() )
 		waveFile.close();
 
@@ -311,7 +312,7 @@ uint64_t waveReader::fillBuf( uint64_t limit, counter<uint64_t> *midCount )
 
 	waveFile.read( (char *) bigBuf + ct.now, ct.max - ct.now );
 
-	if( gcount = waveFile.gcount() )
+	if( (gcount = waveFile.gcount()) )
 	{
 		md5_append( &md5, bigBuf + ct.now, gcount );
 		ct.now += gcount;
@@ -453,7 +454,7 @@ uint64_t flacReader::fillBuf( uint64_t limit, counter<uint64_t> *midCount )
 
 	if( /* limit && */ ct.now > ct.max )
 	{
-		if( unsent = ct.now - ct.max )
+		if( (unsent = ct.now - ct.max ))
 			clearbits( state, _eof );
 		memcpy( reserve, bigBuf + ct.max, unsent );
 		ct.now = ct.max;
@@ -481,7 +482,7 @@ uint64_t flacReader::fillBuf( uint64_t limit, counter<uint64_t> *midCount )
 ::FLAC__StreamDecoderWriteStatus flacReader::write_callback(
 	const ::FLAC__Frame *frame, const FLAC__int32 * const buf[] )
 {
-	
+
 	uint64_t i;
 	uint32_t frameLen = frame->header.blocksize * frame->header.channels *
 		frame->header.bits_per_sample / 8;

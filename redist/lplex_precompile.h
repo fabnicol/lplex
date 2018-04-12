@@ -54,5 +54,8 @@ using namespace std;
 //#include <jpeglib.h>
 #include <vlc_bits.h>
 
+#ifndef uint
+#define uint uint32_t
+#endif
 
 #endif
