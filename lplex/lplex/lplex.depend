@@ -90,7 +90,7 @@
 	"wx.hpp"
 	<windows.h>
 
-1523064231 c:\users\public\dev\lplex\src\wx.hpp
+1523591027 c:\users\public\dev\lplex\src\wx.hpp
 	"lplex_precompile.h"
 	"util.h"
 
@@ -151,7 +151,7 @@
 	"lpcm.hpp"
 	"flac.hpp"
 
-1523495043 c:\users\public\dev\lplex\lplex.def
+1523590008 c:\users\public\dev\lplex\lplex.def
 
 1522802395 c:\users\public\dev\lplex\patch\udflist.h
 	<dvdread/dvd_reader.h>
@@ -176,10 +176,10 @@
 1522802395 source:c:\users\public\dev\lplex\src\flac.cpp
 	"flac.hpp"
 
-1523496570 source:c:\users\public\dev\lplex\src\layout.cpp
+1523496816 source:c:\users\public\dev\lplex\src\layout.cpp
 	"lplex.hpp"
 	"jobs.hpp"
-	<strstream>
+	<sstream>
 
 1522802395 c:\users\public\dev\lplex\src\jobs.hpp
 
@@ -187,11 +187,11 @@
 	"lpcm.hpp"
 	"processor.hpp"
 
-1523496690 source:c:\users\public\dev\lplex\src\lplex.cpp
+1523590436 source:c:\users\public\dev\lplex\src\lplex.cpp
 	"lplex.hpp"
 	"jobs.hpp"
 
-1523495044 source:c:\users\public\dev\lplex\src\main.cpp
+1523595397 source:c:\users\public\dev\lplex\src\main.cpp
 	"lplex.hpp"
 	"jobs.hpp"
 	<sstream>
@@ -215,7 +215,7 @@
 	"processor.hpp"
 	"multichannel.cpp"
 
-1523495044 source:c:\users\public\dev\lplex\src\wx.cpp
+1523596589 source:c:\users\public\dev\lplex\src\wx.cpp
 	<iostream>
 	<experimental/filesystem>
 	"util.h"
@@ -247,7 +247,7 @@
 	<sys/types.h>
 	<inttypes.h>
 
-1523495043 c:\users\public\dev\lplex\config.h
+1523590021 c:\users\public\dev\lplex\config.h
 
 1516181553 c:\users\public\dev\msys2\mingw64\include\dvdread\ifo_types.h
 	<inttypes.h>

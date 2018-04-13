@@ -32,12 +32,12 @@ using namespace std;
 
 
 #if defined __WIN32 || defined _WIN32 || defined _WIN64 || defined __WIN64 || defined MINGW32 || defined MINGW64
-#  define SEPARATOR  "/"
+#  define SEPARATOR  "\\"
 #  define USER  "USERNAME"
 #  define HOME  "C:\\Users"
 #  define USE_C_RMDIR  // as of Apr. 2018, mingw64 port of g++-7.3.0 has a permissions file bug for fs::remove_all
 #else
-#  define SEPARATOR "\\"
+#  define SEPARATOR "/"
 #  define USER "USER"
 #  define HOME "HOME"
 #endif
@@ -50,7 +50,7 @@ size_t fs_DirSize( const fs::path& dirName );
 bool fs_validPath( const fs::path&  filename );
 void fs_fixSeparators( char * path );
 
-class _wxStopWatch 
+class _wxStopWatch
 {
 public:
 	int m, s;

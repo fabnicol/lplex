@@ -22,7 +22,7 @@
 #include "util.h"
 
 namespace fs = std::experimental::filesystem;
-using namespace std;    
+using namespace std;
 
 
 
@@ -59,6 +59,9 @@ bool fs_DeleteDir(const fs::path& dirName)
 #ifndef USE_C_RMDIR
         return(fs::remove_all(dirName) > 0);
 #else
+    if (! fs::exists(dirName)) return true;
+
+    cerr << "Removing " << dirName << endl;
 
     typedef struct slist_t
     {
@@ -68,13 +71,14 @@ bool fs_DeleteDir(const fs::path& dirName)
     } slist_t;
 
 
-    char* root = (char*) dirName.parent_path().c_str();
-    char* dirname = (char*) dirName.filename().c_str();
+    char* root = normalize_windows_paths(dirName.parent_path().string().c_str());   // .c_str() does not work directly under mingw64
+    char* dirname = normalize_windows_paths(dirName.filename().string().c_str());
     char *cwd;
-    cwd = (char*) fs::current_path().c_str();
+    cwd = (char*) normalize_windows_paths(fs::current_path().string().c_str());
 
-        if (chdir (dirname) == -1)
+        if (chdir(dirName.string().c_str()) == -1)
         {
+            cerr << "[ERR] Could not change dir to " << dirName << endl;
             if (errno == ENOTDIR)
             return true;
             //printf ( ERR "chdir() issue with dirname=%s\n", dirname);
@@ -100,7 +104,7 @@ bool fs_DeleteDir(const fs::path& dirName)
                 exit (EXIT_FAILURE);
             }
             memcpy (new_root, root, rootlen);
-            new_root[rootlen] = '/';
+            new_root[rootlen] = SEPARATOR[0];
             memcpy (new_root + rootlen + 1, dirname, dirnamelen);
             new_root[rootlen + dirnamelen + 1] = '\0';
         }
@@ -152,7 +156,10 @@ bool fs_DeleteDir(const fs::path& dirName)
         for (sl = names; sl; sl = sl->next)
         {
             if (!sl->is_dir)
+            {
                 remove(sl->name);
+            }
+
         }
 
 
@@ -162,12 +169,12 @@ bool fs_DeleteDir(const fs::path& dirName)
             {
 
                 fs_DeleteDir(fs::path(new_root) / fs::path(sl->name));
-                if (rmdir (sl->name))
+                rmdir (sl->name);
+                if (fs::exists(fs::path(sl->name)))
                 {
-                    cerr << "[ERR] Impossible to erase directory" << endl ;
+                    cerr << "[ERR] Impossible to erase directory " << sl->name << endl ;
                     throw;
                 }
-
             }
         }
 
@@ -181,8 +188,11 @@ bool fs_DeleteDir(const fs::path& dirName)
             names = names->next;
             free (prev);
         }
-        if (chdir (cwd) != 0) perror("[ERR]  chdir");
-        free (cwd);
+
+
+        if (fs::exists(cwd) && chdir (cwd) != 0) perror("[ERR]  chdir");
+        rmdir(normalize_windows_paths(dirName.string().c_str()));
+        if (fs::exists(dirName)) cerr << "[ERR] Directory " << dirName << " not deleted" << endl;
         return (true);
 #endif
 }
@@ -219,7 +229,7 @@ size_t fs_GetAllDirs( const string& dirName, vector<string>& dirs )
 		    ++n;
 		}
 	 }
-	 
+
 	return n;
 }
 
@@ -232,7 +242,7 @@ size_t fs_GetAllDirs( const string& dirName, vector<string>& dirs )
 size_t fs_DirSize( const fs::path& dirName )
 {
  size_t total_size = 0;
- 
+
  for(auto& p: fs::directory_iterator(dirName))
  {
       if (fs::is_directory(p.path()))
@@ -258,7 +268,7 @@ size_t fs_DirSize( const fs::path& dirName )
 
 bool fs_validPath( const fs::path& p )
 {
-    return (fs::exists(p)); 
+    return (fs::exists(p));
 }
 
 

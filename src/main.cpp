@@ -103,10 +103,13 @@ int main( int argc, char *argv[] )
 {
 	atexit( done );
 	_verbose = false;
+	int res = 0;
 
 	if( init( argc, argv ) )
 	{
-        //wxLog::SetActiveTarget( &_wxLog );
+
+
+
 #ifdef _ERR2LOG
 		xlog << cmdline << "\n-------------------------------------------------------------------------------\n" << endl;
 #endif
@@ -114,9 +117,9 @@ int main( int argc, char *argv[] )
 		{
 #ifdef lgzip_support
 			if( dvd.isOpen() )
-				return udfZip( dvd, true, job.outPath.string() ) ? 0 : 1;
+				res = udfZip( dvd, true, job.outPath.string() ) ? 0 : 1;
 			else if( gzFile != "" )
-				return udfUnzip( gzFile, job.outPath.string() );
+				res = udfUnzip( gzFile, job.outPath.string() );
 			FATAL( "Gzip uninitialized." );
 #else
 			udfError( "Unsupported feature." );
@@ -125,13 +128,26 @@ int main( int argc, char *argv[] )
 //      else
 		if( job.params & unauth )
 		{
-			return unauthor( dvd );
+			res = unauthor( dvd );
 		}
 		else
 		{
 			dvdLayout layout( &Lfiles, &menufiles, &infofiles, &job );
-			return author( layout );
+			res = author( layout );
 		}
+
+		if (fs::exists(job.tempPath))
+        {
+            cerr << job.tempPath << endl;
+            fs_DeleteDir(fs::path("C:\\Users\\Public\\Dev\\temp"));
+            fs_DeleteDir(job.tempPath);
+
+            if (fs::exists(job.tempPath))
+                cerr << "not deleted" << endl;
+        }
+
+		return res;
+
 	}
 	else
 		usage( "No files to process" );
@@ -426,11 +442,11 @@ uint16_t addFiles( fs::path filespec )
 			if( job.inPath.string() == "" )
                 job.inPath = filespec.parent_path();
 		}
-				
+
         cerr << "job.inPath: " << job.inPath << endl;
         cerr << "job.inPath: " << specPath << endl;
         cerr << "filespec.GetFullPath(): " << filespec << endl;
-        
+
         //check if it's an image file
         if( dvd.open( filespec.string().c_str(), false ) )
 		{
@@ -526,8 +542,8 @@ uint16_t addFiles( fs::path filespec )
 		}
 	}
 											//go through and select matching files
-    
-        
+
+
     selector.Traverse(fs::absolute(filespec).string().substr( specPath.string().length()));
 	selector.processFiles();
 
@@ -621,9 +637,9 @@ uint16_t setName( const char *namePath, bool isDir )
   }
 
     uint64_t freeSpace = fs::space(fName).available;
-    
+
     cerr << "[MSG] Free space on "<< fName << " is " << freeSpace/(1024*1024) << " MB.\n\n";
-    
+
 										//...and location
 										//if source is on a hard drive
 	if( freeSpace != 0 )
@@ -634,7 +650,7 @@ uint16_t setName( const char *namePath, bool isDir )
             if( (fs::status( fName.parent_path() ).permissions() & fs::perms::owner_write) != fs::perms::none )
 			{
                 job.outPath = fName.parent_path();
-             
+
 			}
 		}
 		reauthoring = checkName( job.name, true );
@@ -695,8 +711,8 @@ void setJobTargets()
 	if( ! ( job.params & gzip ) )
         job.outPath = job.outPath / job.name;
     job.tempPath = job.tempPath / job.name;
-        
-    if (fs::exists(job.outPath)) 
+
+    if (fs::exists(job.outPath))
     {
        fs_DeleteDir(job.outPath);
     }
@@ -758,11 +774,11 @@ string defaultName()
 {
   time_t now = chrono::system_clock::to_time_t(chrono::system_clock::now());
   stringstream st;
-  
+
   st << put_time(localtime(&now), "%Y-%m-%d_%H%M");
-  
+
   return st.str();
-    
+
 }
 
 // ----------------------------------------------------------------------------
@@ -883,16 +899,16 @@ void lFileTraverser::OnFile( const string& filename )
 void lFileTraverser::Traverse(const string &path)
 {
     string _path = path;
-    
+
     if (path[0] == SEPARATOR[0])
     {
          if (path.length() > 1)
          {
-           _path = path.substr(1);        
+           _path = path.substr(1);
          }
          else return;
     }
-                            
+
     if (fs::is_regular_file(_path))
     {
       OnFile(_path);
@@ -902,10 +918,10 @@ void lFileTraverser::Traverse(const string &path)
     for (auto &p:  fs::directory_iterator(_path))
     {
        int res  = DIR_CONTINUE;
-       
+
        if (fs::is_directory(p))
        {
-          res = OnDir(p.path().string());   
+          res = OnDir(p.path().string());
        }
        else
        if (fs::is_regular_file(p))
@@ -913,13 +929,13 @@ void lFileTraverser::Traverse(const string &path)
          OnFile(p.path().string());
          continue;
        }
-       
+
        if (res == DIR_IGNORE) continue;
        else
        if (res == DIR_CONTINUE)
            Traverse(p.path().string());
     }
-   
+
 }
 
 // ----------------------------------------------------------------------------
@@ -937,7 +953,7 @@ void lFileTraverser::processFiles()
 
 	// ensure alphabetic order; wxDir::Traverse() doesn't necessarily
 	// proceed alphabetically.
-    
+
 	if( filenames.size() > 1 )
 		std::sort( filenames.begin(), filenames.end() );
 
@@ -945,7 +961,7 @@ void lFileTraverser::processFiles()
 	{
 		string& filename = filenames[i];
 		lFile.fName = filename;
-        
+
 		bool ok = true;
 
 		LOG(filename << "\n");
@@ -1009,7 +1025,7 @@ void lFileTraverser::processFiles()
 						err |= mismatchV_ar;
 						ok = false;
 					}
-#endif                    
+#endif
 				}
 				if( ok )
 					Lfiles.push_back( lFile );
@@ -1064,7 +1080,7 @@ int lFileTraverser::OnDir( const string& dirname )
     {
         return DIR_IGNORE;
     }
-    
+
     return DIR_CONTINUE;
 
 }
@@ -1273,8 +1289,8 @@ bool getOpts( int argc, char *argv[] )
 											//in dos directory paths as a literal quote
 		if( argv[optind][strlen(argv[optind])-1] == '\"' )
 			argv[optind][strlen(argv[optind])-1] = '\'';
-        
-        
+
+
 
 		addFiles( fs::path( argv[optind] ) );
 
@@ -1395,7 +1411,7 @@ uint16_t setopt( uint16_t opt, const char *optarg )
 	uint16_t t;
 	char *comma = NULL;
 	bool ok = true, isTrue = 0, isFalse = 0;
-    
+
 	if( optarg && ( comma = (char*)strrchr( optarg, ',' ) ) )
 		comma[0] = '\0';
 
@@ -1415,16 +1431,16 @@ uint16_t setopt( uint16_t opt, const char *optarg )
 			break;
 
 		case 'd':
-			
+
             job.outPath = fs::path(optarg);
-            
+
             if (! fs::is_directory(job.outPath))
             {
                 cerr << "[ERR] " << optarg << " is not a directory." << endl;
                 fs_MakeDirs(job.outPath);
                 ok = validatePath( optarg );
             }
-            
+
             if (fs::is_directory(job.outPath))
             {
               fs::path parent = job.outPath.parent_path();
@@ -1436,8 +1452,8 @@ uint16_t setopt( uint16_t opt, const char *optarg )
                 cerr << "[ERR] Could not create directory " << optarg << endl;
                 throw;
             }
-            
-            
+
+
 			job.params |= ( redirect | userNamed );
 			break;
 
@@ -1547,7 +1563,7 @@ uint16_t setopt( uint16_t opt, const char *optarg )
 			case 'N':
 			menuForce = true;
             [[fallthrough]];
-            
+
 			case 'M':
 			addMenus( optarg, job.tv, menuForce );
 //         menuForce = false;
@@ -1606,7 +1622,7 @@ uint16_t setopt( uint16_t opt, const char *optarg )
 			ok = validatePath( optarg );
             job.dvdPath = fs::path(optarg);
 			break;
-            
+
 		case 'w':
 			ok = validatePath( optarg );
             job.tempPath =  fs::path(optarg);
@@ -1616,7 +1632,7 @@ uint16_t setopt( uint16_t opt, const char *optarg )
                 fs_MakeDirs(job.tempPath);
                 ok = validatePath( optarg );
             }
-            
+
             if (! fs::is_directory(job.tempPath))
             {
                 cerr << "[ERR] Could not create directory " << optarg << endl;
@@ -1750,8 +1766,8 @@ uint16_t setopt( uint16_t opt, const char *optarg )
 			optindl < 0 ? _f( "-%c", opt ).c_str() : _f( "--%s", long_opts[optindl].name ).c_str(),
             optarg ).c_str() );
     }
-    
-    
+
+
 
 	return 1;
 }
@@ -1991,7 +2007,7 @@ bool saveOpts( dvdLayout *layout )
 
 	if( ! ( edit & piped ) )
 		dotLplex.close();
-    
+
     return true;
 }
 

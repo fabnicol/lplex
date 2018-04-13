@@ -12,6 +12,7 @@
 				<Option object_output="obj/Debug/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
+				<Option parameters=" --create=dvd --jpeg  c:/Users/Public/Dev/lplex/data/black_NTSC_704x480.jpg --dir c:\Users\Public\out9 c:/Users/Public/Dev/dvda-author-dev/Docs/a2_16_48.wav " />
 				<Compiler>
 					<Add option="-std=c++1z" />
 					<Add option="-m64" />
