@@ -70,7 +70,7 @@ string toUpper(const string &s);
 
 #define QUOTE(s) ("\"" + string(s) + "\"")
 
-#define Left(X) substr(X)
+#define Left(X) substr(0, X)
 #define Right(X, Y)  (Y < X.length() ? X.substr( X.length() - Y) : string(""))
 
 // trim from start (in place)

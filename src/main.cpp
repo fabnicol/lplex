@@ -19,34 +19,40 @@
 
 
 
-#include "lplex.hpp"
-#include "jobs.hpp"
-//#include <iostream>
 #include <sstream>
 #include <iomanip>
 #include <bitset>
 
+#include "lplex.hpp"
+#include "jobs.hpp"
+
+// Globals
+
 lplexJob job;
+_wxStopWatch stopWatch;
+wxLplexLog _wxLog;
+lpcm_video_ts userMenus;
+
 vector<lpcmFile> Lfiles;
 vector<dvdJpeg> jpegs;
 vector<string> dirs;
 vector<string> menufiles;
 vector<infoFile> infofiles;
-lpcmPGextractor dvd( &Lfiles, &infofiles, &job );
 
+lpcmPGextractor dvd( &Lfiles, &infofiles, &job );
 
 unsigned char bigBlock[BIGBLOCKLEN];
 
 fs::path dataDir, binDir, configDir, tempDir, readOnlyPath;
 fs::path lplexConfig, cwd, projectDotLplex;
+fs::path optSrc;
+
 string  shebang;
 string gzFile;
 string menuPath;
-bool startNewTitleset, projectFile, screenJpg, lgz;
 string cmdline;
 
-_wxStopWatch stopWatch;
-wxLplexLog _wxLog;
+bool startNewTitleset, projectFile, screenJpg, lgz;
 
 enum
 {
@@ -57,22 +63,26 @@ enum
 	mismatch = 0x80
 };
 
-int debug = 0, editing = 0, edit = 0, endPause, menuForce = 0;
-lpcm_video_ts userMenus;
-int menuMap[99];
-fs::path optSrc;
 enum { inif, commandline, prjf };
+
+int debug = 0, editing = 0, edit = 0, endPause, menuForce = 0;
+int menuMap[99];
 int optindl, optContext;
 
+// Initialization of class jobs static private members
+
+int jobs::notrim = 0x01;
+int jobs::seamless = 0x02;
+int jobs::discrete = 0x04;
+int jobs::padded = 0x08;
+int jobs::autoSet = 0xF0;
+int jobs::continuous = seamless | padded;
+int jobs::backward = 0x10;
+int jobs::nearest = 0x20;
+int jobs::forward = 0x40;
 
 #ifdef lplex_console
 
-
-// ----------------------------------------------------------------------------
-//    done :
-// ----------------------------------------------------------------------------
-//    atexit() cleanup.
-// ----------------------------------------------------------------------------
 
 int exitct=0;
 
@@ -139,11 +149,10 @@ int main( int argc, char *argv[] )
 		if (fs::exists(job.tempPath))
         {
             cerr << job.tempPath << endl;
-            fs_DeleteDir(fs::path("C:\\Users\\Public\\Dev\\temp"));
             fs_DeleteDir(job.tempPath);
 
             if (fs::exists(job.tempPath))
-                cerr << "not deleted" << endl;
+                cerr << "[ERR] Temporary path not deleted" << endl;
         }
 
 		return res;
@@ -228,14 +237,15 @@ struct option long_opts[] =
 
 uint16_t init( int argc, char *argv[] )
 {
-    //wxImage::AddHandler( new wxJPEGHandler );
-											//set defaults
 	initPlatform();
     fs_MakeDirs( fs::path(configDir) );
     logInit( (configDir / "lplex.log").string() );
     projectDotLplex = configDir / "project.lplex";
     cwd = fs::current_path();
 	job.tempPath = tempDir;
+	// By default output name is : <YYYY-MM-DD_HHMM>_DVD
+	job.outPath = cwd ;
+
 	job.params = dvdv | md5 | restore | info | cleanup | rescale;
 #ifdef lgzip_support
 	job.prepare = lgzf;
@@ -250,7 +260,7 @@ uint16_t init( int argc, char *argv[] )
 	job.media = plusR;
     job.trim = jobs::seamless;
 	job.trim0 = job.trimCt = 0;
-	job.name = "";
+	job.name = defaultName() + "_DVD";
 	job.extractTo = "";
 	job.now = 0;
 	job.update = 0;
@@ -978,7 +988,7 @@ void lFileTraverser::processFiles()
 			if( lFile.format == wavef )
             {
                 ok = waveHeader::audit( lFile.fName.string().c_str(), &lFile.fmeta );
-                cerr << "Found wav file: " << (ok ? "OK" : "ERR") << endl;
+                if (verbose > 0) cerr << "Found wav file: " << (ok ? "OK" : "ERR") << endl;
             }
 			else if( lFile.format == flacf )
                 ok = flacHeader::audit( lFile.fName.string().c_str(), &lFile.fmeta );
@@ -991,6 +1001,7 @@ void lFileTraverser::processFiles()
 				if( startNewTitleset )
 				{
 					lFile.group = ++job.group;
+					if (verbose > 0) cerr << "[INFO] File " << filename << " belongs to group " << job.group << endl;
 					startNewTitleset = false;
 				}
 
@@ -1231,6 +1242,34 @@ bool getOpts( int argc, char *argv[] )
 
 		optindl = -1;
 	}
+
+
+	if (job.tempPath.empty())
+    {
+        cerr << "[ERR] Working path is empty." << endl;
+        throw;
+    }
+
+    normalize_windows_paths(job.tempPath);
+
+    if ( ! fs::exists( job.tempPath ) )
+    {
+        fs_MakeDirs( job.tempPath );
+    }
+
+    if (job.outPath.empty())
+    {
+        cerr << "[ERR] Output path is empty." << endl;
+        throw;
+    }
+
+    normalize_windows_paths(job.outPath);
+
+    if ( ! fs::exists( job.outPath ) )
+    {
+        fs_MakeDirs( job.outPath);
+    }
+
 
 	argv[0] = argv0;
 	banner();

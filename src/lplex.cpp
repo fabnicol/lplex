@@ -80,30 +80,6 @@ int author( dvdLayout &layout )
 	if( editing )
 		return 0;
 
-    if (job.tempPath.empty())
-    {
-        cerr << "[ERR] Working path is empty." << endl;
-        throw;
-    }
-
-    normalize_windows_paths(job.tempPath);
-
-    if ( ! fs::exists( job.tempPath ) )
-    {
-        fs_MakeDirs( job.tempPath );
-    }
-
-
-    if (job.outPath.empty())
-    {
-        cerr << "[ERR] Output path is empty." << endl;
-        throw;
-    }
-
-    if ( ! fs::exists( job.outPath ) )
-    {
-        fs_MakeDirs( job.outPath);
-    }
 
 	stopWatch.Start();
 
@@ -258,8 +234,8 @@ int author( dvdLayout &layout )
 	if( ! valid_audio )
 		FATAL( "No audio to process!\n" );
 
-//    if( fs::exists( job.dvdPath) )
-//        fs_DeleteDir( job.dvdPath);
+////    if( fs::exists( job.dvdPath) )
+////        fs_DeleteDir( job.dvdPath);
 
     xml.write(dvdauthorXml::open, xml.name);
 	xml.write( dvdauthorXml::closeVob );
@@ -348,8 +324,8 @@ int author( dvdLayout &layout )
 			copyMenufiles( map );
 			delete[] map;
 		}
-		if( job.params & cleanup )
-            fs_DeleteDir( job.tempPath);
+//		if( job.params & cleanup )
+//            fs_DeleteDir( job.tempPath);
 	}
 
 	if( xlogExists )

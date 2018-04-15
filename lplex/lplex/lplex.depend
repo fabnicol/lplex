@@ -62,7 +62,7 @@
 
 1522802395 c:\users\public\dev\lplex\redist\vlc_bits.h
 
-1523496041 c:\users\public\dev\lplex\src\util.h
+1523741220 c:\users\public\dev\lplex\src\util.h
 	"lplex_precompile.h"
 	<stdio.h>
 	<ctype.h>
@@ -84,13 +84,13 @@
 	<md5/md5.h>
 	"color.h"
 
-1523495746 c:\users\public\dev\lplex\src\platform.h
+1523748332 c:\users\public\dev\lplex\src\platform.h
 	"lplex_precompile.h"
 	<experimental/filesystem>
 	"wx.hpp"
 	<windows.h>
 
-1523591027 c:\users\public\dev\lplex\src\wx.hpp
+1523745861 c:\users\public\dev\lplex\src\wx.hpp
 	"lplex_precompile.h"
 	"util.h"
 
@@ -181,22 +181,22 @@
 	"jobs.hpp"
 	<sstream>
 
-1522802395 c:\users\public\dev\lplex\src\jobs.hpp
+1523746827 c:\users\public\dev\lplex\src\jobs.hpp
 
 1523496132 source:c:\users\public\dev\lplex\src\lpcm.cpp
 	"lpcm.hpp"
 	"processor.hpp"
 
-1523590436 source:c:\users\public\dev\lplex\src\lplex.cpp
+1523751821 source:c:\users\public\dev\lplex\src\lplex.cpp
 	"lplex.hpp"
 	"jobs.hpp"
 
-1523595397 source:c:\users\public\dev\lplex\src\main.cpp
-	"lplex.hpp"
-	"jobs.hpp"
+1523753931 source:c:\users\public\dev\lplex\src\main.cpp
 	<sstream>
 	<iomanip>
 	<bitset>
+	"lplex.hpp"
+	"jobs.hpp"
 
 1523496308 source:c:\users\public\dev\lplex\src\reader.cpp
 	"processor.hpp"
@@ -207,7 +207,7 @@
 	"util.h"
 	<sys/stat.h>
 
-1523495044 source:c:\users\public\dev\lplex\src\video.cpp
+1523741249 source:c:\users\public\dev\lplex\src\video.cpp
 	"lplex.hpp"
 	<jpeglib.h>
 
@@ -215,7 +215,7 @@
 	"processor.hpp"
 	"multichannel.cpp"
 
-1523596589 source:c:\users\public\dev\lplex\src\wx.cpp
+1523597394 source:c:\users\public\dev\lplex\src\wx.cpp
 	<iostream>
 	<experimental/filesystem>
 	"util.h"

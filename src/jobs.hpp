@@ -2,17 +2,19 @@
 #define JOBS_HPP
 
 
-namespace jobs
+class jobs
 {
-static    int notrim = 0x01;
-static    int seamless = 0x02;
-static    int discrete = 0x04;
-static    int padded = 0x08;
-static    int autoSet = 0xF0;
-static    int continuous = seamless | padded;
-static    int backward = 0x10;
-static    int nearest = 0x20;
-static    int forward = 0x40;
-}
+public:
+
+static    int notrim;
+static    int seamless;
+static    int discrete;
+static    int padded;
+static    int autoSet;
+static    int continuous;
+static    int backward;
+static    int nearest;
+static    int forward;
+};
 
 #endif // JOBS_HPP

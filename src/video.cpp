@@ -145,7 +145,7 @@ ofstream* m2v( uint32_t vFrames, const char *jpeg, const char *m2vName,
 	if( m2vFile.is_open() )
 		m2vFile.seekp( 0, ios::end );
 
-    char* _m2vName = normalize_windows_paths(m2vName);   
+    char* _m2vName = normalize_windows_paths(m2vName);
 
 	if( ! append )
 	{
@@ -259,7 +259,7 @@ ofstream* m2v( uint32_t vFrames, const char *jpeg, const char *m2vName,
 #ifndef __linux__
     free(_m2vName);
 #endif
-    
+
 	return &m2vFile;
 }
 

@@ -22,7 +22,7 @@
 #define PLATFORM_H_INCLUDED
 
 #ifndef LPLEX_PCH_INCLUDED
-#include "lplex_precompile.h"
+#  include "lplex_precompile.h"
 #endif
 #include <experimental/filesystem>
 #include "wx.hpp"
@@ -30,14 +30,29 @@
 using namespace std;
 namespace  fs = std::experimental::filesystem;
 
-#if defined(__MINGW32__) || defined(__MINGW64__) || defined(_WIN32) || defined(__WIN32) || defined (__WIN32__) || defined (__WIN64) || defined (_WIN64)
-#define lplex_win32
+
+#if defined __WIN32 || defined _WIN32 || defined _WIN64 || defined __WIN64 || defined MINGW32 || defined MINGW64 || defined(__MINGW32__) || defined(__MINGW64__)
+#  define SEPARATOR  "\\"
+#  define USER  "USERNAME"
+#  define HOME  "C:\\Users"
+#  ifndef USE_C_RMDIR
+#    define USE_C_RMDIR  // as of Apr. 2018, mingw64 port of g++-7.3.0 has a permissions file bug for fs::remove_all
+#  endif
+#  ifndef lplex_win32
+#    define lplex_win32
+#  endif
 #else
-#define lplex_linux
+#  define SEPARATOR "/"
+#  define USER "USER"
+#  define HOME "HOME"
+#  ifndef lplex_linux
+#    define lplex_linux
+#  endif
 #endif
 
+
 #if 1
-#define lplex_console
+#  define lplex_console
 #endif
 
 
@@ -139,18 +154,13 @@ inline string volumeLabel( const char *path, bool mustBeRoot )
 
 inline bool initPlatform()
 {
-#ifdef lplex_win32
-    fs::path home = fs::path(HOME) / getenv(USER);
-    fs::path appdata = fs::path(getenv("APPDATA"));
-#else
+
     fs::path home = fs::path(getenv(HOME));
     fs::path appdata = home / "lplex";
-#endif
-
     configDir = appdata / string("lplex");
     lplexConfig = configDir / "lplex.ini";
     binDir = fs::path("/usr/bin"); //fs::current_path() / fs::path("local") / fs::path("bin");
-    dataDir = appdata /  fs::path("data");
+    dataDir = appdata /  fs::path("data") ;
     readOnlyPath = home;
     tempDir = fs::path("/home/fab/temp");
     fs::create_directories(tempDir);
@@ -192,20 +202,19 @@ inline const char* device( dev_t device )
 
 inline bool initPlatform()
 {
-#ifdef lplex_win32
+
     string home = string(HOME) + SEPARATOR + getenv(USER);
     string appdata = string(getenv("APPDATA"));
-#else
-    string home = string(HOME);
-    string appdata = home + SEPARATOR ".local";
-#endif
-
     configDir = appdata + string(SEPARATOR  "lplex"  SEPARATOR);
     lplexConfig = configDir / "lplex.ini";
     binDir = fs::path("C:/Users/Public/Dev/msys2/usr/bin"); //fs::path("/usr/bin"); //fs::current_path() / fs::path("local") / fs::path("bin");
-    dataDir = appdata /  fs::path("data");
+    dataDir = appdata /  fs::path("lplex/data");
     readOnlyPath = home;
-    tempDir = fs::temp_directory_path();
+    tempDir = fs::temp_directory_path()/fs::path("lplex");
+    if (! fs::exists(tempDir))
+      fs::create_directories(tempDir);
+
+
     shebang = "#!/usr/local/bin/lplex -P 1\n";
     endPause = true;
     return true;
