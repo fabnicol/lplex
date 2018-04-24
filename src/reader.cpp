@@ -162,7 +162,7 @@ uint64_t lpcmReader::read( unsigned char *buf, uint64_t len )
 int lpcmReader::swap2dvd( unsigned char *data, uint32_t count,
 	int channels, int bitspersample )
 {
-	uint32_t i;
+	uint32_t i = 0;
 	int x;
 	// Convert little-endian WAV samples to big-endian MPEG LPCM samples
 	if ( bitspersample == 16 )

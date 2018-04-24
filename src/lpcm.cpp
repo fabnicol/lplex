@@ -47,7 +47,7 @@ uint16_t PES_packet::payload( PES_packet::header* PS1,
 	static uint8_t orphanage[11];
 	static uint16_t orphans, sampleSize = 1, bps, ch;
 	uint16_t i, o;
-	uint8_t *seam;
+	uint8_t * seam = nullptr;
 
 	audio->start = dataAddr( PS1 );
 	audio->len = dataLen( PS1 ) + 1;

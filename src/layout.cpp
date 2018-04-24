@@ -451,7 +451,7 @@ int dvdLayout::configure()
 	int titleset = 100, note = 0;
 	int32_t orphans = 0, audioFrames, audioLoss, audioGap, audioPadding;
 	uint64_t audioBytes;
-	uint32_t titleVframes;
+	uint32_t titleVframes = 0;
 
 	total.audio = total.video = total.info = 0;
 
@@ -842,7 +842,7 @@ int dvdauthorXml::write( xmlContext context, const string& str, int flag )
 	switch( context )
 	{
 		case open:
-            xml.open(str, ofstream::out | ofstream::app);
+            xml.open(str, ofstream::out | ofstream::trunc);
 
 			if (! xml.is_open ())
                 cerr << "[ERR] Could not open xml" << endl;
@@ -1000,10 +1000,6 @@ int dvdauthorXml::write( xmlContext context, const string& str, int flag )
             xml.close();
 			break;
 
-        case fileclose:
-            xml.flush();
-            xml.close();
-            break;
 		default:
 			break;
 	}

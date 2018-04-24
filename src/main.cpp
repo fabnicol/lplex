@@ -146,9 +146,8 @@ int main( int argc, char *argv[] )
 			res = author( layout );
 		}
 
-		if (fs::exists(job.tempPath))
+		if ((job.params & cleanup) && fs::exists(job.tempPath))
         {
-            cerr << job.tempPath << endl;
             fs_DeleteDir(job.tempPath);
 
             if (fs::exists(job.tempPath))
@@ -727,10 +726,10 @@ void setJobTargets()
        fs_DeleteDir(job.outPath);
     }
 
-    if (fs::exists(job.tempPath))
+    if  (fs::exists(job.tempPath))
     {
-        fs_DeleteDir(job.tempPath);
-    }
+          fs_DeleteDir(job.tempPath);
+      }
 
     fs_MakeDirs(job.outPath);
     fs_MakeDirs(job.tempPath);
@@ -1447,7 +1446,7 @@ bool stdArgs( int &argc, char** &argv, char *args, size_t size )
 
 uint16_t setopt( uint16_t opt, const char *optarg )
 {
-	uint16_t t;
+	uint16_t t = 0;
 	char *comma = NULL;
 	bool ok = true, isTrue = 0, isFalse = 0;
 

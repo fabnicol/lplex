@@ -37,7 +37,7 @@ int author( dvdLayout &layout )
 	int i, valid_audio = 0, m2vUpdate = -1, multichapter = 0, done = 0;
 	uint16_t uDataLen = 0;
 	uint8_t userData[512];
-	uint32_t vFrames;
+	uint32_t vFrames = 0;
 	ofstream *m2vFile = NULL;
 
 
@@ -118,9 +118,7 @@ int author( dvdLayout &layout )
 
 		}
 
-        // PATCH F. NICOL: lplex BUG ?
-          xml.write(dvdauthorXml::fileclose);
-        //
+
         txt.clear();
         txt = STAT_TAG + Lfiles[i].fName.filename().string();
 		if( jpegs.size() > 1 )
@@ -157,10 +155,8 @@ int author( dvdLayout &layout )
                        ! ( Lfiles[i].trim.type & jobs::continuous ),
                        ! ( Lfiles[i].trim.type & jobs::continuous ) );
 
-        xml.write(dvdauthorXml::open, xml.name);
 		xml.write( dvdauthorXml::addChapter, job.now & appending ?
 			dvdauthorXml::timestampFractional( vFrames, job.tv == NTSC, .001 ) : "0" );
-        xml.write(dvdauthorXml::fileclose);
 
 		vFrames += Lfiles[i].videoFrames;
 
@@ -234,12 +230,9 @@ int author( dvdLayout &layout )
 	if( ! valid_audio )
 		FATAL( "No audio to process!\n" );
 
-////    if( fs::exists( job.dvdPath) )
-////        fs_DeleteDir( job.dvdPath);
+    if  ( fs::exists( job.dvdPath ))   fs_DeleteDir( job.dvdPath);
 
-    xml.write(dvdauthorXml::open, xml.name);
 	xml.write( dvdauthorXml::closeVob );
-
 
 	if( job.prepare >= mpegf )
 	{
@@ -266,9 +259,6 @@ int author( dvdLayout &layout )
 
 		_progress.start = _progress.now = 0;
 		_progress.max = 2 * (uint32_t) ( layout.vobEstimate() / MEGABYTE );
-
-        //vector<const char*> cmdline =
-        //{"-x", xml.name.c_str() };
 
 		if( execute(
             (binDir / "dvdauthor").string(),
@@ -324,8 +314,6 @@ int author( dvdLayout &layout )
 			copyMenufiles( map );
 			delete[] map;
 		}
-//		if( job.params & cleanup )
-//            fs_DeleteDir( job.tempPath);
 	}
 
 	if( xlogExists )
@@ -448,7 +436,7 @@ int mkisofs(const fs::path &isoPath, const fs::path &dvdPath, const string& name
 	if( (exitCode = execute(
             (binDir / "mkisofs").string(),
 			{ "-dvd-video",
-              "-udf"
+              "-udf",
 			  "-V",
               volumeID.c_str(),
 			  "-o",
@@ -476,12 +464,12 @@ int mkisofs(const fs::path &isoPath, const fs::path &dvdPath, const string& name
 
 int unauthor( lpcmPGextractor &dvd )
 {
-	int c, context, titleset = 0, v, processErr, writeIndex, finish;
+	int c, context, titleset = 0, v, processErr, writeIndex = 0, finish;
 	uint16_t s;
 	uint32_t b, blockCt, unfinishedBlock=0;
 	lpcmFile *lFile;
-	lpcmWriter *writer;
-	dvd_file_t *vobs;
+	lpcmWriter *writer = nullptr;
+	dvd_file_t *vobs = nullptr;
 	//md5_byte_t md5str[16];
 	uint64_t ptsBoundary;
 	counter<uint64_t> total;
@@ -894,8 +882,8 @@ uint16_t readUserData( lpcmEntity *lFile, uint8_t* userData )
 
 int tagEmbed()
 {
-	int c, v, L=-1, titleset=-1;
-	uint64_t addr, _SOF, _EOF;
+	int c, v=0, L=-1, titleset=-1;
+	uint64_t addr, _SOF = 0, _EOF = 0;
 	uint16_t uDataLen;
 	uint8_t userData[512];
 
