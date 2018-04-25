@@ -9,10 +9,11 @@
 		<Build>
 			<Target title="Debug">
 				<Option output="bin/Debug/lplex" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="../../../lplex" />
 				<Option object_output="obj/Debug/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
-				<Option parameters="--cleanup no --workpath c:\users\public\temp  --create=dvd    c:\Users\Public\Dev\dvda-author-dev\Docs\a2_16_48.wav  " />
+				<Option parameters=" --create=iso    c:\Users\Public\Dev\dvda-author-dev\Docs\a2_16_48.wav  " />
 				<Compiler>
 					<Add option="-std=c++1z" />
 					<Add option="-m64" />

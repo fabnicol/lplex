@@ -57,7 +57,7 @@ namespace  fs = std::experimental::filesystem;
 
 
 extern string 	shebang;
-extern fs::path lplexConfig, configDir, dataDir, binDir, tempDir, readOnlyPath, projectDotLplex;
+extern fs::path lplexConfig, configDir, dataDir, binDir, tempDir, isoPath, readOnlyPath, projectDotLplex;
 
 											// endian swap macros (from dvdread/bswap.h)
 
@@ -207,13 +207,13 @@ inline bool initPlatform()
     string appdata = string(getenv("APPDATA"));
     configDir = appdata + string(SEPARATOR  "lplex"  SEPARATOR);
     lplexConfig = configDir / "lplex.ini";
-    binDir = fs::path("C:/Users/Public/Dev/msys2/usr/bin"); //fs::path("/usr/bin"); //fs::current_path() / fs::path("local") / fs::path("bin");
+    isoPath = fs::path("iso");
+    binDir =  fs::path("bin");
     dataDir = appdata /  fs::path("lplex/data");
     readOnlyPath = home;
     tempDir = fs::temp_directory_path()/fs::path("lplex");
     if (! fs::exists(tempDir))
       fs::create_directories(tempDir);
-
 
     shebang = "#!/usr/local/bin/lplex -P 1\n";
     endPause = true;

@@ -43,7 +43,7 @@ lpcmPGextractor dvd( &Lfiles, &infofiles, &job );
 
 unsigned char bigBlock[BIGBLOCKLEN];
 
-fs::path dataDir, binDir, configDir, tempDir, readOnlyPath;
+fs::path dataDir, binDir, configDir, tempDir, isoPath, readOnlyPath;
 fs::path lplexConfig, cwd, projectDotLplex;
 fs::path optSrc;
 
@@ -244,7 +244,7 @@ uint16_t init( int argc, char *argv[] )
 	job.tempPath = tempDir;
 	// By default output name is : <YYYY-MM-DD_HHMM>_DVD
 	job.outPath = cwd ;
-
+    job.isoPath = isoPath;
 	job.params = dvdv | md5 | restore | info | cleanup | rescale;
 #ifdef lgzip_support
 	job.prepare = lgzf;
@@ -712,8 +712,10 @@ void setJobTargets()
             job.inPath / (job.name + ".lplex") :
 			projectDotLplex;
 
-    if( (fs::status(job.isoPath).permissions() & fs::perms::owner_write) == fs::perms::none  )
-        job.isoPath = job.outPath.parent_path();
+  if (fs::exists(job.isoPath))
+    {
+       fs_DeleteDir(job.isoPath);
+      }
 
     job.isoPath = job.isoPath / (job.name + ".iso");
 
@@ -1662,11 +1664,11 @@ uint16_t setopt( uint16_t opt, const char *optarg )
 			break;
 
 		case 'w':
-			ok = validatePath( optarg );
+
             job.tempPath =  fs::path(optarg);
             if (! fs::is_directory(job.tempPath))
             {
-                cerr << "[ERR] " << optarg << " is not a directory." << endl;
+                cerr << "[INF] " << " Creating directory " << optarg <<  endl;
                 fs_MakeDirs(job.tempPath);
                 ok = validatePath( optarg );
             }
@@ -1680,8 +1682,19 @@ uint16_t setopt( uint16_t opt, const char *optarg )
 
 		case 'a':
 			if( ! stricmp( optarg, "adjacent" ) ) break;
-			ok = validatePath( optarg );
-            job.isoPath = fs::path(optarg);
+			job.isoPath = fs::path(optarg);
+			if (!  fs::is_directory(job.isoPath))
+            {
+                cerr << "[INF] " << " Creating directory " << optarg <<  endl;
+                fs_MakeDirs(job.isoPath);
+                ok = validatePath( optarg );
+             }
+
+            if (! fs::is_directory(job.isoPath))
+            {
+                cerr << "[ERR] Could not create directory " << optarg << endl;
+                throw;
+            }
 			break;
 
 		case 'E':
