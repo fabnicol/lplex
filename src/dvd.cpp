@@ -433,12 +433,22 @@ int lpcm_video_ts::open( const char * VIDEO_TS, bool fatal )
 		close();
 
 	// suppress console output during libdvdread calls
-	putenv( "DVDREAD_VERBOSE=0" );
-	putenv( "DVDCSS_VERBOSE=0" );
-	freopen( NUL, "wt", stderr );
+	putenv( const_cast<char*>("DVDREAD_VERBOSE=0" ));
+	putenv( const_cast<char*>("DVDCSS_VERBOSE=0" ));
+	FILE* res = freopen( NUL, "wt", stderr );
+    if (res == nullptr) 
+    {
+        cerr << "[ERR] Cannot open /dev/null" << endl;
+        throw;
+    }
+    
 	libdvdReader = DVDOpen( VIDEO_TS );
-	freopen( CON, "wt", stderr );
-
+	res = freopen( CON, "wt", stderr );
+    if (res == nullptr) 
+    {
+        cerr << "[ERR] Cannot open console" << endl;
+        throw;
+    }
 	if( ! libdvdReader )
 	{
 		if( fatal )
@@ -446,10 +456,19 @@ int lpcm_video_ts::open( const char * VIDEO_TS, bool fatal )
 		return 0;
 	}
 
-	freopen( NUL, "wt", stderr );
+	res = freopen( NUL, "wt", stderr );
+    if (res == nullptr) 
+    {
+        cerr << "[ERR] Cannot open /dev/null" << endl;
+        throw;
+    }
 	ifo = ifoOpen( libdvdReader, 0 );
-	freopen( CON, "wt", stderr );
-
+	res = freopen( CON, "wt", stderr );
+    if (res == nullptr) 
+    {
+        cerr << "[ERR] Cannot open console" << endl;
+        throw;
+    }
 	if( ! ifo )
 	{
 		if( fatal )

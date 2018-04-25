@@ -131,10 +131,10 @@ int author( dvdLayout &layout )
 		{
 			if( m2vUpdate > -1 && Lfiles[m2vUpdate].type & lpcmFile::readComplete )
 			{
-				uDataLen = writeUserData( &Lfiles[m2vUpdate], userData, sizeof( userData ) );
+				uDataLen = writeUserData( &Lfiles[m2vUpdate], userData );
 				m2vFile->write( (char*)userData, uDataLen );
 			}
-			uDataLen = writeUserData( &Lfiles[i], userData, sizeof( userData ) );
+			uDataLen = writeUserData( &Lfiles[i], userData );
 		}
 
 		m2vUpdate = job.params & md5 ?
@@ -143,17 +143,17 @@ int author( dvdLayout &layout )
 		BLIP( " ...creating video " );
 		cerr << "m2v" << " " << layout.nameNow << ".m2v" << endl;
 
-		m2vFile = m2v( Lfiles[i].videoFrames,
-			jpegs[ Lfiles[i].jpgIndex ].getName().c_str(),
-                        string(layout.nameNow + ".m2v").c_str(),
-		       	job.tv,
-			jpegs[ Lfiles[i].jpgIndex ].ar == dvdJpeg::_16x9 ? true : false,
-			userData,
-		       	uDataLen,
-		       	( job.tv == NTSC ? 18 : 15 ),
-			job.now & appending,
-                       ! ( Lfiles[i].trim.type & jobs::continuous ),
-                       ! ( Lfiles[i].trim.type & jobs::continuous ) );
+		m2vFile = m2v(Lfiles[i].videoFrames,
+			          jpegs[ Lfiles[i].jpgIndex ].getName().c_str(),
+                      string(layout.nameNow + ".m2v").c_str(),
+		       	      job.tv,
+			          jpegs[ Lfiles[i].jpgIndex ].ar == dvdJpeg::_16x9 ? true : false,
+			          userData,
+		       	      uDataLen,
+		       	      (job.tv == NTSC ? 18 : 15),
+			          job.now & appending,
+                      ! (Lfiles[i].trim.type & jobs::continuous),
+                      ! (Lfiles[i].trim.type & jobs::continuous));
 
 		xml.write( dvdauthorXml::addChapter, job.now & appending ?
 			dvdauthorXml::timestampFractional( vFrames, job.tv == NTSC, .001 ) : "0" );
@@ -162,6 +162,7 @@ int author( dvdLayout &layout )
 
         if( Lfiles[i].trim.type & jobs::continuous )
             SCRN( "\n" )
+                    
 		ECHO( "\n" );
 
         if( Lfiles[i].trim.type & jobs::continuous &&
@@ -170,6 +171,7 @@ int author( dvdLayout &layout )
 
 		if( job.prepare < mpegf )
 			continue;
+        
 		ECHO( "----------------------------------- MPLEX -------------------------------------\n\n"  );
 		BLIP( " ...multiplexing " );
 
@@ -761,13 +763,12 @@ void copyInfoFiles(const fs::path& rootPath )
 //    Arguments:
 //       <lFile>        - pointer to relevant lpcmEntity descriptor
 //       <userData>     - pointer to destination buffer
-//       <sizeofUData>  - size of destination buffer
 //
 //    Returns actual number of bytes written
 // ----------------------------------------------------------------------------
 
 
-uint16_t writeUserData( lpcmEntity *lFile, uint8_t *userData, uint16_t sizeofUData )
+uint16_t writeUserData( lpcmEntity *lFile, uint8_t *userData )
 {
     fs::path noExt =  lFile->fName;
     noExt = noExt.parent_path() / noExt.stem();
@@ -950,7 +951,7 @@ int tagEmbed()
 
 		vobFile.seekp( addr, ios::beg );
 
-		uDataLen = writeUserData( &Lfiles[L++], userData, sizeof( userData ) );
+		uDataLen = writeUserData( &Lfiles[L++], userData );
 
 		if( uDataLen <= 0xBD ) // 0x400 - 0x343
 		{

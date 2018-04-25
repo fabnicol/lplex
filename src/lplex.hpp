@@ -276,7 +276,7 @@ int author( dvdLayout &layout );
 int unauthor( lpcmPGextractor &dvd );
 void copyInfoFiles(const fs::path& nameA );
 uint16_t readUserData( lpcmEntity *lFile, uint8_t *userData );
-uint16_t writeUserData( lpcmEntity *lFile, uint8_t *userData, uint16_t sizeofUData );
+uint16_t writeUserData( lpcmEntity *lFile, uint8_t *userData);
 int tagEmbed();
 int mkisofs(const fs::path &isoPath, const fs::path &dvdPath, const string& name );
 

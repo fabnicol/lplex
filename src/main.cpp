@@ -885,7 +885,12 @@ string  lFileTraverser::setRoot( const char *rootPath, int fromParent )
 	if( fromParent && fs::is_directory(rootDir))
         rootDir = rootDir.parent_path();
     const fs::path&  curPath = fs::current_path();
-    chdir(rootPath);
+    int res = chdir(rootPath);
+    if (res == -1)
+    {
+        cerr << "[ERR]  Impossible to change directory to " << rootPath << endl;
+        throw;
+    }
 
     root = rootDir.string().length();
 	dirs.push_back( rootDir.string() );
@@ -910,7 +915,7 @@ void lFileTraverser::OnFile( const string& filename )
 void lFileTraverser::Traverse(const string &path)
 {
     string _path = path;
-
+#if 0
     if (path[0] == SEPARATOR[0])
     {
          if (path.length() > 1)
@@ -919,7 +924,8 @@ void lFileTraverser::Traverse(const string &path)
          }
          else return;
     }
-
+#endif
+    
     if (fs::is_regular_file(_path))
     {
       OnFile(_path);

@@ -118,14 +118,14 @@ void setcolors( int scheme )
 ofstream xlog;
 string xlogName;
 
-void normalize_windows_paths(string &path)
+void normalize_windows_paths(string & path __attribute__((unused)))
 {
 #ifndef __linux__
     replace(path.begin(), path.end(), '/', '\\');
 #endif
 }
 
-void normalize_windows_paths(fs::path &path)
+void normalize_windows_paths(fs::path &path __attribute__((unused)))
 {
 #ifndef __linux__
     string _path = path.string();
@@ -386,7 +386,7 @@ int otherThan( const char c, unsigned char *buf, int n )
 // ----------------------------------------------------------------------------
 
 
-string hexToStr( const unsigned char *buf, int n, int w )
+string hexToStr( const unsigned char *buf, int n, int w __attribute__((unused)))
 {
 	string str;
 	for ( int i=0; i < n; ++i )

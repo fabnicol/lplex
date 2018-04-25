@@ -4,9 +4,9 @@ CONFIG -= app_bundle
 CONFIG -= qt
 
 INCLUDEPATH += ../redist ..
-QMAKE_CXXFLAGS += -std=c++1z
+QMAKE_CXXFLAGS += -std=c++1z -Wall -Wextra 
 QMAKE_LFLAGS += -L../redist/md5
-LIBS += -lFLAC++ -lFLAC -ldvdread -lm -lstdc++fs -lmd5
+LIBS += -lFLAC++ -lFLAC -ldvdread -lm -lstdc++fs 
 SOURCES += \
     ../src/dvd.cpp \
     ../src/exec.cpp \
@@ -20,7 +20,8 @@ SOURCES += \
     ../src/util.cpp \
     ../src/video.cpp \
     ../src/writer.cpp \
-    ../src/wx.cpp
+    ../src/wx.cpp \
+    ../redist/md5/md5.c
 
 HEADERS += \
     ../src/color.h \
@@ -35,7 +36,8 @@ HEADERS += \
     ../redist/lplex_precompile.h \
     ../src/jobs.hpp \
     ../redist/lplex_precompile.h \
-    ../redist/vlc_bits.h
+    ../redist/vlc_bits.h \
+    ../redist/md5/md5.h
 
 DISTFILES += \
     ../Makefile \

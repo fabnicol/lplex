@@ -139,30 +139,17 @@ inline string volumeLabel( const char *path, bool mustBeRoot )
 #pragma GCC diagnostic pop
 
 
-// inline bool initPlatform()
-// {
-// 	wxStandardPathsBase& platform = wxStandardPaths::Get();
-//     configDir = platform.GetUserDataDir() / "lplex" ;
-//     lplexConfig = configDir / "lplex.conf";
-//     binDir = "";
-//     dataDir = platform.GetDataDir() / "lplex" ;
-// 	readOnlyPath = fs::path::GetHomeDir();
-//     tempDir = platform.GetTempDir();
-// 	shebang = "#!" + platform.GetExecutablePath() + " -P 1\n";
-// 	endPause = false;
-// }
-
 inline bool initPlatform()
 {
-
     fs::path home = fs::path(getenv(HOME));
-    fs::path appdata = home / "lplex";
+    fs::path appdata = home / ".config";
     configDir = appdata / string("lplex");
     lplexConfig = configDir / "lplex.ini";
-    binDir = fs::path("/usr/bin"); //fs::current_path() / fs::path("local") / fs::path("bin");
-    dataDir = appdata /  fs::path("data") ;
+    isoPath = configDir / "iso";
+    binDir = fs::path("/usr/bin"); 
+    dataDir = configDir / "data" ;
     readOnlyPath = home;
-    tempDir = fs::path("/home/fab/temp");
+    tempDir = home / "temp";
     fs::create_directories(tempDir);
 	shebang = "#!/usr/local/bin/lplex -P 1\n";
 	endPause = true;
