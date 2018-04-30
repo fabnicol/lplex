@@ -925,7 +925,7 @@ void lFileTraverser::Traverse(const string &path)
          else return;
     }
 #endif
-    
+
     if (fs::is_regular_file(_path))
     {
       OnFile(_path);
@@ -1030,7 +1030,7 @@ void lFileTraverser::processFiles()
 							lFile.group = ++job.group;
 						}
 					}
-#if 0
+#if 1
 					if( jpegs[ lFile.jpgIndex ].getDim() !=
 						jpegs[ Lfiles.back().jpgIndex ].getDim() )
 					{
@@ -1931,12 +1931,12 @@ bool saveOpts( dvdLayout *layout )
 	{
 		dotLplex <<
 		"--video="       << ( job.tv == NTSC ? "ntsc" : "pal" ) << endl << // -t
-//      "--jpeg="        << QUOTE( job.jpeg.string() ) << endl << // -j
-        "--dvdpath="     << QUOTE( job.dvdPath.parent_path().string() ) << endl << // -p
-        "--workpath="    << QUOTE(  job.tempPath.parent_path().string()  ) << endl << // -w
-        "--isopath="     << QUOTE( job.isoPath.parent_path().string() ) << endl; // -a
-//      "--extractPath=" << QUOTE( job.extractPath.parent_path() ) << endl << // -e
-	}
+   //     "--jpeg="         << QUOTE( job.jpeg.string() ) << endl << // -j
+        "--dvdpath="   << QUOTE( job.dvdPath.parent_path().string() ) << endl << // -p
+        "--workpath=" << QUOTE(  job.tempPath.parent_path().string()  ) << endl << // -w
+        "--isopath="    << QUOTE( job.isoPath.parent_path().string() ) << endl; // -a
+   //     "--extractPath=" << QUOTE( job.extractPath.parent_path() ) << endl << // -e
+    }
 
 	dotLplex <<
 		"--verbose="     << ( _verbose ? T:F ) << endl << // -v

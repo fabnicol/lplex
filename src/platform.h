@@ -50,16 +50,12 @@ namespace  fs = std::experimental::filesystem;
 #  endif
 #endif
 
-
-#if 1
 #  define lplex_console
-#endif
-
 
 extern string 	shebang;
 extern fs::path lplexConfig, configDir, dataDir, binDir, tempDir, isoPath, readOnlyPath, projectDotLplex;
 
-											// endian swap macros (from dvdread/bswap.h)
+// endian swap macros (from dvdread/bswap.h)
 
 inline uint64_t bswap(uint64_t i)
 {
@@ -146,7 +142,7 @@ inline bool initPlatform()
     configDir = appdata / string("lplex");
     lplexConfig = configDir / "lplex.ini";
     isoPath = configDir / "iso";
-    binDir = fs::path("/usr/bin"); 
+    binDir = fs::path("/usr/bin");
     dataDir = configDir / "data" ;
     readOnlyPath = home;
     tempDir = home / "temp";

@@ -13,7 +13,7 @@
 				<Option object_output="obj/Debug/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
-				<Option parameters=" --create=iso    c:\Users\Public\Dev\dvda-author-dev\Docs\a2_16_48.wav  " />
+				<Option parameters=' -j black_L  --unauthor   &quot;C:\Users\Public\Dev\lplex\2018-04-30_2237_DVD&quot;' />
 				<Compiler>
 					<Add option="-std=c++1z" />
 					<Add option="-m64" />
