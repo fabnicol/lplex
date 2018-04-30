@@ -6,7 +6,7 @@ CONFIG -= qt
 INCLUDEPATH += ../redist ..
 QMAKE_CXXFLAGS += -std=c++1z -Wall -Wextra 
 QMAKE_LFLAGS += -L../redist/md5
-LIBS += -lFLAC++ -lFLAC -ldvdread -lm -lstdc++fs 
+LIBS += -lFLAC++ -lFLAC -ldvdread -lm -lstdc++fs -static-libstdc++ -static-libgcc -s
 SOURCES += \
     ../src/dvd.cpp \
     ../src/exec.cpp \
