@@ -2,6 +2,8 @@
 	lplex.cpp - top-level authoring and extraction.
 	Copyright (C) 2006-2011 Bahman Negahban
 
+    Adapted to C++-17 in 2018 by Fabrice Nicol
+
 	This program is free software; you can redistribute it and/or modify it
 	under the terms of the GNU General Public License as published by the
 	Free Software Foundation; either version 2 of the License, or (at your
@@ -162,7 +164,7 @@ int author( dvdLayout &layout )
 
         if( Lfiles[i].trim.type & jobs::continuous )
             SCRN( "\n" )
-                    
+
 		ECHO( "\n" );
 
         if( Lfiles[i].trim.type & jobs::continuous &&
@@ -171,7 +173,7 @@ int author( dvdLayout &layout )
 
 		if( job.prepare < mpegf )
 			continue;
-        
+
 		ECHO( "----------------------------------- MPLEX -------------------------------------\n\n"  );
 		BLIP( " ...multiplexing " );
 

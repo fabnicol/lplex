@@ -2,6 +2,8 @@
 	lplex.hpp - top-level authoring and extraction.
 	Copyright (C) 2006-2011 Bahman Negahban
 
+    Adapted to C++-17 in 2018 by Fabrice Nicol
+
 	This program is free software; you can redistribute it and/or modify it
 	under the terms of the GNU General Public License as published by the
 	Free Software Foundation; either version 2 of the License, or (at your
@@ -314,7 +316,7 @@ public:
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
-	
+
     virtual void DoLog( int level, const char *msg, time_t timestamp )
 	{
 		switch( level )
@@ -334,10 +336,10 @@ public:
 				break;
 		}
 	}
-    
-   
+
+
     virtual void DoLogString( const char* *msg, time_t timestamp ) {}
-#pragma GCC diagnostic pop    
+#pragma GCC diagnostic pop
 };
 
 
@@ -358,7 +360,7 @@ public:
 	void processFiles();
 
     void Traverse(const string& path);
-    
+
     virtual void OnFile( const string& filename );
     virtual int OnDir( const string& dirname );
     virtual void OnOpenError( const string& openerrorname );
@@ -418,7 +420,7 @@ public:
 	struct{ uint64_t estimate, audio, video, info; } total;
 
 	alignment trim;
-	
+
 	lpcmFile *lFile;
 	vector<lpcmFile> *Lfiles;
 	vector<string> *menufiles;

@@ -1,6 +1,7 @@
 /*
 	dvd.cpp - dvd navigation using libdvdread.
 	Copyright (C) 2006-2011 Bahman Negahban
+    Adapted to C++-17 in 2018 by Fabrice Nicol
 
 	This program is free software; you can redistribute it and/or modify it
 	under the terms of the GNU General Public License as published by the
@@ -436,15 +437,15 @@ int lpcm_video_ts::open( const char * VIDEO_TS, bool fatal )
 	putenv( const_cast<char*>("DVDREAD_VERBOSE=0" ));
 	putenv( const_cast<char*>("DVDCSS_VERBOSE=0" ));
 	FILE* res = freopen( NUL, "wt", stderr );
-    if (res == nullptr) 
+    if (res == nullptr)
     {
         cerr << "[ERR] Cannot open /dev/null" << endl;
         throw;
     }
-    
+
 	libdvdReader = DVDOpen( VIDEO_TS );
 	res = freopen( CON, "wt", stderr );
-    if (res == nullptr) 
+    if (res == nullptr)
     {
         cerr << "[ERR] Cannot open console" << endl;
         throw;
@@ -457,14 +458,14 @@ int lpcm_video_ts::open( const char * VIDEO_TS, bool fatal )
 	}
 
 	res = freopen( NUL, "wt", stderr );
-    if (res == nullptr) 
+    if (res == nullptr)
     {
         cerr << "[ERR] Cannot open /dev/null" << endl;
         throw;
     }
 	ifo = ifoOpen( libdvdReader, 0 );
 	res = freopen( CON, "wt", stderr );
-    if (res == nullptr) 
+    if (res == nullptr)
     {
         cerr << "[ERR] Cannot open console" << endl;
         throw;
@@ -729,7 +730,7 @@ int lpcmPGextractor::getCellTraversed()
 			pgc = audioTables.at( pgcIndex ).pgc;
 			numPGCcells = audioTables.at( pgcIndex ).numPGCcells;
 			pg = pgcCell = 0;
-#if 0
+#if DEBUG
 DBUG( "pgcIndex=" << pgcIndex );
 for( int c=0; c < numPGCcells + 1; c++ )
 {
@@ -952,7 +953,7 @@ int lpcmPGextractor::configurePGC()
 		}
 	}
 
-#if 0
+#if DEBUG
 for( int c=0; c < numCells + 1; c++ )
 {
 DBUG( "cell=" << c << " : start=" << audioCells[c].start_sector
@@ -1071,7 +1072,7 @@ int lpcmPGextractor::configureCell( int context )
 			}
 			lFile->trim.padding =
 				( audioframe - lFile->trim.len % audioframe ) % audioframe;
-#if 0
+#if DEBUG
 POST( "\n    dvd    : restored  : offset :  pad   :  file\n" );
 POST( setw(10) << flacHeader::bytesUncompressed( &lFile->fmeta ) << " :" <<
 setw(10) << lFile->trim.len << " :" <<
@@ -1126,10 +1127,12 @@ int lpcmPGextractor::udfItem( const char *fname, uint16_t ftype, uint32_t lb, ui
 	else if( iFile.fName.Left(5) == "XTRA/" )
 		iFile.fName = fname + 6;
 
-//   if( ! infofiles->size() )
-//      INFO( "---offset:----lb:-------size-------------------------\n" );
-//   LOG( _f( " %8lx:%6ld: %10ld %c %s\n",
-//      lb * DVD_VIDEO_LB_LEN, lb, len, iFile.reject ? ' ' : '*', fname ) );
+#if DEBUG
+   if( ! infofiles->size() )
+      INFO( "---offset:----lb:-------size-------------------------\n" );
+   LOG( _f( " %8lx:%6ld: %10ld %c %s\n",
+      lb * DVD_VIDEO_LB_LEN, lb, len, iFile.reject ? ' ' : '*', fname ) );
+#endif
 
 	infofiles->push_back( iFile );
 
