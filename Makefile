@@ -86,8 +86,8 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
-build_triplet = x86_64-w64-mingw32
-host_triplet = x86_64-w64-mingw32
+build_triplet = x86_64-pc-linux-gnu
+host_triplet = x86_64-pc-linux-gnu
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/libFLAC++.m4 \
@@ -236,13 +236,13 @@ distuninstallcheck_listfiles = find . -type f -print
 am__distuninstallcheck_listfiles = $(distuninstallcheck_listfiles) \
   | sed 's|^\./|$(prefix)/|' | grep -v '$(infodir)/dir$$'
 distcleancheck_listfiles = find . -type f -print
-ACLOCAL = ${SHELL} /c/Users/Public/Dev/lplex/missing aclocal-1.15
+ACLOCAL = ${SHELL} /home/fab/Dev/lplex/missing aclocal-1.15
 AMTAR = $${TAR-tar}
 AM_DEFAULT_VERBOSITY = 1
 AR = ar
-AUTOCONF = ${SHELL} /c/Users/Public/Dev/lplex/missing autoconf
-AUTOHEADER = ${SHELL} /c/Users/Public/Dev/lplex/missing autoheader
-AUTOMAKE = ${SHELL} /c/Users/Public/Dev/lplex/missing automake-1.15
+AUTOCONF = ${SHELL} /home/fab/Dev/lplex/missing autoconf
+AUTOHEADER = ${SHELL} /home/fab/Dev/lplex/missing autoheader
+AUTOMAKE = ${SHELL} /home/fab/Dev/lplex/missing automake-1.15
 AWK = gawk
 CC = gcc
 CCDEPMODE = depmode=gcc3
@@ -253,50 +253,50 @@ CXX = g++
 CXXCPP = g++ -E
 CXXDEPMODE = depmode=gcc3
 CXXFLAGS = -g -O2
-CYGPATH_W = cygpath -w
+CYGPATH_W = echo
 DEFS = -DHAVE_CONFIG_H
 DEPDIR = .deps
-DLLTOOL = dlltool
+DLLTOOL = false
 DSYMUTIL = 
 DUMPBIN = 
-DVDAUTHOR_PATH = /usr/bin/dvdauthor
+DVDAUTHOR_PATH = /usr/local/bin/dvdauthor
 ECHO_C = 
 ECHO_N = -n
 ECHO_T = 
-EGREP = /usr/bin/grep -E
-EXEEXT = .exe
-FGREP = /usr/bin/grep -F
-GREP = /usr/bin/grep
+EGREP = /bin/grep -E
+EXEEXT = 
+FGREP = /bin/grep -F
+GREP = /bin/grep
 INSTALL = /usr/bin/install -c
 INSTALL_DATA = ${INSTALL} -m 644
 INSTALL_PROGRAM = ${INSTALL}
 INSTALL_SCRIPT = ${INSTALL}
 INSTALL_STRIP_PROGRAM = $(install_sh) -c -s
-JPEG2YUV_PATH = /usr/bin/jpeg2yuv
-LD = C:/Users/Public/Dev/msys2/mingw64/x86_64-w64-mingw32/bin/ld.exe
+JPEG2YUV_PATH = /usr/local/bin/jpeg2yuv
+LD = /usr/x86_64-pc-linux-gnu/bin/ld -m elf_x86_64
 LDFLAGS = 
 LIBFLACPP_CFLAGS =  
 LIBFLACPP_LIBDIR = ${exec_prefix}/lib
-LIBFLACPP_LIBS = -L${exec_prefix}/lib -lFLAC++ -L/mingw64/lib -lFLAC -lm -lwsock32
+LIBFLACPP_LIBS = -L${exec_prefix}/lib -lFLAC++ -L/home/fab/Dev/lplex/local/lib -lFLAC -lm
 LIBFLAC_CFLAGS = 
 LIBFLAC_LIBDIR = 
-LIBFLAC_LIBS = -L/mingw64/lib -lFLAC -lm
+LIBFLAC_LIBS = -L/home/fab/Dev/lplex/local/lib -lFLAC -lm
 LIBOBJS = 
 LIBS = -ldvdread 
 LIBTOOL = $(SHELL) $(top_builddir)/libtool
 LIPO = 
-LN_S = cp -pR
+LN_S = ln -s
 LPLEX_CPPFLAGS =  -I../redist -I../../redist
 LTLIBOBJS = 
 LT_SYS_LIBRARY_PATH = 
 MAINT = #
-MAKEINFO = ${SHELL} /c/Users/Public/Dev/lplex/missing makeinfo
+MAKEINFO = ${SHELL} /home/fab/Dev/lplex/missing makeinfo
 MANIFEST_TOOL = :
-MKDIR_P = /usr/bin/mkdir -p
-MKISOFS_PATH = 
-MPEG2ENC_PATH = /usr/bin/mpeg2enc
-MPLEX_PATH = /usr/bin/mplex
-NM = /mingw64/bin/nm -B
+MKDIR_P = /bin/mkdir -p
+MKISOFS_PATH = /usr/local/bin/mkisofs
+MPEG2ENC_PATH = /usr/local/bin/mpeg2enc
+MPLEX_PATH = /usr/local/bin/mplex
+NM = /usr/bin/nm -B
 NMEDIT = 
 OBJDUMP = objdump
 OBJEXT = o
@@ -312,17 +312,17 @@ PACKAGE_VERSION = 0.3
 PATH_SEPARATOR = :
 RANLIB = ranlib
 SCRIPT_PATH = 
-SED = /usr/bin/sed
+SED = /bin/sed
 SET_MAKE = 
 SHELL = /bin/sh
 STRIP = strip
 VERSION = 0.3
-WINDRES = windres
-XDGUTILS = 
-abs_builddir = /c/Users/Public/Dev/lplex
-abs_srcdir = /c/Users/Public/Dev/lplex
-abs_top_builddir = /c/Users/Public/Dev/lplex
-abs_top_srcdir = /c/Users/Public/Dev/lplex
+WINDRES = 
+XDGUTILS = yes
+abs_builddir = /home/fab/Dev/lplex
+abs_srcdir = /home/fab/Dev/lplex
+abs_top_builddir = /home/fab/Dev/lplex
+abs_top_srcdir = /home/fab/Dev/lplex
 ac_ct_AR = ar
 ac_ct_CC = gcc
 ac_ct_CXX = g++
@@ -333,26 +333,26 @@ am__quote =
 am__tar = $${TAR-tar} chof - "$$tardir"
 am__untar = $${TAR-tar} xf -
 bindir = ${exec_prefix}/bin
-build = x86_64-w64-mingw32
-build_alias = x86_64-w64-mingw32
+build = x86_64-pc-linux-gnu
+build_alias = 
 build_cpu = x86_64
-build_os = mingw32
-build_vendor = w64
+build_os = linux-gnu
+build_vendor = pc
 builddir = .
 datadir = ${datarootdir}
 datarootdir = ${prefix}/share
 docdir = ${datarootdir}/doc/${PACKAGE_TARNAME}
 dvidir = ${docdir}
 exec_prefix = ${prefix}
-host = x86_64-w64-mingw32
+host = x86_64-pc-linux-gnu
 host_alias = 
 host_cpu = x86_64
-host_os = mingw32
-host_vendor = w64
+host_os = linux-gnu
+host_vendor = pc
 htmldir = ${docdir}
 includedir = ${prefix}/include
 infodir = ${datarootdir}/info
-install_sh = ${SHELL} /c/Users/Public/Dev/lplex/install-sh
+install_sh = ${SHELL} /home/fab/Dev/lplex/install-sh
 libdir = ${exec_prefix}/lib
 libexecdir = ${exec_prefix}/libexec
 localedir = ${datarootdir}/locale
@@ -361,7 +361,7 @@ mandir = ${datarootdir}/man
 mkdir_p = $(MKDIR_P)
 oldincludedir = /usr/include
 pdfdir = ${docdir}
-prefix = /mingw64
+prefix = /home/fab/Dev/lplex/local
 program_transform_name = s,x,x,
 psdir = ${docdir}
 sbindir = ${exec_prefix}/sbin
@@ -383,7 +383,7 @@ lplexdoc_DATA = \
 	NEWS
 
 EXTRA_DIST = $(lplexdoc_DATA) doc/lplex.1 autogen.sh
-#Desktop = $(shell xdg-user-dir DESKTOP)
+Desktop = $(shell xdg-user-dir DESKTOP)
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 
@@ -802,7 +802,7 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
-install-data-hook:
+#install-data-hook:
 clean: clean-recursive
 
 clean-am: clean-generic clean-libtool mostlyclean-am
@@ -915,12 +915,12 @@ dist-hook:
 		fi \
 	done
 
-#install-data-hook:
-#	@if test -e "$(Desktop)/lplex.desktop" ; then echo -e "\n\n"\
-#	"      A launcher has been placed on your desktop to facilitate\n"\
-#	"      drag-and-drop usage of lplex. Please move/remove this as you\n"\
-#	"      prefer, a backup copy is available in your '~/.lplex' folder\n"\
-#	"      should you need it again later.\n\n" ; fi
+install-data-hook:
+	@if test -e "$(Desktop)/lplex.desktop" ; then echo -e "\n\n"\
+	"      A launcher has been placed on your desktop to facilitate\n"\
+	"      drag-and-drop usage of lplex. Please move/remove this as you\n"\
+	"      prefer, a backup copy is available in your '~/.lplex' folder\n"\
+	"      should you need it again later.\n\n" ; fi
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
