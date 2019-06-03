@@ -28,10 +28,10 @@
 #include "lplex_precompile.h"
 #endif
 
-#include <experimental/filesystem>
+#include <filesystem>
 
 using namespace std;
-namespace fs = std::experimental::filesystem;
+namespace fs = std::filesystem;
 
 #include <cstdlib>
 #include <iostream>

@@ -39,7 +39,7 @@
 #include <iomanip>
 #include <sstream>
 #include <string.h>
-#include <experimental/filesystem>
+#include <filesystem>
 #include <algorithm>
 #include <cctype>
 #include <locale>
@@ -47,7 +47,7 @@
 #define ANSI_COLOR
 
 using namespace std;
-namespace fs = std::experimental::filesystem;
+namespace fs = std::filesystem;
 
 #include "platform.h"
 #include <stdint.h>

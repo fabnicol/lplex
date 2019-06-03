@@ -20,10 +20,10 @@
 */
 
 #include <iostream>
-#include <experimental/filesystem>
+#include <filesystem>
 #include "util.h"
 
-namespace fs = std::experimental::filesystem;
+namespace fs = std::filesystem;
 using namespace std;
 
 

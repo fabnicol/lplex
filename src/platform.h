@@ -26,11 +26,11 @@
 #ifndef LPLEX_PCH_INCLUDED
 #  include "lplex_precompile.h"
 #endif
-#include <experimental/filesystem>
+#include <filesystem>
 #include "wx.hpp"
 
 using namespace std;
-namespace  fs = std::experimental::filesystem;
+namespace  fs = std::filesystem;
 
 
 #if defined __WIN32 || defined _WIN32 || defined _WIN64 || defined __WIN64 || defined MINGW32 || defined MINGW64 || defined(__MINGW32__) || defined(__MINGW64__)

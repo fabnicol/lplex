@@ -125,8 +125,8 @@ _Args.insert(_Args.end(), NULL);
 
 
 
-//#if ! defined (__WIN32__)  && ! defined(__WIN64) && ! defined(__w64)
-#ifdef __linux__
+#if ! defined (_WIN32)  && ! defined(__WIN32) 
+
     int pid;
     int tube[2];
     char c;
