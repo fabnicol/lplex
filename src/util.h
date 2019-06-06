@@ -329,11 +329,12 @@ template<class T> struct counter
 	{ start = other.start; now = other.now; max = other.max; }
 };
 
+
 template<class T>
 static inline void blip( counter<T> *ct,
 	int skip = 1, const char *suffix="", const char *prefix=""  )
 {
-	static char *pref;
+    static char *pref = nullptr;
 	if( blip_ct == 0 )
     {
 		if( _verbose )
@@ -364,7 +365,7 @@ static inline void blip( counter<T> *ct,
 	else
 		blip_ct++;
 
-    free(pref);
+    if (pref && blip_ct == 0 ) free(pref);
 }
 
 long execute( const string& application, const vector<const char*>& command, int verbose = _verbose);

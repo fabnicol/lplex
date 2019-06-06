@@ -140,6 +140,7 @@ struct dvdJpeg
 };
 
 
+
 struct lpcmFile : public lpcmEntity
 {
 	enum
@@ -157,7 +158,7 @@ struct lpcmFile : public lpcmEntity
 
 	uint16_t group, type, format, jpgIndex;
 	uint32_t id, dvdFrames, audioFrames, videoFrames;
-	counter<uint32_t> ct;
+    counter<uint32_t> ct;
 	lpcmWriter *writer;
 	string details;
 };

@@ -399,7 +399,9 @@ int waveHeader::audit( const char *filename, FLAC__StreamMetadata *fmeta )
 
 int waveHeader::open( ifstream &wavefile, FLAC__StreamMetadata *fmeta, bool mute )
 {
-	canonical hdr;
+///// !!!! Does not accomodate WAV_FOMAT_EXTENSIBLE (qfact) !!! TODO: fix this ////
+
+    canonical hdr;
 	uint32_t fmtChunk = 0, dataChunk = 0;
 	string msg;
 	struct{ uint8_t ID[4]; uint32_t size; } chunk;
@@ -446,11 +448,11 @@ int waveHeader::open( ifstream &wavefile, FLAC__StreamMetadata *fmeta, bool mute
 
 			wavefile.read( (char *)&hdr+20, chunk.size > 16 ? 16 : chunk.size );
 
-			if( hdr.audioFormat != 1 )
-			{
-				ERR( "Audio is not lpcm.\n" );
-				return 0;
-			}
+            if( hdr.audioFormat != 1 )
+            {
+                ERR( "Audio is not lpcm.\n" );
+                return 0;
+            }
 			continue;
 		}
 
@@ -487,7 +489,9 @@ int waveHeader::open( ifstream &wavefile, FLAC__StreamMetadata *fmeta, bool mute
 		fmtChunk ? "" : "'fmt'", ! fmtChunk && ! dataChunk ? " or " : "",
 		dataChunk ? "" : "'data'", ! fmtChunk && ! dataChunk ? "s" : "" ) );
 	ECHO( "Try converting this file to flac and using that instead." );
-	return 0;
+
+    return 0;
+
 }
 
 
