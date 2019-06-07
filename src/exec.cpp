@@ -34,15 +34,15 @@
 #include <tchar.h>
 #include <strsafe.h>
 #define BUFSIZE 4096
-HANDLE g_hChildStd_IN_Rd = NULL;
-HANDLE g_hChildStd_IN_Wr = NULL;
-HANDLE g_hChildStd_OUT_Rd = NULL;
-HANDLE g_hChildStd_OUT_Wr = NULL;
+HANDLE g_hChildStd_IN_Rd = nullptr;
+HANDLE g_hChildStd_IN_Wr = nullptr;
+HANDLE g_hChildStd_OUT_Rd = nullptr;
+HANDLE g_hChildStd_OUT_Wr = nullptr;
 
-HANDLE g_hChildStd_IN_Rd2 = NULL;
-HANDLE g_hChildStd_IN_Wr2 = NULL;
-HANDLE g_hChildStd_OUT_Rd2 = NULL;
-HANDLE g_hChildStd_OUT_Wr2 = NULL;
+HANDLE g_hChildStd_IN_Rd2 = nullptr;
+HANDLE g_hChildStd_IN_Wr2 = nullptr;
+HANDLE g_hChildStd_OUT_Rd2 = nullptr;
+HANDLE g_hChildStd_OUT_Wr2 = nullptr;
 
 void ErrorExit(PTSTR lpszFunction)
 
@@ -57,11 +57,11 @@ void ErrorExit(PTSTR lpszFunction)
         FORMAT_MESSAGE_ALLOCATE_BUFFER |
         FORMAT_MESSAGE_FROM_SYSTEM |
         FORMAT_MESSAGE_IGNORE_INSERTS,
-        NULL,
+        nullptr,
         dw,
         MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
         (LPTSTR) &lpMsgBuf,
-        0, NULL );
+        0, nullptr );
 
     lpDisplayBuf = (LPVOID)LocalAlloc(LMEM_ZEROINIT,
         (lstrlen((LPCTSTR)lpMsgBuf)+lstrlen((LPCTSTR)lpszFunction)+40)*sizeof(TCHAR));
@@ -69,7 +69,7 @@ void ErrorExit(PTSTR lpszFunction)
         LocalSize(lpDisplayBuf) / sizeof(TCHAR),
         TEXT("%s failed with error %d: %s"),
         lpszFunction, dw, lpMsgBuf);
-    MessageBox(NULL, (LPCTSTR)lpDisplayBuf, TEXT("Error"), MB_OK);
+    MessageBox(nullptr, (LPCTSTR)lpDisplayBuf, TEXT("Error"), MB_OK);
 
     LocalFree(lpMsgBuf);
     LocalFree(lpDisplayBuf);
@@ -121,7 +121,7 @@ errno=0;
 
 auto _Args = Args;
 _Args.insert(_Args.begin(), fs::path(application).filename().string().c_str());
-_Args.insert(_Args.end(), NULL);
+_Args.insert(_Args.end(), nullptr);
 
 
 
@@ -156,12 +156,12 @@ _Args.insert(_Args.end(), NULL);
             while (read(tube[0], &c, 1) == 1)
             {
                 cerr <<  c;
-#               ifdef _ERR2LOG
+#               ifdef ERR2LOGMACRO
                   xlog << c;
 #               endif
             }
 
-            if (option != NOWAIT) waitpid(pid, NULL, option);
+            if (option != NOWAIT) waitpid(pid, nullptr, option);
             close(tube[0]);
     }
 #else
@@ -181,12 +181,12 @@ cerr << cmdline.c_str() << endl;
     // Start the child process.
     if( !CreateProcessA( _application.c_str(),   // No module name (use command line)
         const_cast<char*>(cmdline.c_str()),        // Command line
-        NULL,           // Process handle not inheritable
-        NULL,           // Thread handle not inheritable
+        nullptr,           // Process handle not inheritable
+        nullptr,           // Thread handle not inheritable
         FALSE,          // Set handle inheritance to FALSE
         0,              // No creation flags
-        NULL,           // Use parent's environment block
-        NULL,           // Use parent's starting directory
+        nullptr,           // Use parent's environment block
+        nullptr,           // Use parent's starting directory
         &si,            // Pointer to STARTUPINFO structure
         &pi )           // Pointer to PROCESS_INFORMATION structure
     )
@@ -292,7 +292,7 @@ default:
         return errno;
 
     default:
-        if (option != NOWAIT) waitpid(pid2, NULL, 0);
+        if (option != NOWAIT) waitpid(pid2, nullptr, 0);
         dup2(tubeerr[0], STDIN_FILENO);
 
         while (read(tubeerr[0], &c, 1) == 1) cerr << c;
@@ -331,7 +331,7 @@ return 0;
 
 long execute( const string& application, const vector<const char*>& args, int verbose)
 {
-#ifdef _ERR2LOG
+#ifdef ERR2LOGMACRO
 	if( verbose > -1 )
     {
         xlog << endl << STAT_TAG << "Running command : " << application << " ";
@@ -362,7 +362,7 @@ long execute( const string& application,  const vector<const char*>& args,
               const string& application2, const vector<const char*>& args2,
               int verbose)
 {
-#ifdef _ERR2LOG
+#ifdef ERR2LOGMACRO
 	if( verbose > -1 )
     {
         xlog << endl << STAT_TAG << "Running command : " << application << " ";

@@ -272,7 +272,7 @@ bool stdArgs( int &argc, char** &argv, char *args, size_t size );
 
 void version( const char * str="" );
 void banner();
-void usage( const char *str=NULL );
+void usage( const char *str=nullptr );
 void GPL_notice();
 
 int author( dvdLayout &layout );
@@ -307,7 +307,7 @@ uint32_t roughGOP( dvdJpeg &dvdJpeg, const char *m2vName, bool ntsc );
 bool alias( fs::path &jpeg );
 
 ofstream* m2v( uint32_t vFrames, const char *jpeg, const char *m2vName,
-	uint16_t tv=NTSC, bool ws=false, void *userData=NULL, uint32_t sizeofUData=0,
+	uint16_t tv=NTSC, bool ws=false, void *userData=nullptr, uint32_t sizeofUData=0,
 	uint16_t GOPsize=18, bool append=false, bool endSeq=false, bool close=true );
 
 
@@ -436,7 +436,7 @@ public:
 
 	dvdLayout( vector<lpcmFile> *lFiles, vector<string> *vFiles, vector<infoFile> *iFiles, lplexJob *plexJob ) :
 		Lfiles( lFiles ), menufiles( vFiles ), infofiles( iFiles ), job( plexJob ),
-		readIndex(-1), writeIndex(-1), reader(NULL)
+		readIndex(-1), writeIndex(-1), reader(nullptr)
 	{}
 	~dvdLayout() { /* if( editing ) */ saveOpts( this ); /* if( reader ) delete reader; */ }
 
@@ -458,7 +458,7 @@ public:
     char *val;
     int i;
 
-	xmlAttr( char *buffer ) : buf(buffer), name(NULL), val(NULL), i(0) {}
+	xmlAttr( char *buffer ) : buf(buffer), name(nullptr), val(nullptr), i(0) {}
 
 	uint16_t get()
 	{

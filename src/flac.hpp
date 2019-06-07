@@ -53,7 +53,7 @@ public:
 
 	static void zeroStreamInfo( FLAC__StreamMetadata *meta );
 	static void readStreamInfo( uint8_t* buf, FLAC__StreamMetadata *meta );
-	static void readStreamInfo( waveHeader::canonical *wave, FLAC__StreamMetadata *meta );
+    static void readStreamInfo( waveHeader::wav_extensible *wave, FLAC__StreamMetadata *meta );
 	static void readStreamInfo( PES_packet::LPCM_header *LPCM, FLAC__StreamMetadata *meta );
 	static void writeStreamInfo( uint8_t* buf, FLAC__StreamMetadata *meta );
 	static int write( fstream &out, FLAC__StreamMetadata *meta );

@@ -74,7 +74,7 @@ public:
 	int adjust( int prepend, bool pad );
 
 	virtual uint64_t read( unsigned char *buf, uint64_t len );
-	virtual uint64_t fillBuf( uint64_t limit=0, counter<uint64_t> *midCount=NULL ) = 0;
+	virtual uint64_t fillBuf( uint64_t limit=0, counter<uint64_t> *midCount=nullptr ) = 0;
     virtual uint16_t reset( const string& filename, int alignUnit=0 ) = 0;
 };
 
@@ -91,7 +91,7 @@ public:
 	~waveReader() { if( waveFile.is_open() ) waveFile.close(); }
 
 	// from lpcmReader
-	virtual uint64_t fillBuf( uint64_t limit=0, counter<uint64_t> *midCount=NULL );
+	virtual uint64_t fillBuf( uint64_t limit=0, counter<uint64_t> *midCount=nullptr );
     virtual uint16_t reset( const string& filename, int alignUnit=0 );
 };
 
@@ -105,12 +105,12 @@ public:
 
     flacReader( const string& filename, unsigned char *buf, uint32_t size,
 		int alignUnit=0 )
-		: lpcmReader( buf, size ), FLAC::Decoder::File(), reserve( NULL )
+		: lpcmReader( buf, size ), FLAC::Decoder::File(), reserve( nullptr )
         { reset( filename, alignUnit ); }
 	~flacReader() { if( reserve ) delete reserve; }
 
 	// from lpcmReader
-	virtual uint64_t fillBuf( uint64_t limit=0, counter<uint64_t> *midCount=NULL );
+	virtual uint64_t fillBuf( uint64_t limit=0, counter<uint64_t> *midCount=nullptr );
     virtual uint16_t reset( const string& filename, int alignUnit=0 );
 
 	// from FLAC::Decoder::File

@@ -115,7 +115,7 @@ void setcolors( int scheme )
 #endif
 
 
-#ifdef _ERR2LOG
+#ifdef ERR2LOGMACRO
 
 ofstream xlog;
 string xlogName;

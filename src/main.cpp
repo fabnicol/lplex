@@ -32,7 +32,7 @@
 
 lplexJob job;
 _wxStopWatch stopWatch;
-wxLplexLog _wxLog;
+static wxLplexLog _wxLog;
 lpcm_video_ts userMenus;
 
 vector<lpcmFile> Lfiles;
@@ -41,20 +41,20 @@ vector<string> dirs;
 vector<string> menufiles;
 vector<infoFile> infofiles;
 
-lpcmPGextractor dvd( &Lfiles, &infofiles, &job );
+static  lpcmPGextractor dvd( &Lfiles, &infofiles, &job );
 
 unsigned char bigBlock[BIGBLOCKLEN];
 
-fs::path dataDir, binDir, configDir, tempDir, isoPath, readOnlyPath;
-fs::path lplexConfig, cwd, projectDotLplex;
-fs::path optSrc;
+fs::path dataDir, binDir, configDir, tempDir, isoPath, readOnlyPath, lplexConfig, projectDotLplex;
+static fs::path cwd;
+static fs::path optSrc;
 
 string  shebang;
-string gzFile;
+static string gzFile;
 string menuPath;
-string cmdline;
+static string cmdline;
 
-bool startNewTitleset, projectFile, screenJpg, lgz;
+static bool startNewTitleset, projectFile, screenJpg, lgz;
 
 enum
 {
@@ -86,7 +86,7 @@ int jobs::forward = 0x40;
 #ifdef lplex_console
 
 
-int exitct=0;
+static int exitct=0;
 
 void done()
 {
@@ -122,7 +122,7 @@ int main( int argc, char *argv[] )
 
 
 
-#ifdef _ERR2LOG
+#ifdef ERR2LOGMACRO
 		xlog << cmdline << "\n-------------------------------------------------------------------------------\n" << endl;
 #endif
 		if( job.params & gzip )
@@ -172,42 +172,42 @@ const char *short_opts = "ud:f:t:m:r:x:i:j:M:N:R:l:s:C:c:z:p:w:a:E:v:VQh?D:n:e:P
 
 struct option long_opts[] =
 {
-	{ "unauthor",    0, 0, 'u' },
-	{ "dir",         1, 0, 'd' },
-	{ "formatout",   1, 0, 'f' },
-	{ "video",       1, 0, 't' },
-	{ "md5aware",    1, 0, 'm' },
-	{ "restore",     1, 0, 'r' },
-	{ "infofiles",   1, 0, 'x' },
-	{ "infodir",     1, 0, 'i' },
-	{ "jpeg",        1, 0, 'j' },
-	{ "menu",        1, 0, 'M' },
-	{ "menuforce",   1, 0, 'N' },
-	{ "rescale",     1, 0, 'R' },
+    { "unauthor",    0, nullptr, 'u' },
+    { "dir",         1, nullptr, 'd' },
+    { "formatout",   1, nullptr, 'f' },
+    { "video",       1, nullptr, 't' },
+    { "md5aware",    1, nullptr, 'm' },
+    { "restore",     1, nullptr, 'r' },
+    { "infofiles",   1, nullptr, 'x' },
+    { "infodir",     1, nullptr, 'i' },
+    { "jpeg",        1, nullptr, 'j' },
+    { "menu",        1, nullptr, 'M' },
+    { "menuforce",   1, nullptr, 'N' },
+    { "rescale",     1, nullptr, 'R' },
 //   { "alignment",   1, 0, 'l' },
-	{ "splice",      1, 0, 'l' },
-	{ "shift",       1, 0, 's' },
-	{ "cleanup",     1, 0, 'C' },
-	{ "create",      1, 0, 'c' },
-	{ "media",       1, 0, 'z' },
-	{ "dvdpath",     1, 0, 'p' },
-	{ "workpath",    1, 0, 'w' },
-	{ "isopath",     1, 0, 'a' },
-	{ "extractpath", 1, 0, 'E' },
-	{ "verbose",     1, 0, 'v' },
-	{ "version",     0, 0, 'V' },
-	{ "license",     0, 0, 'Q' },
-	{ "help",        0, 0, 'h' },
-	{ "readonlypath",1, 0, 'D' },
-	{ "name",        1, 0, 'n' },
-	{ "editing",     1, 0, 'e' },
-	{ "pause",       1, 0, 'P' },
-	{ "lgz",         1, 0, 'Z' },
-	{ "color",       1, 0, 'L' },
+    { "splice",      1, nullptr, 'l' },
+    { "shift",       1, nullptr, 's' },
+    { "cleanup",     1, nullptr, 'C' },
+    { "create",      1, nullptr, 'c' },
+    { "media",       1, nullptr, 'z' },
+    { "dvdpath",     1, nullptr, 'p' },
+    { "workpath",    1, nullptr, 'w' },
+    { "isopath",     1, nullptr, 'a' },
+    { "extractpath", 1, nullptr, 'E' },
+    { "verbose",     1, nullptr, 'v' },
+    { "version",     0, nullptr, 'V' },
+    { "license",     0, nullptr, 'Q' },
+    { "help",        0, nullptr, 'h' },
+    { "readonlypath",1, nullptr, 'D' },
+    { "name",        1, nullptr, 'n' },
+    { "editing",     1, nullptr, 'e' },
+    { "pause",       1, nullptr, 'P' },
+    { "lgz",         1, nullptr, 'Z' },
+    { "color",       1, nullptr, 'L' },
 
-	{ "nocerr",      0, 0, 'q' }, //(private)
-	{ "debug",       1, 0, 'G' }, //(private)
-	{ "skip",        1, 0, 'K' }, //(private)
+    { "nocerr",      0, nullptr, 'q' }, //(private)
+    { "debug",       1, nullptr, 'G' }, //(private)
+    { "skip",        1, nullptr, 'K' }, //(private)
 
 	{ "formatOut",   1, &deprecated, 'f' },
 	{ "md5Aware",    1, &deprecated, 'm' },
@@ -221,7 +221,7 @@ struct option long_opts[] =
 	{ "readonlypath",  1, &deprecated, 'D' },
 	{ "alignment",   1, &deprecated, 'l' },
 
-	{ 0,0,0,0 }
+    { nullptr,0,nullptr,0 }
 };
 
 
@@ -259,7 +259,7 @@ uint16_t init( int argc, char *argv[] )
 	job.jpegNow = 0;
 	job.group = -1;
 	job.media = plusR;
-    job.trim = jobs::seamless;
+    job.trim = static_cast<uint16_t>(jobs::seamless);
 	job.trim0 = job.trimCt = 0;
 	job.name = defaultName() + "_DVD";
 	job.extractTo = "";
@@ -336,7 +336,7 @@ uint16_t init( int argc, char *argv[] )
     optSrc = cwd / "command line";
 	optindl = -1;
 
-#ifdef _ERR2LOG
+#ifdef ERR2LOGMACRO
 
     _affirm = "   ";
     cmdline += "\n-------------------------------------------------------------------------------\n";
@@ -428,7 +428,7 @@ uint16_t addFiles( fs::path filespec )
 				job.outPath = job.extractTo;
 
             dvd.open( filespec.string().c_str() );
-			job.tv = dvd.tv;
+            job.tv = static_cast<uint16_t>(dvd.tv);
 			clearbits( job.params, jobMode );
 #ifdef dvdread_udflist
 			if( job.format == lgzf )
@@ -1136,7 +1136,7 @@ void lFileTraverser::OnOpenError( const string& openerrorname )
 void getOpts( const char *filename )
 {
 	int argc = 0;
-	char **argv=NULL, *args=NULL;
+    char **argv=nullptr, *args=nullptr;
 	size_t size;
 
 	ifstream optFile( filename, ios::binary );
@@ -1156,7 +1156,7 @@ void getOpts( const char *filename )
 	optFile.read( args, size );
 
 
-#ifdef _ERR2LOG
+#ifdef ERR2LOGMACRO
     cmdline += "\n-------------------------------------------------------------------------------\n";
     cmdline += INFO_TAG + string(filename);
     cmdline += ":" "\n\n" + string(args);
@@ -1420,7 +1420,7 @@ bool stdArgs( int &argc, char** &argv, char *args, size_t size )
 		return false;
 
 	argv = new char*[ argc ];
-	argv[0] = NULL;
+    argv[0] = nullptr;
 	firstChar = true;
 
 	for( uint i=0, j=0; i < size; ++i )
@@ -1457,13 +1457,13 @@ bool stdArgs( int &argc, char** &argv, char *args, size_t size )
 uint16_t setopt( uint16_t opt, const char *optarg )
 {
 	uint16_t t = 0;
-	char *comma = NULL;
+    char *comma = nullptr;
 	bool ok = true, isTrue = 0, isFalse = 0;
 
 	if( optarg && ( comma = (char*)strrchr( optarg, ',' ) ) )
 		comma[0] = '\0';
 
-	if( optarg == NULL || ! stricmp( optarg, "yes" ) || ! stricmp( optarg, "true" ) || ! stricmp( optarg, "1" ) )
+    if( optarg == nullptr || ! stricmp( optarg, "yes" ) || ! stricmp( optarg, "true" ) || ! stricmp( optarg, "1" ) )
 		isTrue = true;
 	else if( ! stricmp( optarg, "no" ) || ! stricmp( optarg, "false" ) || ! stricmp( optarg, "0" ) )
 		isFalse = true;

@@ -142,14 +142,14 @@ public:
 	int len;
 
 	hexStr( const void *buf, int n ) :
-		data((const unsigned char *)buf), len(n) {};
+        data(static_cast<const unsigned char *>(buf)), len(n) {}
 
 	friend ostream& operator << ( ostream& stream, const hexStr& x )
 	{
 		_Ios_Fmtflags fl = stream.flags();
 
 		for ( int i=0; i < x.len; i++ )
-			stream << hex << noskipws << setw(2) << setfill('0')<< (short)x.data[i];
+            stream << hex << noskipws << setw(2) << setfill('0')<< static_cast<short>(x.data[i]);
 
 		stream << dec;
 		stream.setf( fl );
@@ -199,10 +199,10 @@ extern messenger *myMessenger;
 
 extern uint16_t xlogExists, _verbose, _xcode;
 
-#define _ERR2LOG
+#define ERR2LOGMACRO
 extern ofstream xlog;
 
-#ifdef _ERR2LOG
+#ifdef ERR2LOGMACRO
 
 extern string xlogName;
 void logInit( const string& logFilename = "" );
@@ -224,7 +224,7 @@ int logReopen(){}
 #endif
 
 #define XERR(t) do{ scrub(); if(_verbose) cerr << t; XLOG(t); xlog.flush(); }while(0)
-#define _ERR(t) do{ scrub(); cerr << endl << TINT_ERR(t); cerr.flush(); XLOG((string("\n") + string(t)).c_str()); xlog.flush();  }while(0)
+#define ERRORLOG(t) do{ scrub(); cerr << endl << TINT_ERR(t); cerr.flush(); XLOG((string("\n") + string(t)).c_str()); xlog.flush();  }while(0)
 
 #if 1
 #define STAT_TAG "STAT: "
@@ -271,23 +271,23 @@ void setcolors( int scheme = bright );
 #define ECHO(t) XERR(t)
 #define ECHOv(t) cerr << t; XLOG(t); xlog.flush()
 
-#define _XLOG(tag,t) XLOG(tag << t); xlog.flush()
-#define _XERR(tag,tint,t) cerr <<  tag << t;
-#define _POSTv(tag,tint,t) do{ scrub();_XERR(tag,tint,t);_XLOG(tag,t);}while(0)
-#define _POST(tag,tint,t)  do{ scrub();if(_verbose) _XERR(tag,tint,t);_XLOG(tag,t);}while(0)
+#define XLOGMACRO(tag,t) XLOG(tag << t); xlog.flush()
+#define XERRMACRO(tag,tint,t) cerr <<  tag << t;
+#define POSTvMACRO(tag,tint,t) do{ scrub();XERRMACRO(tag,tint,t);XLOGMACRO(tag,t);}while(0)
+#define POSTMACRO(tag,tint,t)  do{ scrub();if(_verbose) XERRMACRO(tag,tint,t);XLOGMACRO(tag,t);}while(0)
 
-#define STAT(t) _POST(STAT_TAG,TINT_STAT,t)
-#define INFO(t) _POST(INFO_TAG,TINT_INFO,t)
-#define LOG(t)  _POST(LOG_TAG,TINT_LOG,t)
-#define WARN(t) _POST(WARN_TAG,TINT_WARN,t)
-#define ERRv(t) _POST(ERR_TAG,TINT_ERR,t)
+#define STAT(t) POSTMACRO(STAT_TAG,TINT_STAT,t)
+#define INFO(t) POSTMACRO(INFO_TAG,TINT_INFO,t)
+#define LOG(t)  POSTMACRO(LOG_TAG,TINT_LOG,t)
+#define WARN(t) POSTMACRO(WARN_TAG,TINT_WARN,t)
+#define ERRv(t) POSTMACRO(ERR_TAG,TINT_ERR,t)
 
-#define STATv(t) _POSTv(STAT_TAG,TINT_STAT,t)
-#define INFOv(t) _POSTv(INFO_TAG,TINT_INFO,t)
-#define LOGv(t)  _POSTv(LOG_TAG,TINT_LOG,t)
-#define WARNv(t) _POSTv(WARN_TAG,TINT_WARN,t)
+#define STATv(t) POSTvMACRO(STAT_TAG,TINT_STAT,t)
+#define INFOv(t) POSTvMACRO(INFO_TAG,TINT_INFO,t)
+#define LOGv(t)  POSTvMACRO(LOG_TAG,TINT_LOG,t)
+#define WARNv(t) POSTvMACRO(WARN_TAG,TINT_WARN,t)
 
-#define ERR(t) do{ _xcode=2; _ERR( (string(ERR_TAG) + string(t)).c_str() ); }while(0);
+#define ERR(t) do{ _xcode=2; ERRORLOG( (string(ERR_TAG) + string(t)).c_str() ); }while(0);
 
 #ifdef lplex_console
 #define FATAL(t) {  \
@@ -302,7 +302,7 @@ void setcolors( int scheme = bright );
 #define SCRN(t) do{ if(!_verbose) { unblip(true); cerr << t; } }while(0);
 #define POST(t) do{ SCRN(t); XERR(t); }while(0)
 
-#define DBUG(t) _ERR( (string(DBUG_TAG) + string(t)).c_str() )
+#define DBUG(t) ERRORLOG( (string(DBUG_TAG) + string(t)).c_str() )
 
 											// ...screen log & message functions:
 
@@ -311,7 +311,7 @@ extern string _blip, _affirm;
 extern char propellor[];
 
 const char * scrub();
-void blip( const char *msg = NULL );
+void blip( const char *msg = nullptr );
 void blip(const string& msg);
 
 void normalize_windows_paths(string &path);
@@ -350,7 +350,7 @@ static inline void blip( counter<T> *ct,
 	{
 		if( ct->max && ct->max - ct->now )
 		{
-			int val = (int)(( ct->now - ct->start ) * 1000 / ( ct->max - ct->start ));
+            int val = static_cast<int>(( ct->now - ct->start ) * 1000 / ( ct->max - ct->start ));
 			blip( _f( "%s%2d.%d%% %s", pref, val / 10, val % 10, suffix ) );
 
 		}

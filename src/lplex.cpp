@@ -40,7 +40,7 @@ int author( dvdLayout &layout )
 	uint16_t uDataLen = 0;
 	uint8_t userData[512];
 	uint32_t vFrames = 0;
-	ofstream *m2vFile = NULL;
+	ofstream *m2vFile = nullptr;
 
 
 #ifndef lgzip_support
@@ -311,7 +311,7 @@ int author( dvdLayout &layout )
 
 	if( job.prepare >= vobf )
 	{
-		int *map = NULL;
+		int *map = nullptr;
 		if( menufiles.size() && ( map = mapMenus() ) )
 		{
             SCRN( STAT_TAG  "Copying custom menu files... \n" )
@@ -1063,7 +1063,7 @@ int _tag0 = 0;
 int mpeg2encProgress( const char *msg, bool echo )
 {
 	uint16_t pct;
-	char *pos = NULL;
+	char *pos = nullptr;
 	if(   msg[1] == '*'
 		&& msg[2] == 'E'
 		&& msg[3] == 'R' )
@@ -1407,7 +1407,7 @@ int* mapMenus()
 {
 	vector<string> xobs;
 	if( ! menufiles.size() )
-		return NULL;
+		return nullptr;
 
 	int err = 0;
     const char* VIDEO_TS = (job.dvdPath / "VIDEO_TS").string().c_str();
