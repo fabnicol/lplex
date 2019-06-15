@@ -23,7 +23,7 @@
 #define HAVE_MEMSET 1
 
 /* Define to 1 if you have the `popen' function. */
-#define HAVE_POPEN 1
+/* #undef HAVE_POPEN */
 
 /* Define to 1 if you have the `putenv' function. */
 #define HAVE_PUTENV 1
@@ -40,7 +40,7 @@
 /* Define to 1 if you have the <strings.h> header file. */
 #define HAVE_STRINGS_H 1
 
-/* Define to 1 if you have the <string.h> header file. */
+/* Define to 1 if you have the <std::string.h> header file. */
 #define HAVE_STRING_H 1
 
 /* Define to 1 if you have the `strrchr' function. */

@@ -86,8 +86,8 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
-build_triplet = x86_64-pc-linux-gnu
-host_triplet = x86_64-pc-linux-gnu
+build_triplet = x86_64-unknown-cygwin
+host_triplet = x86_64-unknown-cygwin
 subdir = msw
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/libFLAC++.m4 \
@@ -213,13 +213,13 @@ am__relativize = \
     dir1=`echo "$$dir1" | sed -e "$$sed_rest"`; \
   done; \
   reldir="$$dir2"
-ACLOCAL = ${SHELL} /home/fab/Dev/lplex/missing aclocal-1.15
+ACLOCAL = ${SHELL} /cygdrive/c/Users/Public/Dev/lplex/missing aclocal-1.15
 AMTAR = $${TAR-tar}
 AM_DEFAULT_VERBOSITY = 1
 AR = ar
-AUTOCONF = ${SHELL} /home/fab/Dev/lplex/missing autoconf
-AUTOHEADER = ${SHELL} /home/fab/Dev/lplex/missing autoheader
-AUTOMAKE = ${SHELL} /home/fab/Dev/lplex/missing automake-1.15
+AUTOCONF = ${SHELL} /cygdrive/c/Users/Public/Dev/lplex/missing autoconf
+AUTOHEADER = ${SHELL} /cygdrive/c/Users/Public/Dev/lplex/missing autoheader
+AUTOMAKE = ${SHELL} /cygdrive/c/Users/Public/Dev/lplex/missing automake-1.15
 AWK = gawk
 CC = gcc
 CCDEPMODE = depmode=gcc3
@@ -230,49 +230,49 @@ CXX = g++
 CXXCPP = g++ -E
 CXXDEPMODE = depmode=gcc3
 CXXFLAGS = -g -O2
-CYGPATH_W = echo
+CYGPATH_W = cygpath -w
 DEFS = -DHAVE_CONFIG_H
 DEPDIR = .deps
-DLLTOOL = false
+DLLTOOL = dlltool
 DSYMUTIL = 
 DUMPBIN = 
-DVDAUTHOR_PATH = /usr/local/bin/dvdauthor
+DVDAUTHOR_PATH = 
 ECHO_C = 
 ECHO_N = -n
 ECHO_T = 
-EGREP = /bin/grep -E
-EXEEXT = 
-FGREP = /bin/grep -F
-GREP = /bin/grep
+EGREP = /usr/bin/grep -E
+EXEEXT = .exe
+FGREP = /usr/bin/grep -F
+GREP = /usr/bin/grep
 INSTALL = /usr/bin/install -c
 INSTALL_DATA = ${INSTALL} -m 644
 INSTALL_PROGRAM = ${INSTALL}
 INSTALL_SCRIPT = ${INSTALL}
 INSTALL_STRIP_PROGRAM = $(install_sh) -c -s
-JPEG2YUV_PATH = /usr/local/bin/jpeg2yuv
-LD = /usr/x86_64-pc-linux-gnu/bin/ld -m elf_x86_64
+JPEG2YUV_PATH = 
+LD = /usr/x86_64-pc-cygwin/bin/ld.exe
 LDFLAGS = 
 LIBFLACPP_CFLAGS =  
-LIBFLACPP_LIBDIR = ${exec_prefix}/lib
-LIBFLACPP_LIBS = -L${exec_prefix}/lib -lFLAC++ -L/home/fab/Dev/lplex/local/lib -lFLAC -lm
+LIBFLACPP_LIBDIR = 
+LIBFLACPP_LIBS = -lFLAC++ -lFLAC -lm -lwsock32
 LIBFLAC_CFLAGS = 
 LIBFLAC_LIBDIR = 
-LIBFLAC_LIBS = -L/home/fab/Dev/lplex/local/lib -lFLAC -lm
+LIBFLAC_LIBS = -lFLAC -lm
 LIBOBJS = 
 LIBS = -ldvdread 
 LIBTOOL = $(SHELL) $(top_builddir)/libtool
 LIPO = 
 LN_S = ln -s
-LPLEX_CPPFLAGS =  -I../redist -I../../redist
+LPLEX_CPPFLAGS = -mno-cygwin  -I../redist -I../../redist
 LTLIBOBJS = 
 LT_SYS_LIBRARY_PATH = 
 MAINT = #
-MAKEINFO = ${SHELL} /home/fab/Dev/lplex/missing makeinfo
+MAKEINFO = ${SHELL} /cygdrive/c/Users/Public/Dev/lplex/missing makeinfo
 MANIFEST_TOOL = :
-MKDIR_P = /bin/mkdir -p
-MKISOFS_PATH = /usr/local/bin/mkisofs
-MPEG2ENC_PATH = /usr/local/bin/mpeg2enc
-MPLEX_PATH = /usr/local/bin/mplex
+MKDIR_P = /usr/bin/mkdir -p
+MKISOFS_PATH = 
+MPEG2ENC_PATH = 
+MPLEX_PATH = 
 NM = /usr/bin/nm -B
 NMEDIT = 
 OBJDUMP = objdump
@@ -289,17 +289,17 @@ PACKAGE_VERSION = 0.3
 PATH_SEPARATOR = :
 RANLIB = ranlib
 SCRIPT_PATH = 
-SED = /bin/sed
+SED = /usr/bin/sed
 SET_MAKE = 
 SHELL = /bin/sh
 STRIP = strip
 VERSION = 0.3
-WINDRES = 
-XDGUTILS = yes
-abs_builddir = /home/fab/Dev/lplex/msw
-abs_srcdir = /home/fab/Dev/lplex/msw
-abs_top_builddir = /home/fab/Dev/lplex
-abs_top_srcdir = /home/fab/Dev/lplex
+WINDRES = windres
+XDGUTILS = 
+abs_builddir = /cygdrive/c/Users/Public/Dev/lplex/msw
+abs_srcdir = /cygdrive/c/Users/Public/Dev/lplex/msw
+abs_top_builddir = /cygdrive/c/Users/Public/Dev/lplex
+abs_top_srcdir = /cygdrive/c/Users/Public/Dev/lplex
 ac_ct_AR = ar
 ac_ct_CC = gcc
 ac_ct_CXX = g++
@@ -310,26 +310,26 @@ am__quote =
 am__tar = $${TAR-tar} chof - "$$tardir"
 am__untar = $${TAR-tar} xf -
 bindir = ${exec_prefix}/bin
-build = x86_64-pc-linux-gnu
+build = x86_64-unknown-cygwin
 build_alias = 
 build_cpu = x86_64
-build_os = linux-gnu
-build_vendor = pc
+build_os = cygwin
+build_vendor = unknown
 builddir = .
 datadir = ${datarootdir}
 datarootdir = ${prefix}/share
 docdir = ${datarootdir}/doc/${PACKAGE_TARNAME}
 dvidir = ${docdir}
 exec_prefix = ${prefix}
-host = x86_64-pc-linux-gnu
+host = x86_64-unknown-cygwin
 host_alias = 
 host_cpu = x86_64
-host_os = linux-gnu
-host_vendor = pc
+host_os = cygwin
+host_vendor = unknown
 htmldir = ${docdir}
 includedir = ${prefix}/include
 infodir = ${datarootdir}/info
-install_sh = ${SHELL} /home/fab/Dev/lplex/install-sh
+install_sh = ${SHELL} /cygdrive/c/Users/Public/Dev/lplex/install-sh
 libdir = ${exec_prefix}/lib
 libexecdir = ${exec_prefix}/libexec
 localedir = ${datarootdir}/locale
@@ -338,9 +338,10 @@ mandir = ${datarootdir}/man
 mkdir_p = $(MKDIR_P)
 oldincludedir = /usr/include
 pdfdir = ${docdir}
-prefix = /home/fab/Dev/lplex/local
+prefix = /usr/local
 program_transform_name = s,x,x,
 psdir = ${docdir}
+runstatedir = ${localstatedir}/run
 sbindir = ${exec_prefix}/sbin
 sharedstatedir = ${prefix}/com
 srcdir = .
@@ -358,8 +359,8 @@ msw_files = \
 	lplex.log.lnk \
 	project.lplex.lnk
 
-#msw_releasedir = $(top_builddir)/release/$(PACKAGE)-$(VERSION)
-#msw_release_DATA = $(msw_files)
+msw_releasedir = $(top_builddir)/release/$(PACKAGE)-$(VERSION)
+msw_release_DATA = $(msw_files)
 EXTRA_DIST = $(msw_files)
 all: all-recursive
 
@@ -613,8 +614,8 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
-install-data-hook:
-uninstall-hook:
+#install-data-hook:
+#uninstall-hook:
 clean: clean-recursive
 
 clean-am: clean-generic clean-libtool mostlyclean-am
@@ -704,34 +705,34 @@ uninstall-am: uninstall-msw_releaseDATA
 .PRECIOUS: Makefile
 
 
-#install-data-hook:
-#	test -z "$(msw_releasedir)/bin" || mkdir -p "$(msw_releasedir)/bin"
-#	test -z "$(msw_releasedir)/data" || mkdir -p "$(msw_releasedir)/data"
-#	cp -f $(bindir)/lplex.exe $(msw_releasedir)/
-#	cp -fr $(datadir)/$(PACKAGE)/* $(msw_releasedir)/data/
-#	@( \
-#	pending=$(msw_releasedir)/lplex.exe ; \
-#	while test "x$$pending" != "x" ; do \
-#		objs=$$pending ;\
-#		pending="" ;\
-#		for obj in $$objs ; do \
-#			dlls=$$(objdump -x $$obj | grep "DLL Name: " | \
-#				sed -e 's/DLL Name: //g' | sort -u) ;\
-#			for dll in $$dlls ; do \
-#				waschecked=$$(echo "$$checked" | grep -i $$dll) ;\
-#				if test "x$$waschecked" = "x" ; then \
-#					dllpath=$$(find $(prefix)/ -iname $$dll) ;\
-#					if test "x$$dllpath" != "x" ; then \
-#						echo "copying $$dll" ;\
-#						cp -f $$dllpath $(msw_releasedir) ;\
-#						pending="$$pending $$dllpath" ;\
-#					fi ;\
-#					checked="$$checked $$dll" ;\
-#				fi ;\
-#			done ;\
-#		done ;\
-#	done \
-#	)
+install-data-hook:
+	test -z "$(msw_releasedir)/bin" || mkdir -p "$(msw_releasedir)/bin"
+	test -z "$(msw_releasedir)/data" || mkdir -p "$(msw_releasedir)/data"
+	cp -f $(bindir)/lplex.exe $(msw_releasedir)/
+	cp -fr $(datadir)/$(PACKAGE)/* $(msw_releasedir)/data/
+	@( \
+	pending=$(msw_releasedir)/lplex.exe ; \
+	while test "x$$pending" != "x" ; do \
+		objs=$$pending ;\
+		pending="" ;\
+		for obj in $$objs ; do \
+			dlls=$$(objdump -x $$obj | grep "DLL Name: " | \
+				sed -e 's/DLL Name: //g' | sort -u) ;\
+			for dll in $$dlls ; do \
+				waschecked=$$(echo "$$checked" | grep -i $$dll) ;\
+				if test "x$$waschecked" = "x" ; then \
+					dllpath=$$(find $(prefix)/ -iname $$dll) ;\
+					if test "x$$dllpath" != "x" ; then \
+						echo "copying $$dll" ;\
+						cp -f $$dllpath $(msw_releasedir) ;\
+						pending="$$pending $$dllpath" ;\
+					fi ;\
+					checked="$$checked $$dll" ;\
+				fi ;\
+			done ;\
+		done ;\
+	done \
+	)
 
 #	@( \
 #	dlls=$$(objdump -x $(msw_releasedir)/lplex.exe | \
@@ -745,15 +746,15 @@ uninstall-am: uninstall-msw_releaseDATA
 #	done \
 #	)
 
-#	@echo -e "\n\n"\
-#	"      A windows binary package has been created in 'release/$(PACKAGE)-$(VERSION)'.\n\n"\
-#	"      Before running lplex, don't forget to add the runtime tools\n"\
-#	"            mplex, jpeg2yuv, mpeg2enc, dvdauthor, mkisofs\n"\
-#	"      into the 'bin' directory, for instance by copying these from\n"\
-#	"      an official release of lplex.\n\n"
+	@echo -e "\n\n"\
+	"      A windows binary package has been created in 'release/$(PACKAGE)-$(VERSION)'.\n\n"\
+	"      Before running lplex, don't forget to add the runtime tools\n"\
+	"            mplex, jpeg2yuv, mpeg2enc, dvdauthor, mkisofs\n"\
+	"      into the 'bin' directory, for instance by copying these from\n"\
+	"      an official release of lplex.\n\n"
 
-#uninstall-hook:
-#	rm -fr $(msw_releasedir)
+uninstall-hook:
+	rm -fr $(msw_releasedir)
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

@@ -15,7 +15,6 @@
 				<Option compiler="gcc" />
 				<Option parameters=" --create=iso    c:\Users\Public\Dev\dvda-author-dev\Docs\a2_16_48.wav  " />
 				<Compiler>
-					<Add option="-std=c++1z" />
 					<Add option="-m64" />
 					<Add option="-g" />
 				</Compiler>
@@ -30,7 +29,7 @@
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Compiler>
-					<Add option="-O2" />
+					<Add option="-O3" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
@@ -38,10 +37,11 @@
 			</Target>
 		</Build>
 		<Compiler>
+			<Add option="-Wextra" />
 			<Add option="-Wall" />
-			<Add option="-std=c++1z" />
 			<Add option="-m64" />
 			<Add option="-fexceptions" />
+			<Add option="-std=c++17" />
 			<Add option="-Dlplex_win32" />
 			<Add option="-DUSE_C_RMDIR" />
 			<Add directory="../../../msys2/mingw64/include" />
@@ -52,12 +52,12 @@
 		<Linker>
 			<Add option="-static-libstdc++" />
 			<Add option="-m64" />
-			<Add option="-lFLAC" />
-			<Add option="-lFLAC++" />
-			<Add option="-logg" />
-			<Add option="-ldvdread" />
-			<Add option="-lmd5" />
-			<Add option="-lstdc++fs" />
+			<Add library="C:/msys64/mingw64/lib/libFLAC++.a" />
+			<Add library="C:/msys64/mingw64/lib/libFLAC.a" />
+			<Add library="c:/msys64/mingw64/lib/libogg.a" />
+			<Add library="c:/msys64/mingw64/lib/libdvdread.a" />
+			<Add library="../../redist/md5/libmd5.a" />
+			<Add library="C:/msys64/mingw64/lib/libdvdcss.a" />
 			<Add directory="../../../msys2/mingw64/lib" />
 			<Add directory="../../redist/md5" />
 		</Linker>
