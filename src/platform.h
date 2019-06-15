@@ -1,22 +1,22 @@
 /*
-	platform.h - platform-related utilities.
-	Copyright (C) 2006-2011 Bahman Negahban
+    platform.h - platform-related utilities.
+    Copyright (C) 2006-2011 Bahman Negahban
 
     Adapted to C++-17 in 2018 by Fabrice Nicol
 
-	This program is free software; you can redistribute it and/or modify it
-	under the terms of the GNU General Public License as published by the
-	Free Software Foundation; either version 2 of the License, or (at your
-	option) any later version.
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the
+    Free Software Foundation; either version 2 of the License, or (at your
+    option) any later version.
 
-	This program is distributed in the hope that it will be useful, but
-	WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
-	Public License for more details.
+    This program is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+    Public License for more details.
 
-	You should have received a copy of the GNU General Public License
-	along with this program; if not, write to the Free Software Foundation,
-	Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software Foundation,
+    Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
 
 
@@ -28,9 +28,9 @@
 #endif
 #include <filesystem>
 #include "wx.hpp"
+#include <cstring>
+namespace fs = std::filesystem;
 
-using namespace std;
-namespace  fs = std::filesystem;
 
 
 #if defined __WIN32 || defined _WIN32 || defined _WIN64 || defined __WIN64 || defined MINGW32 || defined MINGW64 || defined(__MINGW32__) || defined(__MINGW64__)
@@ -54,36 +54,36 @@ namespace  fs = std::filesystem;
 
 #  define lplex_console
 
-extern string 	shebang;
+extern std::string   shebang;
 extern fs::path lplexConfig, configDir, dataDir, binDir, tempDir, isoPath, readOnlyPath, projectDotLplex;
 
 // endian swap macros (from dvdread/bswap.h)
 
-inline uint64_t bswap(uint64_t i)
+inline uint64_t bswap (uint64_t i)
 {
-	return (
-		(((i) & 0xff00000000000000LL) >> 56) |
-		(((i) & 0x00ff000000000000LL) >> 40) |
-		(((i) & 0x0000ff0000000000LL) >> 24) |
-		(((i) & 0x000000ff00000000LL) >>  8) |
-		(((i) & 0x00000000ff000000LL) <<  8) |
-		(((i) & 0x0000000000ff0000LL) << 24) |
-		(((i) & 0x000000000000ff00LL) << 40) |
-		(((i) & 0x00000000000000ffLL) << 56));
+    return (
+               ( ( (i) & 0xff00000000000000LL) >> 56) |
+               ( ( (i) & 0x00ff000000000000LL) >> 40) |
+               ( ( (i) & 0x0000ff0000000000LL) >> 24) |
+               ( ( (i) & 0x000000ff00000000LL) >>  8) |
+               ( ( (i) & 0x00000000ff000000LL) <<  8) |
+               ( ( (i) & 0x0000000000ff0000LL) << 24) |
+               ( ( (i) & 0x000000000000ff00LL) << 40) |
+               ( ( (i) & 0x00000000000000ffLL) << 56));
 }
-inline uint32_t bswap(uint32_t i)
+inline uint32_t bswap (uint32_t i)
 {
-	return (
-		(((i) & 0xff000000) >> 24) |
-		(((i) & 0x00ff0000) >>  8) |
-		(((i) & 0x0000ff00) <<  8) |
-		(((i) & 0x000000ff) << 24));
+    return (
+               ( ( (i) & 0xff000000) >> 24) |
+               ( ( (i) & 0x00ff0000) >>  8) |
+               ( ( (i) & 0x0000ff00) <<  8) |
+               ( ( (i) & 0x000000ff) << 24));
 }
-inline uint16_t bswap(uint16_t i)
+inline uint16_t bswap (uint16_t i)
 {
-	return (
-		(((i) & 0xff00) >> 8) |
-		(((i) & 0x00ff) << 8));
+    return (
+               ( ( (i) & 0xff00) >> 8) |
+               ( ( (i) & 0x00ff) << 8));
 }
 
 // ----------------------------------------------------------------------------
@@ -112,8 +112,8 @@ inline uint16_t bswap(uint16_t i)
 #endif
 
 //#define HAS_STRICMP
-#define stricmp strcasecmp
-#define strnicmp strncasecmp
+#define stricmp strcmp
+#define strnicmp strncmp
 
 #define SCRIPT_CMD "bash "
 #define SCRIPT_EXT "sh"
@@ -127,30 +127,36 @@ inline uint16_t bswap(uint16_t i)
 #endif
 
 extern int endPause;
-inline void _pause() { cerr << "\npress <enter> to close..."; cin.get(); }
+inline void _pause()
+{
+   std::cerr << "\npress <enter> to close...";
+    cin.get();
+}
 //inline void _pause() { system( "echo press any key to close; read -n 1" ); }
 #define device(d) d
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
-inline string volumeLabel( const char *path, bool mustBeRoot )
-	{ return ""; }
+inline std::string volumeLabel (const char *path)
+{
+    return "";
+}
 #pragma GCC diagnostic pop
 
 
 inline bool initPlatform()
 {
-    fs::path home = fs::path(getenv(HOME));
+    fs::path home = fs::path (getenv (HOME));
     fs::path appdata = home / ".config";
-    configDir = appdata / string("lplex");
+    configDir = appdata / std::string ("lplex");
     lplexConfig = configDir / "lplex.ini";
     isoPath = configDir / "iso";
-    binDir = fs::path("/usr/bin");
+    binDir = fs::path ("/usr/bin");
     dataDir = configDir / "data" ;
     readOnlyPath = home;
     tempDir = home / "temp";
-    fs::create_directories(tempDir);
-	shebang = "#!/usr/local/bin/lplex -P 1\n";
-	endPause = true;
+    fs::create_directories (tempDir);
+    shebang = "#!/usr/local/bin/lplex -P 1\n";
+    endPause = true;
     return true;
 }
 
@@ -178,27 +184,33 @@ inline bool initPlatform()
 
 extern int endPause;
 inline void _pause()
-	{ cerr << "\npress any key to close..."; system( "pause>nul" ); }
-//inline void _pause() { cerr << "\npress <enter> to close..."; cin.get(); }
+{
+    std::cerr << "\npress any key to close...";
+    system ("pause>nul");
+}
+//inline void _pause() {std::cerr << "\npress <enter> to close..."; cin.get(); }
 #if 0
-inline const char* device( dev_t device )
-	{ char dev[] = { 'A' + device, '\0' }; return dev; }
+inline const char* device (dev_t device)
+{
+    char dev[] = { 'A' + device, '\0' };
+    return dev;
+}
 #endif
 
 inline bool initPlatform()
 {
-
-    string home = string(HOME) + SEPARATOR + getenv(USER);
-    string appdata = string(getenv("APPDATA"));
-    configDir = appdata + string(SEPARATOR  "lplex"  SEPARATOR);
+    std::string home = std::string (HOME) + SEPARATOR + getenv (USER);
+    std::string appdata = std::string (getenv ("APPDATA"));
+    configDir = appdata + std::string (SEPARATOR  "lplex"  SEPARATOR);
     lplexConfig = configDir / "lplex.ini";
-    isoPath = fs::path("iso");
-    binDir =  fs::path("bin");
-    dataDir = appdata /  fs::path("lplex/data");
+    isoPath = fs::path ("iso");
+    binDir =  fs::path ("bin");
+    dataDir = appdata /  fs::path ("lplex/data");
     readOnlyPath = home;
-    tempDir = fs::temp_directory_path()/fs::path("lplex");
-    if (! fs::exists(tempDir))
-      fs::create_directories(tempDir);
+    tempDir = fs::temp_directory_path() / fs::path ("lplex");
+
+    if (! fs::exists (tempDir))
+        fs::create_directories (tempDir);
 
     shebang = "#!/usr/local/bin/lplex -P 1\n";
     endPause = true;
@@ -213,9 +225,9 @@ inline bool initPlatform()
 // ----------------------------------------------------------------------------
 
 
-inline string volumeLabel( const char * path, bool mustBeRoot=false )
+inline std::string volumeLabel (const char * path)
 {
-    return fs::path(path).root_path().string();
+    return fs::path (path).root_path().string();
 }
 
 

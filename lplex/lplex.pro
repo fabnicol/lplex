@@ -3,6 +3,13 @@ CONFIG += console c++11
 CONFIG -= app_bundle
 CONFIG -= qt
 
+INCLUDEPATH += ../redist C:/msys64/mingw64/include ..
+DEFINES += lplex_win32  __cplusplus=201903
+LIBS += -ldvdread
+QMAKE_CXX=C:/msys64//mingw64/bin/g++
+QMAKE_LFLAGS += -LC:/msys64//mingw64/lib #-lstdc++fs
+QMAKE_CXXFLAGS += -std=c++17 -march=core-avx2 -static-libstdc++ -static -static-libgcc
+
 SOURCES += \
     ../src/dvd.cpp \
     ../src/exec.cpp \
@@ -19,6 +26,7 @@ SOURCES += \
     ../src/wx.cpp
 
 HEADERS += \
+    ../redist/lplex_precompile.h \
     ../src/color.h \
     ../src/platform.h \
     ../src/util.h \
@@ -28,3 +36,8 @@ HEADERS += \
     ../src/lplex.hpp \
     ../src/processor.hpp \
     ../src/wx.hpp
+
+DISTFILES += \
+    ../Makefile.am \
+    ../configure.ac \
+    ../lplex.def

@@ -38,7 +38,7 @@
   that follows (in reverse chronological order):
 
   2002-04-13 lpd Clarified derivation from RFC 1321; now handles byte order
-	either statically or dynamically; added missing #include <string.h>
+	either statically or dynamically; added missing #include <std::string.h>
 	in library.
   2002-03-11 lpd Corrected argument list for main(), and added int return
 	type, in test program and T value program.
@@ -50,6 +50,11 @@
   1999-10-18 lpd Fixed typo in header comment (ansi2knr rather than md5).
   1999-05-03 lpd Original version.
  */
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #include "md5.h"
 #include <string.h>
@@ -379,3 +384,7 @@ md5_finish(md5_state_t *pms, md5_byte_t digest[16])
     for (i = 0; i < 16; ++i)
 	digest[i] = (md5_byte_t)(pms->abcd[i >> 2] >> ((i & 3) << 3));
 }
+
+#ifdef __cplusplus
+}
+#endif

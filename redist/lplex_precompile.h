@@ -2,9 +2,6 @@
 #define LPLEX_PCH_INCLUDED
 
 #ifdef __cplusplus
-
-using namespace std;
-
 #include <cstdlib>
 #include <iostream>
 #include <fstream>
@@ -25,14 +22,14 @@ using namespace std;
 #include <ctype.h>
 #include <errno.h>
 #include <fcntl.h>
-#include <string.h>
+#include <string>
 
 #ifndef __STDC_LIMIT_MACROS
 #define __STDC_LIMIT_MACROS 1
 #endif
 
 #include <stdint.h>
-                                 // prevents #error from dvdread/ifo_types.h
+// prevents #error from dvdread/ifo_types.h
 #ifndef INT32_MAX
 #define INT32_MAX 2147483647
 #endif
@@ -57,5 +54,7 @@ using namespace std;
 #ifndef uint
 #define uint uint32_t
 #endif
+
+
 
 #endif

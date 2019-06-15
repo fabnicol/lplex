@@ -88,34 +88,34 @@ void ErrorExit(PTSTR lpszFunction)
 #define NOWAIT -1
 
 
-extern ofstream xlog;
+extern std::ofstream xlog;
 
-inline string quote(const string& path)
+inline std::string quote(const std::string& path)
 {
-      	return (string("\"") + path + string("\""));
+      	return (std::string("\"") + path + std::string("\""));
 }
 
-string get_cl(const char* application, const vector<const char*>& Args, uint16_t start)
+std::string get_cl(const char* application, const std::vector<const char*>& Args, uint16_t start)
 {
-    string cmd;
+    std::string cmd;
     auto it = Args.begin() + start;
     while (it != Args.end())
     {
-        string s = *it;
+        std::string s = *it;
 	bool do_quote=((s[0] != '"') && (s[0] != '-') && (s[0] != '|')) ;
 	do_quote=false;
         cmd += ((do_quote)? quote(s): s);
         if (it + 1 != Args.end()) cmd += " ";
         ++it;
     }
-    cmd = string(application) + ".exe "  + cmd;
+    cmd = std::string(application) + ".exe "  + cmd;
 
     normalize_windows_paths(cmd);
 
 return cmd;
 }
 
-int run(const char* application, const vector<const char*>&  Args, const int option)
+int run(const char* application, const std::vector<const char*>&  Args, const int option)
 {
 errno=0;
 
@@ -125,7 +125,7 @@ _Args.insert(_Args.end(), NULL);
 
 
 
-#if ! defined (_WIN32)  && ! defined(__WIN32) 
+#if ! defined (_WIN32)  && ! defined(__WIN32)
 
     int pid;
     int tube[2];
@@ -140,13 +140,13 @@ _Args.insert(_Args.end(), NULL);
     switch (pid = fork())
     {
         case -1:
-            cerr << "[ERR] Could not launch " << application <<endl;
+           std::cerr << "[ERR] Could not launch " << application <<endl;
             break;
         case 0:
             close(tube[0]);
             dup2(tube[1], STDERR_FILENO);
             execv(application, (char* const*) args);
-            cerr << "[ERR] Runtime failure in " <<  application << " child process" << endl;
+           std::cerr << "[ERR] Runtime failure in " <<  application << " child process" << std::endl;
 
             return errno;
 
@@ -155,7 +155,7 @@ _Args.insert(_Args.end(), NULL);
             dup2(tube[0], STDIN_FILENO);
             while (read(tube[0], &c, 1) == 1)
             {
-                cerr <<  c;
+               std::cerr <<  c;
 #               ifdef _ERR2LOG
                   xlog << c;
 #               endif
@@ -173,10 +173,10 @@ _Args.insert(_Args.end(), NULL);
     si.cb = sizeof(si);
     ZeroMemory( &pi, sizeof(pi) );
 
-    string _application = string(application) + ".exe";
-    string cmdline = get_cl(application, Args, 0);
-cerr <<endl<<_application.c_str()<<endl;
-cerr << cmdline.c_str() << endl;
+    std::string _application = std::string(application) + ".exe";
+    std::string cmdline = get_cl(application, Args, 0);
+    std::cerr << std::endl<<_application.c_str()<< std::endl;
+    std::cerr << cmdline.c_str() << std::endl;
 
     // Start the child process.
     if( !CreateProcessA( _application.c_str(),   // No module name (use command line)
@@ -191,7 +191,7 @@ cerr << cmdline.c_str() << endl;
         &pi )           // Pointer to PROCESS_INFORMATION structure
     )
     {
-        cerr << "CreateProcess failed " << GetLastError() << endl;
+       std::cerr << "CreateProcess failed " << GetLastError() << std::endl;
         return -1;
     }
 
@@ -207,8 +207,8 @@ cerr << cmdline.c_str() << endl;
 }
 
 
-int run(const char* application,  const vector<const char*>& Args,
-        const char* application2, const vector<const char*>& Args2,
+int run (const char* application,  const std::vector<const char*>& Args,
+        const char* application2, const std::vector<const char*>& Args2,
         const int option)
 {
 #ifdef __linux__
@@ -250,7 +250,7 @@ errno=0;
 switch (fork())
 {
 case -1:
-    cerr << "[ERR] Could not launch " << application << endl;
+   std::cerr << "[ERR] Could not launch " << application << std::endl;
     break;
 
 case 0:
@@ -261,7 +261,7 @@ case 0:
     // Piping stdout is required here as STDOUT is not a possible duplicate for stdout
     dup2(tubeerr[1], STDERR_FILENO);
     execv(application, (char* const*) args);
-    cerr << "[ERR] Runtime failure in jpeg2yuv child process" << endl;
+   std::cerr << "[ERR] Runtime failure in jpeg2yuv child process" << std::endl;
 
     return errno;
 
@@ -270,12 +270,12 @@ default:
     close(tube[1]);
     close(tubeerr[1]);
     dup2(tube[0], STDIN_FILENO);
-    cerr << "[INF] Piping to ..." << application2 << endl;
+   std::cerr << "[INF] Piping to ..." << application2 << std::endl;
 
     switch (pid2 = fork())
     {
     case -1:
-        cerr << "[ERR] Could not launch " << application2 << endl;
+       std::cerr << "[ERR] Could not launch " << application2 << std::endl;
         break;
 
     case 0:
@@ -288,19 +288,19 @@ default:
         dup2(tubeerr2[1], STDERR_FILENO);
         // End of comment
         execv(application2, (char* const*) args2);
-        cerr << "[ERR] Runtime failure in " << application2 << " parent process" << endl;
+       std::cerr << "[ERR] Runtime failure in " << application2 << " parent process" << std::endl;
         return errno;
 
     default:
         if (option != NOWAIT) waitpid(pid2, NULL, 0);
         dup2(tubeerr[0], STDIN_FILENO);
 
-        while (read(tubeerr[0], &c, 1) == 1) cerr << c;
+        while (read(tubeerr[0], &c, 1) == 1)std::cerr << c;
         close(tubeerr[0]);
         close(tubeerr2[1]);
         dup2(tubeerr2[0], STDIN_FILENO);
 
-        while (read(tubeerr2[0], &c, 1) == 1) cerr << c;
+        while (read(tubeerr2[0], &c, 1) == 1)std::cerr << c;
         close(tubeerr2[0]);
     }
     close(tube[0]);
@@ -309,18 +309,18 @@ return errno;
 
 #else
 
-       string cmdline = get_cl(application, Args, 0);
-       string cmdline2 = get_cl(application2, Args2, 0);
+       std::string cmdline = get_cl(application, Args, 0);
+       std::string cmdline2 = get_cl(application2, Args2, 0);
 
-	   cerr <<"###" << cmdline << "###" << endl;
+	  std::cerr <<"###" << cmdline << "###" << std::endl;
 
-	   cerr <<"###" << cmdline2 << "###" << endl;
+	  std::cerr <<"###" << cmdline2 << "###" << std::endl;
 
-       string command =  cmdline + string(" | ") + cmdline2;
+       std::string command =  cmdline + std::string(" | ") + cmdline2;
 
-	   cerr << "!!!" << command << "!!!"  << endl;
+	  std::cerr << "!!!" << command << "!!!"  << std::endl;
 
-       cerr << "***" <<  command << "***" << endl;
+      std::cerr << "***" <<  command << "***" << std::endl;
 
        //int res =
         system(command.c_str());
@@ -329,14 +329,14 @@ return 0;
 }
 
 
-long execute( const string& application, const vector<const char*>& args, int verbose)
+long execute( const std::string& application, const std::vector<const char*>& args, int verbose)
 {
 #ifdef _ERR2LOG
 	if( verbose > -1 )
     {
-        xlog << endl << STAT_TAG << "Running command : " << application << " ";
+        xlog << std::endl << STAT_TAG << "Running command : " << application << " ";
         for(const auto& s: args)  xlog << s << " ";
-        xlog << endl;
+        xlog << std::endl;
     }
 	else
 		xlog.close();
@@ -344,11 +344,11 @@ long execute( const string& application, const vector<const char*>& args, int ve
 
     if (verbose > -1)
     {
-        cerr << endl << STAT_TAG << "Running command : " << application << " ";
-        for(const auto& s: args)  cerr << s << " ";
+       std::cerr << std::endl << STAT_TAG << "Running command : " << application << " ";
+        for(const auto& s: args) std::cerr << s << " ";
     }
 
-    string _application = application;
+    std::string _application = application;
     normalize_windows_paths(_application);
 
     run(_application.c_str(), args, 0);
@@ -358,14 +358,14 @@ long execute( const string& application, const vector<const char*>& args, int ve
 
 
 
-long execute( const string& application,  const vector<const char*>& args,
-              const string& application2, const vector<const char*>& args2,
+long execute( const std::string& application,  const std::vector<const char*>& args,
+              const std::string& application2, const std::vector<const char*>& args2,
               int verbose)
 {
 #ifdef _ERR2LOG
 	if( verbose > -1 )
     {
-        xlog << endl << STAT_TAG << "Running command : " << application << " ";
+        xlog << std::endl << STAT_TAG << "Running command : " << application << " ";
         for(const auto& s: args)  xlog << s << " ";
     }
 	else
@@ -376,16 +376,16 @@ long execute( const string& application,  const vector<const char*>& args,
     {
         xlog << " | ";
         for(const auto& s: args2)  xlog << s << " ";
-        xlog << endl;
+        xlog << std::endl;
     }
 
 	if( verbose > -1 )
     {
-         cerr << endl << STAT_TAG << "Running command : " << endl << application << " ";
-         for(const auto& s: args)  cerr << s << " ";
-         cerr << " | ";
-         cerr << application2 << " ";
-         for(const auto& s: args2)  cerr << s << " ";
+        std::cerr << std::endl << STAT_TAG << "Running command : " << std::endl << application << " ";
+         for(const auto& s: args) std::cerr << s << " ";
+        std::cerr << " | ";
+        std::cerr << application2 << " ";
+         for(const auto& s: args2) std::cerr << s << " ";
     }
 
     run(application.c_str(), args, application2.c_str(), args2, 0);
