@@ -22,6 +22,7 @@
 
 
 #include "lpcm.hpp"
+#include "flac.hpp"
 #include "processor.hpp"
 
 
@@ -395,7 +396,51 @@ int waveHeader::audit (const char *filename, FLAC__StreamMetadata *fmeta)
 
 int waveHeader::open (std::ifstream &wavefile, FLAC__StreamMetadata *fmeta, bool mute)
 {
-    canonical hdr;
+
+//    (standard header)
+//    uint8_t header[44]=
+//    {'R','I','F','F',    //   0 - ChunkID
+//      0,0,0,0,            //  4 - ChunkSize (filesize - 8 - padbyte)
+//      'W','A','V','E',    //  8 - Format
+//      'f','m','t',' ',    // 12 - SubChunkID
+//      16,0,0,0,           // 16 - SubChunk1ID  // 16 for PCM
+//      1,0,                // 20 - AudioFormat (1=16-bit)
+//      2,0,                // 22 - NumChannels
+//      0,0,0,0,            // 24 - SampleRate in Hz
+//      0,0,0,0,            // 28 - Byte Rate (SampleRate*NumChannels*(BitsPerSample/8)
+//      4,0,                // 32 - BlockAlign (== NumChannels * BitsPerSample/8)
+//      16,0,               // 34 - BitsPerSample
+//      'd','a','t','a',    // 36 - Subchunk2ID
+//      0,0,0,0             // 40 - 43 Subchunk2Size = Chunksize - 36 = filesize - 44 - padbyte
+//    };
+
+//    uint8_t header[N]=
+//    {'R','I','F','F',    //  0 - ChunkID
+//      0,0,0,0,            //  4 - ChunkSize (filesize - 8 - padbyte)
+//      'W','A','V','E',    //  8 - Format
+//      'f','m','t',' ',    // 12 - SubChunkID
+//      40,0,0,0,           // 16 - SubChunk1ID  // 18 or 40 for PCM as 16 is only for WAVE_FORMAT_PCM
+//      1,0,                // 20 - AudioFormat (1=16-bit)
+//      2,0,                // 22 - NumChannels
+//      0,0,0,0,            // 24 - SampleRate in Hz
+//      0,0,0,0,            // 28 - Byte Rate (SampleRate*NumChannels*(BitsPerSample/8)
+//      4,0,                // 32 - BlockAlign (== NumChannels * BitsPerSample/8)
+//      16,0,               // 34 - BitsPerSample
+//      22,0,               // 36 - wav extension  (0 or 22 bytes)
+//      if not 0:
+//      0,0,                // 38 - number of valid bits
+//      0,0,0,0,            // 40 - speaker position mask
+//      [16 B]              // 44 - GUID including WAV_FORMAT_PCM or WAV_FORMAT_EXTENSIBLE
+//      'f','a','c','t',    // 60 - fact chunk, optional for PCM here minimum)
+//      0,0,0,4,            // 64 - net length of fact chunk
+//      0,0,0,0,            // 68 - number of samples written per channel out (uint32_t)
+//     // some software pack up various tags in here... + x bytes
+//      'd','a','t','a',    // 72 + x - Sunchunk2IDO
+//      0,0,0,0             // 76 + x - 80 Subchunk2Size = filesize - padbyte - N
+//    };
+
+
+    wav_extensible hdr;
     uint32_t fmtChunk = 0, dataChunk = 0;
     std::string msg;
     struct
@@ -437,16 +482,20 @@ int waveHeader::open (std::ifstream &wavefile, FLAC__StreamMetadata *fmeta, bool
                 {
                     fmtChunk = wavefile.tellg();
 
-                    if (chunk.size > 16)
-                        msg += _f ("[16 read, %d ignored]  ", chunk.size - 16);
 
-                    wavefile.read ( (char *) &hdr + 20, chunk.size > 16 ? 16 : chunk.size);
+            wavefile.read((char*) &hdr + 20, chunk.size );
 
-                    if (hdr.audioFormat != 1)
-                        {
-                            ERR ("Audio is not lpcm.\n");
-                            return 0;
-                        }
+            if (hdr.audioFormat[0] == 1)
+                std::cerr << "Header is standard.\n" ;
+            else
+            if(hdr.audioFormat[0] == 0xFE && hdr.audioFormat[1] == 0xFF)
+            {
+                std::cerr << "Header is extensible.\n" ;
+            }
+            else {
+                std::cerr << "Header is neither standard nor extensible.\n";
+                return 0;
+            }
 
                     continue;
                 }
@@ -475,8 +524,6 @@ int waveHeader::open (std::ifstream &wavefile, FLAC__StreamMetadata *fmeta, bool
 
     if (fmtChunk && dataChunk)
         {
-            if (! mute && (fmtChunk != 20 || dataChunk != 44))
-                LOG ("Non-canonical header. Subchunks: " << msg << "\n");
 
             flacHeader::readStreamInfo (&hdr, fmeta);
             wavefile.clear();
@@ -484,11 +531,9 @@ int waveHeader::open (std::ifstream &wavefile, FLAC__StreamMetadata *fmeta, bool
             return 1;
         }
 
-    ERR (_f ("Non-canonical header. Can't find %s%s%s chunk%s.\n",
-             fmtChunk ? "" : "'fmt'", ! fmtChunk && ! dataChunk ? " or " : "",
-             dataChunk ? "" : "'data'", ! fmtChunk && ! dataChunk ? "s" : ""));
-    ECHO ("Try converting this file to flac and using that instead.");
+
     return 0;
+
 }
 
 

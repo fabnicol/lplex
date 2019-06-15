@@ -27,8 +27,8 @@ extern "C" {
 //    Return anything (ignored).
 // ----------------------------------------------------------------------------
 
-typedef int (*udflist_cb_t)( const char *fname, uint16_t ftype, uint32_t lb,
-   uint32_t len, dvd_reader_t *device );
+typedef int (*udflist_cb_t) (const char *fname, uint16_t ftype, uint32_t lb,
+                             uint32_t len, dvd_reader_t *device);
 
 // ----------------------------------------------------------------------------
 //    udflist :
@@ -45,8 +45,8 @@ typedef int (*udflist_cb_t)( const char *fname, uint16_t ftype, uint32_t lb,
 //    Returns number of items encountered
 // ----------------------------------------------------------------------------
 
-int udflist( dvd_reader_t *device, const char *filename,
-   int recursive, int listdirs, udflist_cb_t cb );
+int udflist (dvd_reader_t *device, const char *filename,
+             int recursive, int listdirs, udflist_cb_t cb);
 
 
 #ifdef __cplusplus
@@ -60,53 +60,63 @@ int udflist( dvd_reader_t *device, const char *filename,
 
 class udfLister
 {
-public:
-   // udfItem - derived class "callback", for args see udflist_cb_t above.
-   virtual int udfItem( const char *fname, uint16_t ftype, uint32_t lb,
-      uint32_t len ) = 0;
+    public:
+        // udfItem - derived class "callback", for args see udflist_cb_t above.
+        virtual int udfItem (const char *fname, uint16_t ftype, uint32_t lb,
+                             uint32_t len) = 0;
 
-   // udfList - lists items under <path>, for args see udflist above.
-   //    e.g. udfList( myReader, this, "/some/path" );
-   static int udfList( dvd_reader_t *reader, udfLister *instance,
-      const char *path="", int recursive=true, int listdirs=false )
-   {
-      udfInstance( reader, instance );
-      return ::udflist( reader, path, recursive, listdirs, &udflist_cb );
-      udfInstance( reader, instance, false );
-   }
+        // udfList - lists items under <path>, for args see udflist above.
+        //    e.g. udfList( myReader, this, "/some/path" );
+        static int udfList (dvd_reader_t *reader, udfLister *instance,
+                            const char *path = "", int recursive = true, int listdirs = false)
+        {
+            udfInstance (reader, instance);
+            return ::udflist (reader, path, recursive, listdirs, &udflist_cb);
+            udfInstance (reader, instance, false);
+        }
 
-private:
+    private:
 
-   typedef struct{ dvd_reader_t *reader; udfLister *instance; } udfkey;
+        typedef struct
+        {
+            dvd_reader_t *reader;
+            udfLister *instance;
+        } udfkey;
 
-   static udfLister* udfInstance(
-      dvd_reader_t *reader, udfLister *instance = NULL, bool alive = true )
-   {
-      staticstd::vector<udfkey> xref;
+        static udfLister* udfInstance (
+            dvd_reader_t *reader, udfLister *instance = nullptr, bool alive = true)
+        {
+            staticstd::vector<udfkey> xref;
 
-      if( instance )
-      {
-         xref.push_back( (udfkey){ reader, instance } );
-         return instance;
-      }
+            if (instance)
+                {
+                    xref.push_back ( (udfkey)
+                    {
+                        reader, instance
+                    });
+                    return instance;
+                }
 
-      for( int i=0; i < xref.size(); i++ )
-         if( xref[i].reader == reader )
-         {
-            if( alive )
-               return xref[i].instance;
-            else
-               xref.erase( xref.begin() + i );
-         }
-      return NULL;
-   }
+            for (int i = 0; i < xref.size(); i++)
+                if (xref[i].reader == reader)
+                    {
+                        if (alive)
+                            return xref[i].instance;
 
-   static int udflist_cb( const char *fname, uint16_t ftype, uint32_t lb, uint32_t len, dvd_reader_t *reader )
-   {
-      if( udfLister *instance = udfInstance( reader ) )
-         return instance->udfItem( fname, ftype, lb, len );
-      return 0;
-   }
+                        else
+                            xref.erase (xref.begin() + i);
+                    }
+
+            return nullptr;
+        }
+
+        static int udflist_cb (const char *fname, uint16_t ftype, uint32_t lb, uint32_t len, dvd_reader_t *reader)
+        {
+            if (udfLister *instance = udfInstance (reader))
+                return instance->udfItem (fname, ftype, lb, len);
+
+            return 0;
+        }
 };
 
 #endif

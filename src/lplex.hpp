@@ -148,6 +148,7 @@ struct dvdJpeg
 };
 
 
+
 struct lpcmFile : public lpcmEntity
 {
     enum
@@ -285,7 +286,7 @@ bool stdArgs (int &argc, char** &argv, char *args, size_t size);
 
 void version (const char * str = "");
 void banner();
-void usage (const char *str = NULL);
+void usage (const char *str = nullptr);
 void GPL_notice();
 
 int author (dvdLayout &layout);
@@ -297,7 +298,7 @@ int tagEmbed();
 int mkisofs (const fs::path &isoPath, const fs::path &dvdPath, const std::string& name);
 
 #ifndef lplex_console
-void update (vector<lpcmFile> *lFiles,std::vector<infoFile> *iFiles, lplexJob *job);
+void update (vector<lpcmFile> *lFiles, std::vector<infoFile> *iFiles, lplexJob *job);
 void update (vector<lpcmFile> *lFiles);
 void update (vector<infoFile> *infofiles);
 #endif
@@ -320,8 +321,8 @@ uint32_t roughGOP (dvdJpeg &dvdJpeg, const char *m2vName, bool ntsc);
 bool alias (fs::path &jpeg);
 
 std::ofstream* m2v (uint32_t vFrames, const char *jpeg, const char *m2vName,
-               uint16_t tv = NTSC, bool ws = false, void *userData = NULL, uint32_t sizeofUData = 0,
-               uint16_t GOPsize = 18, bool append = false, bool endSeq = false, bool close = true);
+                    uint16_t tv = NTSC, bool ws = false, void *userData = nullptr, uint32_t sizeofUData = 0,
+                    uint16_t GOPsize = 18, bool append = false, bool endSeq = false, bool close = true);
 
 
 class wxLplexLog : public std::ofstream
@@ -385,7 +386,7 @@ class lFileTraverser //: public wxDirTraverser
         bool dirSpecified;
         struct lpcmFile lFile;
         struct infoFile iFile;
-       std::vector<std::string> filenames;
+        std::vector<std::string> filenames;
 
         lFileTraverser (bool isStrict = true) : titleset (100), err (0), strict (isStrict) {}
 
@@ -469,9 +470,10 @@ class dvdLayout : public dvdUtil
         counter<uint64_t> ct;
         std::string nameNow, spaceTxt;
 
-        dvdLayout (std::vector<lpcmFile> *lFiles,std::vector<std::string> *vFiles,std::vector<infoFile> *iFiles, lplexJob *plexJob) :
+        dvdLayout (std::vector<lpcmFile> *lFiles, std::vector<std::string> *vFiles, std::vector<infoFile> *iFiles,
+                   lplexJob *plexJob) :
             Lfiles (lFiles), menufiles (vFiles), infofiles (iFiles), job (plexJob),
-            readIndex (-1), writeIndex (-1), reader (NULL)
+            readIndex (-1), writeIndex (-1), reader (nullptr)
         {}
         ~dvdLayout()
         {
@@ -495,7 +497,7 @@ class xmlAttr
         char *val;
         int i;
 
-        xmlAttr (char *buffer) : buf (buffer), name (NULL), val (NULL), i (0) {}
+        xmlAttr (char *buffer) : buf (buffer), name (nullptr), val (nullptr), i (0) {}
 
         uint16_t get()
         {

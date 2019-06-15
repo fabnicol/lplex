@@ -598,7 +598,7 @@ int lpcm_video_ts::open (const char * VIDEO_TS, bool fatal)
 //    lpcm_video_ts::cellAt :
 // ----------------------------------------------------------------------------
 //    Returns a pointer to the cell address table entry matching the vob
-//    and cell ids specified by the given cell position entry, or NULL on fail.
+//    and cell ids specified by the given cell position entry, or nullptr on fail.
 //
 //    Arguments:
 //       <pos>    - pointer to cell position entry to match
@@ -616,7 +616,7 @@ cell_adr_t* lpcm_video_ts::cellAt (cell_position_t *pos)
 //    lpcm_video_ts::cellAt :
 // ----------------------------------------------------------------------------
 //    Returns a pointer to the cell address table entry matching the given
-//    <vob_id> and <cell_id>, or NULL on fail.
+//    <vob_id> and <cell_id>, or nullptr on fail.
 // ----------------------------------------------------------------------------
 
 
@@ -631,8 +631,7 @@ cell_adr_t* lpcm_video_ts::cellAt (int vob_id, int cell_id)
                 if (cells[i].cell_id == cell_id)
                     return &cells[i];
         }
-
-    return NULL;
+	return nullptr;
 }
 
 
@@ -868,7 +867,7 @@ uint32_t lpcmPGextractor::nextAudioCellPts (uint16_t c)
 //       <writeIndex>      - program cell index
 //       <context>         - cell position context
 //
-//    Returns pointer to new writer on success, NULL if index is out of range
+//    Returns pointer to new writer on success, nullptr if index is out of range
 // ----------------------------------------------------------------------------
 
 
@@ -965,8 +964,13 @@ lpcmWriter* lpcmPGextractor::getWriter (int writeIndex, int context)
             lastIndex = audioCells[writeIndex].xIndex;
             return lFile->writer;
         }
+		SCRN( "\n" );
+        SCRN( std::string(STAT_TAG) + txt)
+        SCRN(TINT( lFile->writer->fName.filename().string().c_str() ))
+        SCRN( "... " )
 
-    return NULL;
+		lastIndex = audioCells[writeIndex].xIndex;
+		return lFile->writer;
 }
 
 

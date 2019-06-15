@@ -517,6 +517,7 @@ uint32_t waveWriter::process (unsigned char *buf, uint32_t size)
 
 uint16_t waveWriter::close()
 {
+
     waveHeader::tag (waveFile, &fmeta);
     waveFile.close();
     md5_finish (&md5, md5str);
@@ -728,7 +729,7 @@ uint16_t flacWriter::md5Report()
     if (! isOpen())
         return false;
 
-   std::ifstream flacFile (fName.string(), std::ios::binary);
+    std::ifstream flacFile (fName.string(), std::ios::binary);
 
     if (! flacFile.is_open())
         {

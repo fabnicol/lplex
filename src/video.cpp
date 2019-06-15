@@ -368,7 +368,7 @@ int addJpeg (const char * fname, lplexJob &job, bool zero, bool ws)
     if (zero && jpegs.size())
         jpegs.clear();
 
-    if (jpeg.fName.has_parent_path()  && std::string(fname).Left (5) == "black")
+    if (jpeg.fName.has_parent_path()  && std::string (fname).Left (5) == "black")
         {
             alias (jpeg.fName);
             isBlack = true;
@@ -529,7 +529,7 @@ int jpegCheck (dvdJpeg &jpeg, bool ntsc, bool rescale)
     struct jpeg_error_mgr jErr;
     FILE *dvdJpeg = fopen (jpeg.fName.string(), "rb");
 
-    if (dvdJpeg == NULL)
+    if (dvdJpeg == nullptr)
         FATAL ("Can't open jpeg file " + jpeg.fName.string());
 
     j.err = jpeg_std_error (&jErr);   /* ?????????? */

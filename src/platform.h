@@ -129,7 +129,7 @@ inline uint16_t bswap (uint16_t i)
 extern int endPause;
 inline void _pause()
 {
-   std::cerr << "\npress <enter> to close...";
+    std::cerr << "\npress <enter> to close...";
     cin.get();
 }
 //inline void _pause() { system( "echo press any key to close; read -n 1" ); }

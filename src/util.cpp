@@ -118,7 +118,7 @@ void setcolors (int scheme)
 #endif
 
 
-#ifdef _ERR2LOG
+#ifdef ERR2LOGMACRO
 
 std::ofstream xlog;
 std::string xlogName;

@@ -40,7 +40,7 @@ int author (dvdLayout &layout)
     uint16_t uDataLen = 0;
     uint8_t userData[512];
     uint32_t vFrames = 0;
-    std::ofstream *m2vFile = NULL;
+    std::ofstream *m2vFile = nullptr;
 #ifndef lgzip_support
 
     if (job.prepare >= lgzf)
@@ -236,13 +236,13 @@ int author (dvdLayout &layout)
     if (job.prepare >= mpegf)
         {
             done = mpegf;
-            XLOG (INFO_TAG << "dvd" << (xml.dvdStyler ? "Styler" : "author")
+            LOG (INFO_TAG << "dvd" << (xml.dvdStyler ? "Styler" : "author")
                   << " xml configuration file:\n");
 
             if (multichapter)
                 {
-                    XLOG (LOG_TAG  << "-chapters below are in dvdauthor's rounded fractional format\n");
-                    XLOG (LOG_TAG  << "-see layout table(s) above for frame-accurate timestamps\n\n");
+                    LOG (LOG_TAG  << "-chapters below are in dvdauthor's rounded fractional format\n");
+                    LOG (LOG_TAG  << "-see layout table(s) above for frame-accurate timestamps\n\n");
                 }
         }
 
@@ -308,7 +308,7 @@ int author (dvdLayout &layout)
 
     if (job.prepare >= vobf)
         {
-            int *map = NULL;
+            int *map = nullptr;
 
             if (menufiles.size() && (map = mapMenus()))
                 {
@@ -1078,7 +1078,7 @@ int _tag0 = 0;
 int mpeg2encProgress (const char *msg, bool echo)
 {
     uint16_t pct;
-    char *pos = NULL;
+    char *pos = nullptr;
 
     if (msg[1] == '*'
             && msg[2] == 'E'
@@ -1452,7 +1452,7 @@ int* mapMenus()
    std::vector<std::string> xobs;
 
     if (! menufiles.size())
-        return NULL;
+        return nullptr;
 
     int err = 0;
     const char* VIDEO_TS = (job.dvdPath / "VIDEO_TS").string().c_str();

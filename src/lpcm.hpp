@@ -279,7 +279,7 @@ class PES_packet
                         return LPCM;
                 }
 
-            return NULL;
+            return nullptr;
         }
 
 
@@ -307,16 +307,77 @@ class waveHeader
             uint32_t subchunk2Size;
         };
 
-        static int tag (std::ofstream& out, FLAC__StreamMetadata *meta = 0);
-        static int tag (std::ofstream& out, PES_packet::LPCM_header* LPCM = 0);
-        static int tag (std::ofstream& out, PES_packet::header* PS1)
+        //    (standard header)
+        //    uint8_t header[44]=
+        //    {'R','I','F','F',    //   0 - ChunkID
+        //      0,0,0,0,            //  4 - ChunkSize (filesize - 8 - padbyte)
+        //      'W','A','V','E',    //  8 - Format
+        //      'f','m','t',' ',    // 12 - SubChunkID
+        //      16,0,0,0,           // 16 - SubChunk1ID  // 16 for PCM
+        //      1,0,                // 20 - AudioFormat (1=16-bit)
+        //      2,0,                // 22 - NumChannels
+        //      0,0,0,0,            // 24 - SampleRate in Hz
+        //      0,0,0,0,            // 28 - Byte Rate (SampleRate*NumChannels*(BitsPerSample/8)
+        //      4,0,                // 32 - BlockAlign (== NumChannels * BitsPerSample/8)
+        //      16,0,               // 34 - BitsPerSample
+        //      'd','a','t','a',    // 36 - Subchunk2ID
+        //      0,0,0,0             // 40 - 43 Subchunk2Size = Chunksize - 36 = filesize - 44 - padbyte
+        //    };
+
+        struct wav_extensible
         {
-            return tag (out, PES_packet::lpcmAddr (PS1));
-        }
+            uint8_t chunkID[4];
+            uint32_t chunkSize;
+            uint8_t format[4];
+            uint8_t subChunkID[4];
+            uint32_t SubChunkSize;
+            uint8_t audioFormat[2];
+            uint16_t numChannels;
+            uint32_t sampleRate;
+            uint32_t byteRate;
+            uint16_t blockAlign;
+            uint16_t bitsPerSample;
+            uint16_t wav_extension;
+            uint16_t nvalid;
+            uint32_t speaker_position_mask;
+            uint8_t GUID[16];
+            uint8_t fact[4];
+            uint8_t fact_length;
+            uint32_t nsamplesperchannel;
+            uint8_t subchunk2ID[4];
+            uint32_t subchunk2Size;
+        };
+
+        //    uint8_t header[N]=
+        //    {'R','I','F','F',    //  0 - ChunkID
+        //      0,0,0,0,            //  4 - ChunkSize (filesize - 8 - padbyte)
+        //      'W','A','V','E',    //  8 - Format
+        //      'f','m','t',' ',    // 12 - SubChunkID
+        //      40,0,0,0,           // 16 - SubChunk1ID  // 18 or 40 for PCM as 16 is only for WAVE_FORMAT_PCM
+        //      1,0,                // 20 - AudioFormat (1=16-bit)
+        //      2,0,                // 22 - NumChannels
+        //      0,0,0,0,            // 24 - SampleRate in Hz
+        //      0,0,0,0,            // 28 - Byte Rate (SampleRate*NumChannels*(BitsPerSample/8)
+        //      4,0,                // 32 - BlockAlign (== NumChannels * BitsPerSample/8)
+        //      16,0,               // 34 - BitsPerSample
+        //      22,0,               // 36 - wav extension  (0 or 22 bytes)
+        //      if not 0:
+        //      0,0,                // 38 - number of valid bits
+        //      0,0,0,0,            // 40 - speaker position mask
+        //      [16 B]              // 44 - GUID including WAV_FORMAT_PCM or WAV_FORMAT_EXTENSIBLE
+        //      'f','a','c','t',    // 60 - fact chunk, optional for PCM here minimum)
+        //      0,0,0,4,            // 64 - net length of fact chunk
+        //      0,0,0,0,            // 68 - number of samples written per channel out (uint32_t)
+        //     // some software pack up various tags in here... + x bytes
+        //      'd','a','t','a',    // 72 + x - Sunchunk2IDO
+        //      0,0,0,0             // 76 + x - 80 Subchunk2Size = filesize - padbyte - N
+        //    };
 
         static int open (std::ifstream &wavefile, FLAC__StreamMetadata *fmeta, bool mute = false);
         static int audit (const char *filename, FLAC__StreamMetadata *fmeta);
-        static void display (canonical* h, const char* prefix = "", std::ostream &stream =std::cerr);
+        static void display (canonical* h, const char* prefix = "", std::ostream &stream = std::cerr);
+        static int tag (std::ofstream& out, FLAC__StreamMetadata *meta);
+        static int tag (std::ofstream& out, PES_packet::LPCM_header* LPCM);
 
 };
 

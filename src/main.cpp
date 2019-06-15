@@ -32,7 +32,7 @@
 
 lplexJob job;
 _wxStopWatch stopWatch;
-wxLplexLog _wxLog;
+static wxLplexLog _wxLog;
 lpcm_video_ts userMenus;
 
 std::vector<lpcmFile> Lfiles;
@@ -45,16 +45,16 @@ lpcmPGextractor dvd (&Lfiles, &infofiles, &job);
 
 unsigned char bigBlock[BIGBLOCKLEN];
 
-fs::path dataDir, binDir, configDir, tempDir, isoPath, readOnlyPath;
-fs::path lplexConfig, cwd, projectDotLplex;
-fs::path optSrc;
+fs::path dataDir, binDir, configDir, tempDir, isoPath, readOnlyPath, lplexConfig, projectDotLplex;
+static fs::path cwd;
+static fs::path optSrc;
 
 std::string  shebang;
 std::string gzFile;
 std::string menuPath;
 std::string cmdline;
 
-bool startNewTitleset, projectFile, screenJpg, lgz;
+static bool startNewTitleset, projectFile, screenJpg, lgz;
 
 enum
 {
@@ -86,7 +86,7 @@ int jobs::forward = 0x40;
 #ifdef lplex_console
 
 
-int exitct = 0;
+static int exitct = 0;
 
 void done()
 {
@@ -123,7 +123,7 @@ int main (int argc, char *argv[])
 
     if (init (argc, argv))
         {
-#ifdef _ERR2LOG
+#ifdef ERR2LOGMACRO
             xlog << cmdline << "\n-------------------------------------------------------------------------------\n" << std::endl;
 #endif
 
@@ -161,7 +161,7 @@ int main (int argc, char *argv[])
                     fs_DeleteDir (job.tempPath);
 
                     if (fs::exists (job.tempPath))
-                       std::cerr << "[ERR] Temporary path not deleted" << std::endl;
+                        std::cerr << "[ERR] Temporary path not deleted" << std::endl;
                 }
 
             return res;
@@ -180,42 +180,42 @@ const char *short_opts = "ud:f:t:m:r:x:i:j:M:N:R:l:s:C:c:z:p:w:a:E:v:VQh?D:n:e:P
 
 struct option long_opts[] =
 {
-    { "unauthor",    0, 0, 'u' },
-    { "dir",         1, 0, 'd' },
-    { "formatout",   1, 0, 'f' },
-    { "video",       1, 0, 't' },
-    { "md5aware",    1, 0, 'm' },
-    { "restore",     1, 0, 'r' },
-    { "infofiles",   1, 0, 'x' },
-    { "infodir",     1, 0, 'i' },
-    { "jpeg",        1, 0, 'j' },
-    { "menu",        1, 0, 'M' },
-    { "menuforce",   1, 0, 'N' },
-    { "rescale",     1, 0, 'R' },
+    { "unauthor",    0, nullptr, 'u' },
+    { "dir",         1, nullptr, 'd' },
+    { "formatout",   1, nullptr, 'f' },
+    { "video",       1, nullptr, 't' },
+    { "md5aware",    1, nullptr, 'm' },
+    { "restore",     1, nullptr, 'r' },
+    { "infofiles",   1, nullptr, 'x' },
+    { "infodir",     1, nullptr, 'i' },
+    { "jpeg",        1, nullptr, 'j' },
+    { "menu",        1, nullptr, 'M' },
+    { "menuforce",   1, nullptr, 'N' },
+    { "rescale",     1, nullptr, 'R' },
     //   { "alignment",   1, 0, 'l' },
-    { "splice",      1, 0, 'l' },
-    { "shift",       1, 0, 's' },
-    { "cleanup",     1, 0, 'C' },
-    { "create",      1, 0, 'c' },
-    { "media",       1, 0, 'z' },
-    { "dvdpath",     1, 0, 'p' },
-    { "workpath",    1, 0, 'w' },
-    { "isopath",     1, 0, 'a' },
-    { "extractpath", 1, 0, 'E' },
-    { "verbose",     1, 0, 'v' },
-    { "version",     0, 0, 'V' },
-    { "license",     0, 0, 'Q' },
-    { "help",        0, 0, 'h' },
-    { "readonlypath", 1, 0, 'D' },
-    { "name",        1, 0, 'n' },
-    { "editing",     1, 0, 'e' },
-    { "pause",       1, 0, 'P' },
-    { "lgz",         1, 0, 'Z' },
-    { "color",       1, 0, 'L' },
+    { "splice",      1, nullptr, 'l' },
+    { "shift",       1, nullptr, 's' },
+    { "cleanup",     1, nullptr, 'C' },
+    { "create",      1, nullptr, 'c' },
+    { "media",       1, nullptr, 'z' },
+    { "dvdpath",     1, nullptr, 'p' },
+    { "workpath",    1, nullptr, 'w' },
+    { "isopath",     1, nullptr, 'a' },
+    { "extractpath", 1, nullptr, 'E' },
+    { "verbose",     1, nullptr, 'v' },
+    { "version",     0, nullptr, 'V' },
+    { "license",     0, nullptr, 'Q' },
+    { "help",        0, nullptr, 'h' },
+    { "readonlypath", 1, nullptr, 'D' },
+    { "name",        1, nullptr, 'n' },
+    { "editing",     1, nullptr, 'e' },
+    { "pause",       1, nullptr, 'P' },
+    { "lgz",         1, nullptr, 'Z' },
+    { "color",       1, nullptr, 'L' },
 
-    { "nocerr",      0, 0, 'q' }, //(private)
-    { "debug",       1, 0, 'G' }, //(private)
-    { "skip",        1, 0, 'K' }, //(private)
+    { "nocerr",      0, nullptr, 'q' }, //(private)
+    { "debug",       1, nullptr, 'G' }, //(private)
+    { "skip",        1, nullptr, 'K' }, //(private)
 
     { "formatOut",   1, &deprecated, 'f' },
     { "md5Aware",    1, &deprecated, 'm' },
@@ -229,7 +229,7 @@ struct option long_opts[] =
     { "readonlypath",  1, &deprecated, 'D' },
     { "alignment",   1, &deprecated, 'l' },
 
-    { 0, 0, 0, 0 }
+    { nullptr, 0, nullptr, 0 }
 };
 
 
@@ -267,7 +267,7 @@ uint16_t init (int argc, char *argv[])
     job.jpegNow = 0;
     job.group = -1;
     job.media = plusR;
-    job.trim = jobs::seamless;
+    job.trim = static_cast<uint16_t> (jobs::seamless);
     job.trim0 = job.trimCt = 0;
     job.name = defaultName() + "_DVD";
     job.extractTo = "";
@@ -342,7 +342,7 @@ uint16_t init (int argc, char *argv[])
     optContext = commandline;
     optSrc = cwd / "command line";
     optindl = -1;
-#ifdef _ERR2LOG
+#ifdef ERR2LOGMACRO
     _affirm = "   ";
     cmdline += "\n-------------------------------------------------------------------------------\n";
     cmdline += INFO_TAG;
@@ -432,7 +432,7 @@ uint16_t addFiles (fs::path filespec)
                         job.outPath = job.extractTo;
 
                     dvd.open (filespec.string().c_str());
-                    job.tv = dvd.tv;
+                    job.tv = static_cast<uint16_t> (dvd.tv);
                     clearbits (job.params, jobMode);
 #ifdef dvdread_udflist
 
@@ -465,9 +465,9 @@ uint16_t addFiles (fs::path filespec)
                             job.inPath = filespec.parent_path();
                     }
 
-               std::cerr << "job.inPath: " << job.inPath << std::endl;
-               std::cerr << "job.inPath: " << specPath << std::endl;
-               std::cerr << "filespec.GetFullPath(): " << filespec << std::endl;
+                std::cerr << "job.inPath: " << job.inPath << std::endl;
+                std::cerr << "job.inPath: " << specPath << std::endl;
+                std::cerr << "filespec.GetFullPath(): " << filespec << std::endl;
 
                 //check if it's an image file
                 if (dvd.open (filespec.string().c_str(), false))
@@ -677,7 +677,7 @@ uint16_t setName (const char *namePath, bool isDir)
         }
 
     uint64_t freeSpace = fs::space (fName).available;
-   std::cerr << "[MSG] Free space on " << fName << " is " << freeSpace / (1024 * 1024) << " MB.\n\n";
+    std::cerr << "[MSG] Free space on " << fName << " is " << freeSpace / (1024 * 1024) << " MB.\n\n";
 
     //...and location
     //if source is on a hard drive
@@ -932,7 +932,7 @@ std::string  lFileTraverser::setRoot (const char *rootPath, int fromParent)
 
     if (res == -1)
         {
-           std::cerr << "[ERR]  Impossible to change directory to " << rootPath << std::endl;
+            std::cerr << "[ERR]  Impossible to change directory to " << rootPath << std::endl;
             throw;
         }
 
@@ -977,7 +977,7 @@ void lFileTraverser::Traverse (const std::string &path)
     if (fs::is_regular_file (_path))
         {
             OnFile (_path);
-           std::cerr << "[INF] Adding " << _path << std::endl;
+            std::cerr << "[INF] Adding " << _path << std::endl;
         }
 
     else
@@ -1047,7 +1047,7 @@ void lFileTraverser::processFiles()
                             ok = waveHeader::audit (lFile.fName.string().c_str(), &lFile.fmeta);
 
                             if (verbose > 0)
-                               std::cerr << "Found wav file: " << (ok ? "OK" : "ERR") << std::endl;
+                                std::cerr << "Found wav file: " << (ok ? "OK" : "ERR") << std::endl;
                         }
 
                     else
@@ -1065,7 +1065,7 @@ void lFileTraverser::processFiles()
                                         lFile.group = ++job.group;
 
                                         if (verbose > 0)
-                                           std::cerr << "[INFO] File " << filename << " belongs to group " << job.group << std::endl;
+                                            std::cerr << "[INFO] File " << filename << " belongs to group " << job.group << std::endl;
 
                                         startNewTitleset = false;
                                     }
@@ -1208,9 +1208,9 @@ void lFileTraverser::OnOpenError (const std::string& openerrorname)
 void getOpts (const char *filename)
 {
     int argc = 0;
-    char **argv = NULL, *args = NULL;
+    char **argv = nullptr, *args = nullptr;
     size_t size;
-   std::ifstream optFile (filename, std::ios::binary);
+    std::ifstream optFile (filename, std::ios::binary);
 
     if (! optFile.is_open())
         FATAL ("Can't open Project file " + std::string (filename));
@@ -1223,7 +1223,7 @@ void getOpts (const char *filename)
     args[ size ] = '\0';
     optFile.seekg (0, std::ios::beg);
     optFile.read (args, size);
-#ifdef _ERR2LOG
+#ifdef ERR2LOGMACRO
     cmdline += "\n-------------------------------------------------------------------------------\n";
     cmdline += INFO_TAG + std::string (filename);
     cmdline += ":" "\n\n" + std::string (args);
@@ -1334,7 +1334,7 @@ bool getOpts (int argc, char *argv[])
 
     if (job.tempPath.empty())
         {
-           std::cerr << "[ERR] Working path is empty." << std::endl;
+            std::cerr << "[ERR] Working path is empty." << std::endl;
             throw;
         }
 
@@ -1347,7 +1347,7 @@ bool getOpts (int argc, char *argv[])
 
     if (job.outPath.empty())
         {
-           std::cerr << "[ERR] Output path is empty." << std::endl;
+            std::cerr << "[ERR] Output path is empty." << std::endl;
             throw;
         }
 
@@ -1508,7 +1508,7 @@ bool stdArgs (int &argc, char** &argv, char *args, size_t size)
         return false;
 
     argv = new char*[ argc ];
-    argv[0] = NULL;
+    argv[0] = nullptr;
     firstChar = true;
 
     for (uint i = 0, j = 0; i < size; ++i)
@@ -1546,13 +1546,13 @@ bool stdArgs (int &argc, char** &argv, char *args, size_t size)
 uint16_t setopt (uint16_t opt, const char *optarg)
 {
     uint16_t t = 0;
-    char *comma = NULL;
+    char *comma = nullptr;
     bool ok = true, isTrue = 0, isFalse = 0;
 
     if (optarg && (comma = (char*) strrchr (optarg, ',')))
         comma[0] = '\0';
 
-    if (optarg == NULL || ! stricmp (optarg, "yes") || ! stricmp (optarg, "true") || ! stricmp (optarg, "1"))
+    if (optarg == nullptr || ! stricmp (optarg, "yes") || ! stricmp (optarg, "true") || ! stricmp (optarg, "1"))
         isTrue = true;
 
     else
@@ -1574,7 +1574,7 @@ uint16_t setopt (uint16_t opt, const char *optarg)
 
                 if (! fs::is_directory (job.outPath))
                     {
-                       std::cerr << "[ERR] " << optarg << " is not a directory." << std::endl;
+                        std::cerr << "[ERR] " << optarg << " is not a directory." << std::endl;
                         fs_MakeDirs (job.outPath);
                         ok = validatePath (optarg);
                     }
@@ -1588,7 +1588,7 @@ uint16_t setopt (uint16_t opt, const char *optarg)
 
                 else
                     {
-                       std::cerr << "[ERR] Could not create directory " << optarg << std::endl;
+                        std::cerr << "[ERR] Could not create directory " << optarg << std::endl;
                         throw;
                     }
 
@@ -1861,14 +1861,14 @@ uint16_t setopt (uint16_t opt, const char *optarg)
 
                 if (! fs::is_directory (job.tempPath))
                     {
-                       std::cerr << "[INF] " << " Creating directory " << optarg <<  std::endl;
+                        std::cerr << "[INF] " << " Creating directory " << optarg <<  std::endl;
                         fs_MakeDirs (job.tempPath);
                         ok = validatePath (optarg);
                     }
 
                 if (! fs::is_directory (job.tempPath))
                     {
-                       std::cerr << "[ERR] Could not create directory " << optarg << std::endl;
+                        std::cerr << "[ERR] Could not create directory " << optarg << std::endl;
                         throw;
                     }
 
@@ -1882,14 +1882,14 @@ uint16_t setopt (uint16_t opt, const char *optarg)
 
                 if (!  fs::is_directory (job.isoPath))
                     {
-                       std::cerr << "[INF] " << " Creating directory " << optarg <<  std::endl;
+                        std::cerr << "[INF] " << " Creating directory " << optarg <<  std::endl;
                         fs_MakeDirs (job.isoPath);
                         ok = validatePath (optarg);
                     }
 
                 if (! fs::is_directory (job.isoPath))
                     {
-                       std::cerr << "[ERR] Could not create directory " << optarg << std::endl;
+                        std::cerr << "[ERR] Could not create directory " << optarg << std::endl;
                         throw;
                     }
 
@@ -2038,7 +2038,7 @@ uint16_t setopt (uint16_t opt, const char *optarg)
                 break;
 
             case 'q':
-               std::cerr.rdbuf (std::cerr.rdbuf());
+                std::cerr.rdbuf (std::cerr.rdbuf());
                 break;
 
             case 'G':
@@ -2085,8 +2085,8 @@ uint16_t setopt (uint16_t opt, const char *optarg)
 bool saveOpts (dvdLayout *layout)
 {
     lplexJob &job = *layout->job;
-   std::vector<lpcmFile> &Lfiles = *layout->Lfiles;
-   std::vector<infoFile> &infofiles = *layout->infofiles;
+    std::vector<lpcmFile> &Lfiles = *layout->Lfiles;
+    std::vector<infoFile> &infofiles = *layout->infofiles;
     std::string projectFile;
     bool generating = true;  // = false?
 
@@ -2120,7 +2120,7 @@ bool saveOpts (dvdLayout *layout)
             POST ("\n");
         }
 
-    std::ofstream & dotLplex = (edit & piped ? (std::ofstream &)std::cerr : (std::ofstream &) optFile);
+    std::ofstream & dotLplex = (edit & piped ? (std::ofstream &) std::cerr : (std::ofstream &) optFile);
 
     if (! generating)
         {
@@ -2185,7 +2185,7 @@ bool saveOpts (dvdLayout *layout)
         {
             dotLplex <<
                      "--video="       << (job.tv == NTSC ? "ntsc" : "pal") << std::endl <<   // -t
-                     "--jpeg="         << QUOTE( job.jpeg) << std::endl << // -j
+                     "--jpeg="         << QUOTE (job.jpeg) << std::endl << // -j
                      "--dvdpath="   << QUOTE (job.dvdPath.parent_path().string()) << std::endl <<  // -p
                      "--workpath=" << QUOTE (job.tempPath.parent_path().string()) << std::endl <<    // -w
                      "--isopath="    << QUOTE (job.isoPath.parent_path().string()) << std::endl;  // -a
@@ -2345,7 +2345,7 @@ bool saveOpts (dvdLayout *layout)
 
 
 void update (vector<lpcmFile> *lFiles,
-            std::vector<infoFile> *iFiles, lplexJob *job)
+             std::vector<infoFile> *iFiles, lplexJob *job)
 {
     if (job->update & edited)
         {
@@ -2363,7 +2363,7 @@ void update (vector<lpcmFile> *lFiles,
 
 void update (vector<lpcmFile> *lFiles)
 {
-   std::vector<lpcmFile>::iterator next = lFiles->begin();
+    std::vector<lpcmFile>::iterator next = lFiles->begin();
 
     while (next != lFiles->end())
         {
@@ -2386,7 +2386,7 @@ void update (vector<lpcmFile> *lFiles)
 void update (vector<infoFile> *infofiles)
 {
     sort (infofiles->begin(), infofiles->end());
-   std::vector<infoFile>::iterator next = infofiles->begin() + 1;
+    std::vector<infoFile>::iterator next = infofiles->begin() + 1;
     infoFile *prev = &* (next - 1);
 
     while (next != infofiles->end())
@@ -2467,7 +2467,7 @@ void usage (const char *str)
             if (endPause)
                 {
                     char c = 'y';
-                   std::cerr << "\nshow lplex help? ...y\b";
+                    std::cerr << "\nshow lplex help? ...y\b";
                     std::cin.get (c);
 
                     if (c != 'y' && c != 0x0A)
@@ -2479,106 +2479,106 @@ void usage (const char *str)
 
             else
                 {
-                   std::cerr << std::endl << "type 'lplex -h' for program help.\n";
+                    std::cerr << std::endl << "type 'lplex -h' for program help.\n";
                     exit (1);
                 }
         }
 
-   std::cerr << std::endl <<
-         " Usage: lplex [options] <files> ... [flags] <files> ...\n\n"
-         " Options          Values (default=*)    (1/0 true/false can be used for yes/no)\n\n"
-         " -t --video       pal|secam|ntsc *      -use this tv standard.\n"
-         " -c --create      lpcm|m2v|dvdstyler    -author to this stage.\n"
+    std::cerr << std::endl <<
+              " Usage: lplex [options] <files> ... [flags] <files> ...\n\n"
+              " Options          Values (default=*)    (1/0 true/false can be used for yes/no)\n\n"
+              " -t --video       pal|secam|ntsc *      -use this tv standard.\n"
+              " -c --create      lpcm|m2v|dvdstyler    -author to this stage.\n"
 #ifdef lgzip_support
-         "                  mpeg|dvd|iso|lgz *\n"
+              "                  mpeg|dvd|iso|lgz *\n"
 #else
-         "                  mpeg|dvd|iso *\n"
+              "                  mpeg|dvd|iso *\n"
 #endif
-         " -n --name        <projectname>         -name the project this.\n"
-         " -m --md5aware    no|yes *              -insert Lplex tags into the dvd.\n"
-         " -l --splice                            -splice the tracks together this way:\n"
-         "                  seamless *             continuous, gapless, e.g. a concert\n"
-         "                  discrete|padded        separate, a compilation w gaps|padding\n"
-         "                  none                   truncated, allow audio loss\n"
-         " -s --shift       forward|nearest       -move seamless startpoints in this\n"
-         "                  backward *             direction.\n"
-         " -x --infofiles   no|yes *              -make an 'XTRA' info folder on the dvd.\n"
-         " -i --infodir     <dir>                 -copy files in this folder to 'XTRA'.\n"
-         " -j --jpeg        <filename>            -use this jpeg as the background,\n"
-         "                  black *                or use a default black screen:\n"
-         "                  black_#(L,M,S,XS)         L       M       S       XS\n"
-         "                                         720x480 704x480 352x480 352x240* NTSC\n"
-         "                                         720x576 704x576 352x576 352x288*  PAL\n"
-         " -R --rescale     no|yes *              -rescale jpegs ntsc<->pal if necessary.\n"
-         " -z --media       none|dl|dvd-r|dvd+r * -don't exceed this disc size.\n"
-         " -e --editing     yes|no *              -do a demo run and write a project file\n"
-         "                  absolute|relative      using this type of filename\n"
-         //   "                  strict|lax *           whether to auto-generate titlesets\n"
-         "                  [,v]                   with verbose comments\n"
-         "                  [,p]                   print project file to stderr\n"
-         "                                         (e.g. '--editing=relative,v')\n"
-         " -M --menu        <dir>                 -use these custom dvd menus.\n"
-         " -d --dir         <dir>                 -output everything to this directory.\n"
-         " -p --dvdpath     <dir>|adjacent *      -output dvd files to this directory.\n"
-         " -w --workpath    <dir>|adjacent *      -use this folder for temporary space.\n"
-         " -a --isopath     <dir>|adjacent *      -output disc image to this directory.\n"
-         " -E --extractpath <dir>|adjacent *      -extract to this directory.\n"
-         " -u --unauthor                          -extract audio from dvd.\n"
+              " -n --name        <projectname>         -name the project this.\n"
+              " -m --md5aware    no|yes *              -insert Lplex tags into the dvd.\n"
+              " -l --splice                            -splice the tracks together this way:\n"
+              "                  seamless *             continuous, gapless, e.g. a concert\n"
+              "                  discrete|padded        separate, a compilation w gaps|padding\n"
+              "                  none                   truncated, allow audio loss\n"
+              " -s --shift       forward|nearest       -move seamless startpoints in this\n"
+              "                  backward *             direction.\n"
+              " -x --infofiles   no|yes *              -make an 'XTRA' info folder on the dvd.\n"
+              " -i --infodir     <dir>                 -copy files in this folder to 'XTRA'.\n"
+              " -j --jpeg        <filename>            -use this jpeg as the background,\n"
+              "                  black *                or use a default black screen:\n"
+              "                  black_#(L,M,S,XS)         L       M       S       XS\n"
+              "                                         720x480 704x480 352x480 352x240* NTSC\n"
+              "                                         720x576 704x576 352x576 352x288*  PAL\n"
+              " -R --rescale     no|yes *              -rescale jpegs ntsc<->pal if necessary.\n"
+              " -z --media       none|dl|dvd-r|dvd+r * -don't exceed this disc size.\n"
+              " -e --editing     yes|no *              -do a demo run and write a project file\n"
+              "                  absolute|relative      using this type of filename\n"
+              //   "                  strict|lax *           whether to auto-generate titlesets\n"
+              "                  [,v]                   with verbose comments\n"
+              "                  [,p]                   print project file to stderr\n"
+              "                                         (e.g. '--editing=relative,v')\n"
+              " -M --menu        <dir>                 -use these custom dvd menus.\n"
+              " -d --dir         <dir>                 -output everything to this directory.\n"
+              " -p --dvdpath     <dir>|adjacent *      -output dvd files to this directory.\n"
+              " -w --workpath    <dir>|adjacent *      -use this folder for temporary space.\n"
+              " -a --isopath     <dir>|adjacent *      -output disc image to this directory.\n"
+              " -E --extractpath <dir>|adjacent *      -extract to this directory.\n"
+              " -u --unauthor                          -extract audio from dvd.\n"
 #ifdef lgzip_support
-         " -f --formatout   lgz|raw|wav *         -extract audio to this format.\n"
+              " -f --formatout   lgz|raw|wav *         -extract audio to this format.\n"
 #else
-         " -f --formatout   raw|wav *             -extract audio to this format.\n"
+              " -f --formatout   raw|wav *             -extract audio to this format.\n"
 #endif
-         "                  flac|flac#(0-8)        (flac equals flac8)\n"
-         " -r --restore     no|yes *              -restore files to original length.\n"
+              "                  flac|flac#(0-8)        (flac equals flac8)\n"
+              " -r --restore     no|yes *              -restore files to original length.\n"
 #ifdef lgzip_support
-         " -Z --lgz                               -convert dvd to a .lgz container file.\n"
+              " -Z --lgz                               -convert dvd to a .lgz container file.\n"
 #endif
-         " -C --cleanup     no|yes *              -delete interim files when done.\n"
-         " -v --verbose     yes|no *              -show all messages.\n"
-         " -L --color       "
+              " -C --cleanup     no|yes *              -delete interim files when done.\n"
+              " -v --verbose     yes|no *              -show all messages.\n"
+              " -L --color       "
 #ifdef lplex_win32
-         "dark|bright"
+              "dark|bright"
 #else
-         "bright|dark"
+              "bright|dark"
 #endif
-         " *         -colorize console output.\n"
-         "                  no|yes\n"
-         " -P --pause       "
+              " *         -colorize console output.\n"
+              "                  no|yes\n"
+              " -P --pause       "
 #ifdef lplex_win32
-         "no|yes"
+              "no|yes"
 #else
-         "yes|no"
+              "yes|no"
 #endif
-         " *              -pause console before exiting.\n"
-         "    --version                           -print out the version and build info.\n"
-         "    --license                           -print out the GNU GPL License notice.\n"
-         " -h --help                              -print this lot out!\n\n"
-         " Flags:\n"
-         "  ts                                    -start a new titleset here.\n"
-         "  jpg            <jpegfile>             -use this  4:3 background from now on.\n"
-         "  jpgw           <jpegfile>             -use this 16:9 background from now on.\n"
-         "  prj            <projectfile>          -merge this .lplex project file here.\n"
-         "  seamless|discrete|padded              -use this splice from now on.\n"
-         "\n                                Examples\n\n"
-         " Create a single-title NTSC dvd fileset:\n"
+              " *              -pause console before exiting.\n"
+              "    --version                           -print out the version and build info.\n"
+              "    --license                           -print out the GNU GPL License notice.\n"
+              " -h --help                              -print this lot out!\n\n"
+              " Flags:\n"
+              "  ts                                    -start a new titleset here.\n"
+              "  jpg            <jpegfile>             -use this  4:3 background from now on.\n"
+              "  jpgw           <jpegfile>             -use this 16:9 background from now on.\n"
+              "  prj            <projectfile>          -merge this .lplex project file here.\n"
+              "  seamless|discrete|padded              -use this splice from now on.\n"
+              "\n                                Examples\n\n"
+              " Create a single-title NTSC dvd fileset:\n"
 #ifdef lplex_win32
-         "      lplex --video=ntsc --create=dvd c:\\myAudio\n\n"
+              "      lplex --video=ntsc --create=dvd c:\\myAudio\n\n"
 #else
-         "      lplex --video=ntsc --create=dvd ~/myAudio\n\n"
+              "      lplex --video=ntsc --create=dvd ~/myAudio\n\n"
 #endif
-         " Create a 2 title PAL dvd with different backgrounds and splicing:\n"
+              " Create a 2 title PAL dvd with different backgrounds and splicing:\n"
 #ifdef lplex_win32
-         "      lplex -t pal discrete jpg=c:\\a.jpg \"c:\\My Songs\" ts seamless\n"
-         "         jpg=c:\\b.jpg c:\\myConcert\n\n"
+              "      lplex -t pal discrete jpg=c:\\a.jpg \"c:\\My Songs\" ts seamless\n"
+              "         jpg=c:\\b.jpg c:\\myConcert\n\n"
 #else
-         "      lplex -t pal discrete jpg=a.jpg mySongs ts seamless jpg=b.jpg myConcert\n\n"
+              "      lplex -t pal discrete jpg=a.jpg mySongs ts seamless jpg=b.jpg myConcert\n\n"
 #endif
-         " Extract audio from a dvd disc to a specific folder at flac level 6:\n"
+              " Extract audio from a dvd disc to a specific folder at flac level 6:\n"
 #ifdef lplex_win32
-         "      lplex --dir=\"c:\\My Flacs\" --formatout=flac6 d:\n\n\n";
+              "      lplex --dir=\"c:\\My Flacs\" --formatout=flac6 d:\n\n\n";
 #else
-         "      lplex --dir=~/myFlacs --formatout=flac6 /dev/dvd\n\n\n";
+              "      lplex --dir=~/myFlacs --formatout=flac6 /dev/dvd\n\n\n";
 #endif
     exit (1);
 }
@@ -2590,19 +2590,19 @@ void usage (const char *str)
 
 void GPL_notice()
 {
-   std::cerr << std::endl <<
-         "   This program is free software; you can redistribute it and/or\n"
-         "   modify it under the terms of the GNU General Public License as\n"
-         "   published by the Free Software Foundation; either version 2 of\n"
-         "   the License, or (at your option) any later version.\n\n"
-         "   This program is distributed in the hope that it will be useful,\n"
-         "   but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
-         "   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the\n"
-         "   GNU General Public License for more details.\n\n"
-         "   You should have received a copy of the GNU General Public\n"
-         "   License along with this program; if not, write to the\n"
-         "   Free Software Foundation, Inc., 59 Temple Place, Suite 330,\n"
-         "   Boston, MA 02111-1307 USA\n\n";
+    std::cerr << std::endl <<
+              "   This program is free software; you can redistribute it and/or\n"
+              "   modify it under the terms of the GNU General Public License as\n"
+              "   published by the Free Software Foundation; either version 2 of\n"
+              "   the License, or (at your option) any later version.\n\n"
+              "   This program is distributed in the hope that it will be useful,\n"
+              "   but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+              "   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the\n"
+              "   GNU General Public License for more details.\n\n"
+              "   You should have received a copy of the GNU General Public\n"
+              "   License along with this program; if not, write to the\n"
+              "   Free Software Foundation, Inc., 59 Temple Place, Suite 330,\n"
+              "   Boston, MA 02111-1307 USA\n\n";
 }
 
 

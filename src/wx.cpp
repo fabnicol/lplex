@@ -87,7 +87,7 @@ bool fs_DeleteDir (const fs::path& dirName)
                 return (false);
         }
 
-    slist_t *names = NULL;
+        slist_t *names = nullptr;
     slist_t *sl;
     DIR *FD;
     struct dirent *f;
@@ -97,8 +97,7 @@ bool fs_DeleteDir (const fs::path& dirName)
         {
             int rootlen = strlen (root);
             int dirnamelen = strlen (dirname);
-
-            if (NULL ==
+            if (nullptr ==
                     (new_root = (char*)
                                 malloc ( (rootlen + dirnamelen + 2) * sizeof * new_root)))
                 {
@@ -111,15 +110,16 @@ bool fs_DeleteDir (const fs::path& dirName)
             memcpy (new_root + rootlen + 1, dirname, dirnamelen);
             new_root[rootlen + dirnamelen + 1] = '\0';
         }
-
     else
-        new_root = strdup (dirname);
+    {
+            new_root = strdup (dirname);
+    }
 
-    if (NULL == (FD = opendir (".")))
-        {
-           std::cerr << "[ERR] opendir() issue\n";
-            return (-1);
-        }
+    if (nullptr == (FD = opendir (".")))
+    {
+       std::cerr << "[ERR] opendir() issue\n";
+        return (-1);
+    }
 
     sl = names;
 
@@ -136,8 +136,8 @@ bool fs_DeleteDir (const fs::path& dirName)
 
             if (stat (f->d_name, &st))
                 continue;
-
-            if (NULL == (n = (slist_t*) malloc (sizeof * n)))
+            if (nullptr == (n = (slist_t*) malloc (sizeof *n)))
+            if (nullptr == (n = (slist_t*) malloc (sizeof * n)))
                 {
                    std::cerr << "[ERR] memory issue\n";
                     throw;
@@ -150,8 +150,7 @@ bool fs_DeleteDir (const fs::path& dirName)
 
             else
                 n->is_dir = 0;
-
-            n->next = NULL;
+            n->next = nullptr;
 
             if (sl)
                 {

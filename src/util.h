@@ -145,7 +145,7 @@ class hexStr
         int len;
 
         hexStr (const void *buf, int n) :
-            data ( (const unsigned char *) buf), len (n) {};
+        data(static_cast<const unsigned char *>(buf)), len(n) {}
 
         friend std::ostream& operator << (std::ostream& stream, const hexStr& x)
         {
@@ -205,10 +205,10 @@ extern messenger *myMessenger;
 
 extern uint16_t xlogExists, _verbose, _xcode;
 
-#define _ERR2LOG
+#define ERR2LOGMACRO
 extern std::ofstream xlog;
 
-#ifdef _ERR2LOG
+#ifdef ERR2LOGMACRO
 
 extern std::string xlogName;
 void logInit (const std::string& logFilename = "");
@@ -217,10 +217,10 @@ int logClose();
 int logDelete();
 int logReopen();
 
-#define XLOG(t) xlog << t
+#define XLOGMACRO(t) xlog << t
 
 #else
-#define XLOG(t) 0
+#define XLOGMACRO(t) 0
 int logInit (const std::string& logFilename = "") {}
 int logCopy (const fs::path& filename = "") {}
 int logClose() {}
@@ -228,9 +228,6 @@ int logDelete() {}
 int logReopen() {}
 
 #endif
-
-#define XERR(t) do{ scrub(); if(_verbose)std::cerr << t; XLOG(t); xlog.flush(); }while(0)
-#define _ERR(t) do{ scrub();std::cerr << std::endl << TINT_ERR(t);std::cerr.flush(); XLOG((std::string("\n") + std::string(t)).c_str()); xlog.flush();  }while(0)
 
 #if 1
 #define STAT_TAG "STAT: "
@@ -274,26 +271,26 @@ void setcolors (int scheme = bright);
 
 #endif
 
-#define ECHO(t) XERR(t)
-#define ECHOv(t)std::cerr << t; XLOG(t); xlog.flush()
+#define ECHO(t) std::cerr << t ;
+#define ECHOv(t)std::cerr << t; LOG(t); xlog.flush()
 
-#define _XLOG(tag,t) XLOG(tag << t); xlog.flush()
-#define _XERR(tag,tint,t)std::cerr <<  tag << t;
-#define _POSTv(tag,tint,t) do{ scrub();_XERR(tag,tint,t);_XLOG(tag,t);}while(0)
-#define _POST(tag,tint,t)  do{ scrub();if(_verbose) _XERR(tag,tint,t);_XLOG(tag,t);}while(0)
 
-#define STAT(t) _POST(STAT_TAG,TINT_STAT,t)
-#define INFO(t) _POST(INFO_TAG,TINT_INFO,t)
-#define LOG(t)  _POST(LOG_TAG,TINT_LOG,t)
-#define WARN(t) _POST(WARN_TAG,TINT_WARN,t)
-#define ERRv(t) _POST(ERR_TAG,TINT_ERR,t)
+#define XERRMACRO(tag,tint,t)std::cerr <<  tag << t;
+#define POSTvMACRO(tag,tint,t) do{ scrub();XERRMACRO(tag,tint,t);XLOGMACRO(t);}while(0)
+#define POSTMACRO(tag,tint,t)  do{ scrub();if(_verbose) XERRMACRO(tag,tint,t);XLOGMACRO(t);}while(0)
 
-#define STATv(t) _POSTv(STAT_TAG,TINT_STAT,t)
-#define INFOv(t) _POSTv(INFO_TAG,TINT_INFO,t)
-#define LOGv(t)  _POSTv(LOG_TAG,TINT_LOG,t)
-#define WARNv(t) _POSTv(WARN_TAG,TINT_WARN,t)
+#define STAT(t) POSTMACRO(STAT_TAG,TINT_STAT,t)
+#define INFO(t) POSTMACRO(INFO_TAG,TINT_INFO,t)
+#define LOG(t)  POSTMACRO(LOG_TAG,TINT_LOG,t)
+#define WARN(t) POSTMACRO(WARN_TAG,TINT_WARN,t)
+#define ERRv(t) POSTMACRO(ERR_TAG,TINT_ERR,t)
 
-#define ERR(t) do{ _xcode=2; _ERR( (std::string(ERR_TAG) + std::string(t)).c_str() ); }while(0);
+#define STATv(t) POSTvMACRO(STAT_TAG,TINT_STAT,t)
+#define INFOv(t) POSTvMACRO(INFO_TAG,TINT_INFO,t)
+#define LOGv(t)  POSTvMACRO(LOG_TAG,TINT_LOG,t)
+#define WARNv(t) POSTvMACRO(WARN_TAG,TINT_WARN,t)
+
+#define ERR(t) std::cerr << (std::string(ERR_TAG) + std::string(t)).c_str();
 
 #ifdef lplex_console
 #define FATAL(t) {  \
@@ -306,9 +303,9 @@ void setcolors (int scheme = bright);
 
 #define BLIP(t) do{ if(!_verbose) { unblip(true);std::cerr << TINT_BLIP( (_blip + std::string(t)).c_str() ) << std::flush; } }while(0)
 #define SCRN(t) do{ if(!_verbose) { unblip(true);std::cerr << t; } }while(0);
-#define POST(t) do{ SCRN(t); XERR(t); }while(0)
+#define POST(t) do{ SCRN(t); std::cerr << t; }while(0)
 
-#define DBUG(t) _ERR( (std::string(DBUG_TAG) + std::string(t)).c_str() )
+#define DBUG(t) ERR( (std::string(DBUG_TAG) + std::string(t)).c_str() )
 
 // ...screen log & message functions:
 
@@ -317,7 +314,7 @@ extern std::string _blip, _affirm;
 extern char propellor[];
 
 const char * scrub();
-void blip (const char *msg = NULL);
+void blip (const char *msg = nullptr);
 void blip (const std::string& msg);
 
 void normalize_windows_paths (std::string &path);
@@ -338,6 +335,7 @@ template<class T> struct counter
         max = other.max;
     }
 };
+
 
 template<class T>
 static inline void blip (counter<T> *ct,
@@ -361,7 +359,8 @@ static inline void blip (counter<T> *ct,
         {
             if (ct->max && ct->max - ct->now)
                 {
-                    int val = (int) ( (ct->now - ct->start) * 1000 / (ct->max - ct->start));
+
+                    int val = static_cast<int>(( ct->now - ct->start ) * 1000 / ( ct->max - ct->start ));
                     blip (_f ("%s%2d.%d%% %s", pref, val / 10, val % 10, suffix));
                 }
 
