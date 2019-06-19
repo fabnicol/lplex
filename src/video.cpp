@@ -143,24 +143,16 @@ std::ofstream* m2v (uint32_t vFrames, const char *jpeg, const char *m2vName,
     if (! m2vFile.good())
         m2vFile.clear();
 
-    if (m2vFile.is_open())
-        m2vFile.seekp (0, std::ios::end);
-
-    char* _m2vName = normalize_windows_paths (m2vName);
+    std::string _m2vName = normalize_windows_paths (std::string(m2vName));
 
     if (! append)
         {
-            if (m2vFile.is_open())
-                {
-                    size_t filesize = m2vFile.tellp();
-                    INFO ("Closing m2v file: " << filesize << "_bytess\n");
-                    m2vFile.close();
-                }
+            if (m2vFile.is_open()) m2vFile.close();
 
             m2vFile.open (_m2vName, std::ios::binary);
 
             if (! m2vFile.is_open())
-                FATAL ("Can't open output file " + std::string (_m2vName));
+                FATAL ("m2v -> mm2vFile.open: Can't open output file " +  _m2vName);
         }
 
     miniFileSize = miniFile.tellg();
@@ -260,9 +252,7 @@ std::ofstream* m2v (uint32_t vFrames, const char *jpeg, const char *m2vName,
     else
         m2vFile.seekp (uDataPos, std::ios::beg);
 
-#ifndef __linux__
-    free (_m2vName);
-#endif
+
 
     return &m2vFile;
 }
@@ -460,7 +450,7 @@ int addJpeg (const char * fname, lplexJob &job, bool zero, bool ws)
 
     jpegs.push_back (jpeg);
     job.jpegNow = jpegs.size() - 1;
-    job.jpeg = fname;
+
     return 0;
 }
 

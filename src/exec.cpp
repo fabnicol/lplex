@@ -92,30 +92,38 @@ inline std::string quote (const std::string& path)
     return (std::string ("\"") + path + std::string ("\""));
 }
 
-std::string get_cl (const char* application, const std::vector<const char*>& Args, uint16_t start)
+std::string get_cl (const std::string& application, const std::vector<const char*>& Args, uint16_t start)
 {
     std::string cmd;
     auto it = Args.begin() + start;
 
     while (it != Args.end())
         {
-            std::string s = *it;
-            bool do_quote = ( (s[0] != '"') && (s[0] != '-') && (s[0] != '|')) ;
-            do_quote = false;
-            cmd += ( (do_quote) ? quote (s) : s);
-
+            std::string s (*it);
+            cmd += s;
             if (it + 1 != Args.end())
                 cmd += " ";
 
             ++it;
         }
 
-    cmd = std::string (application) + ".exe "  + cmd;
-    normalize_windows_paths (cmd);
-    return cmd;
+    std:: string new_cmd (application);
+
+    #ifdef _WIN32
+      new_cmd +=  ".exe ";
+    #endif
+
+    new_cmd += cmd;
+
+    std::string s = normalize_windows_paths (new_cmd);
+
+    std::cerr << "\n[INF] Command line is: " << s << std::endl;
+
+    fflush(nullptr);
+    return s;
 }
 
-int run (const char* application, const std::vector<const char*>&  Args, const int option)
+int run (const std::string& application, const std::vector<const char*>&  Args, const int option)
 {
     errno = 0;
     auto _Args = Args;
@@ -204,8 +212,8 @@ int run (const char* application, const std::vector<const char*>&  Args, const i
 }
 
 
-int run (const char* application,  const std::vector<const char*>& Args,
-         const char* application2, const std::vector<const char*>& Args2,
+int run (const std::string& application,  const std::vector<const char*>& Args,
+         const std::string& application2, const std::vector<const char*>& Args2,
          const int option)
 {
 #ifdef __linux__
@@ -306,12 +314,11 @@ int run (const char* application,  const std::vector<const char*>& Args,
 #else
     std::string cmdline = get_cl (application, Args, 0);
     std::string cmdline2 = get_cl (application2, Args2, 0);
-    std::cerr << "###" << cmdline << "###" << std::endl;
-    std::cerr << "###" << cmdline2 << "###" << std::endl;
+    ECHO(std::endl << "[CLI] " << cmdline);
+    ECHO(std::endl << "[CLI] " << cmdline2);
     std::string command =  cmdline + std::string (" | ") + cmdline2;
-    std::cerr << "!!!" << command << "!!!"  << std::endl;
-    std::cerr << "***" <<  command << "***" << std::endl;
-    //int res =
+    ECHO(std::endl << "[CLI] " << command);
+
     system (command.c_str());
     return 0;
 #endif
@@ -343,11 +350,11 @@ long execute (const std::string& application, const std::vector<const char*>& ar
 
             for (const auto& s : args)
                 std::cerr << s << " ";
+            std::cerr << std::endl;
         }
 
-    std::string _application = application;
-    normalize_windows_paths (_application);
-    run (_application.c_str(), args, 0);
+
+    run (normalize_windows_paths (application), args, 0);
     return errno;
 }
 
@@ -396,7 +403,7 @@ long execute (const std::string& application,  const std::vector<const char*>& a
                 std::cerr << s << " ";
         }
 
-    run (application.c_str(), args, application2.c_str(), args2, 0);
+    run (application, args, application2, args2, 0);
     return errno;
 }
 

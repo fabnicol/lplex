@@ -9,11 +9,11 @@
 		<Build>
 			<Target title="Debug">
 				<Option output="bin/Debug/lplex" prefix_auto="1" extension_auto="1" />
-				<Option working_dir="../../../lplex" />
+				<Option working_dir="bin/Debug" />
 				<Option object_output="obj/Debug/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
-				<Option parameters=" --create=iso    c:\Users\Public\Dev\dvda-author-dev\Docs\a2_16_48.wav  " />
+				<Option parameters=" C:\Users\Public\Dev\dvda-author-dev\Docs\a2_16_48.wav --create dvd --dir C:\Users\fabrn\output -P no --video pal --jpeg C:\Users\Public\Dev\dvd-audio-dvda-author-gui-qt4\data\black_PAL_720x576.jpg --workpath C:\Users\Public\Dev\dvd-audio-dvda-author-gui-qt4\temp -x yes" />
 				<Compiler>
 					<Add option="-m64" />
 					<Add option="-g" />

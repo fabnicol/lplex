@@ -288,10 +288,11 @@ int dvdLayout::checkSpace()
         }
 
     INFOv (spaceTxt << ".\n");
-#if 0
+#if 1
     uint64_t freeSpace = fs::space (job->outPath).available;
     uint64_t tempSpace = fs::space (job->tempPath).available;
-    uint64_t isoSpace  = fs::space (job->isoPath).available;
+    uint64_t isoSpace  = fs::space (job->tempPath).available;
+
 
     if (job->prepare == lpcmf)
         total.estimate = total.audio;
@@ -389,16 +390,26 @@ int dvdLayout::checkSpace()
                     ERR ("Not enough space on device " << device (devices[i]) << " (" << sizeStr (freeSpace) << " free)\n");
 
 #else
+            if (! fs_validPath (job->outPath))  {
+                    std::cerr << "outPath is not valid: "  +   job->outPath.string(); throw;
+            }
+            if (! fs_validPath (job->tempPath))  {
+                    std::cerr << "tempPath is not valid: " +   job->tempPath.string(); throw;
+            }
+            if (! fs_validPath (job->isoPath)) {
+                    std::cerr << "isoPath is not valid: "  +   job->isoPath.string(); throw;
+            }
+
             struct
             {
                 dev_t id;
                 uint64_t space;
-                char *path;
+                const char *path;
             } devices[] =
             {
-                { deviceNum (fs_validPath (job->outPath)), freeSpace, "dvdpath " },
-                { deviceNum (fs_validPath (job->tempPath)), tempSpace, "workpath" },
-                { deviceNum (fs_validPath (job->isoPath)), isoSpace, "isopath " }
+                {  deviceNum (job->outPath.string()), freeSpace, "dvdpath " },
+                {  deviceNum (job->tempPath.string()), tempSpace, "workpath" },
+                {  deviceNum (job->isoPath.string()), isoSpace, "isopath " }
             };
 
             for (int i = 0; i < 3; i++)
@@ -443,7 +454,7 @@ int dvdLayout::checkSpace()
                         LOG (_f (" -or editing %s\n", job->projectPath.string().c_str()));
                 }
 
-            ECHO (endl << std::endl);
+            ECHO (std::endl);
 
             if (! editing)
                 {
@@ -746,7 +757,7 @@ int dvdLayout::getNext()
                std::ios::binary);
 
     if (! out.is_open())
-        FATAL ("Can't open output file " + nameNow);
+        FATAL (" getNext -> out.open: Can't open output file " + nameNow);
 
     total.start = total.now = padding = samplePadding = 0;
     total.max = writeFile->trim.len;

@@ -38,7 +38,7 @@ int author (dvdLayout &layout)
 {
     int i, valid_audio = 0, m2vUpdate = -1, multichapter = 0, done = 0;
     uint16_t uDataLen = 0;
-    uint8_t userData[512];
+    uint8_t userData[512]={0};
     uint32_t vFrames = 0;
     std::ofstream *m2vFile = nullptr;
 #ifndef lgzip_support
@@ -92,9 +92,7 @@ int author (dvdLayout &layout)
 
     while (layout.getNext())
         {
-#ifndef lplex_console
-            wxYieldIfNeeded();
-#endif
+
             valid_audio++;
             multichapter |= (job.now & appending);
 
@@ -127,7 +125,7 @@ int author (dvdLayout &layout)
                     txt += std::string (" + ") + jpegs[ Lfiles[i].jpgIndex ].fName.filename().string();
                     SCRN (std::string (" + ") +  jpegs[ Lfiles[i].jpgIndex ].fName.filename().string())
                 }
-
+#if 0
             if (job.params & md5)
                 {
                     if (m2vUpdate > -1 && Lfiles[m2vUpdate].type & lpcmFile::readComplete)
@@ -138,11 +136,28 @@ int author (dvdLayout &layout)
 
                     uDataLen = writeUserData (&Lfiles[i], userData);
                 }
-
+#endif
             m2vUpdate = job.params & md5 ?
                         Lfiles[i].type & lpcmFile::readComplete ? -1 : i : -1;
-            BLIP (" ...creating video ");
-           std::cerr << "m2v" << " " << layout.nameNow << ".m2v" << std::endl;
+
+           std::cerr << "[INF] Creating video using m2v with output " << layout.nameNow + ".mpg "  << layout.nameNow + ".m2v " << layout.nameNow + ".lpcm   ... " << std::endl;
+
+           std::cerr << "m2v" << std::endl << "     ";
+
+           std::cerr << Lfiles[i].videoFrames << " "
+                     << jpegs[ Lfiles[i].jpgIndex ].getName().c_str() << " "
+                     << std::string (layout.nameNow + ".m2v").c_str() << std::endl << "     "
+                     << job.tv << " "
+                     << (jpegs[ Lfiles[i].jpgIndex ].ar == dvdJpeg::_16x9 ? 0 : 1) << " "
+                     << userData << " "
+                     << uDataLen << std::endl << "     "
+                     << (job.tv == NTSC ? 18 : 15) << " "
+                     << (job.now & appending) << " "
+                     << ! (Lfiles[i].trim.type & jobs::continuous) << " "
+                     << ! (Lfiles[i].trim.type & jobs::continuous) << " "
+                     << std::endl;
+            fflush(NULL);
+
             m2vFile = m2v (Lfiles[i].videoFrames,
                            jpegs[ Lfiles[i].jpgIndex ].getName().c_str(),
                            std::string (layout.nameNow + ".m2v").c_str(),
@@ -154,6 +169,7 @@ int author (dvdLayout &layout)
                            job.now & appending,
                            ! (Lfiles[i].trim.type & jobs::continuous),
                            ! (Lfiles[i].trim.type & jobs::continuous));
+
             xml.write (dvdauthorXml::addChapter, job.now & appending ?
                        dvdauthorXml::timestampFractional (vFrames, job.tv == NTSC, .001) : "0");
             vFrames += Lfiles[i].videoFrames;

@@ -55,7 +55,7 @@ namespace fs = std::filesystem;
 #  define lplex_console
 
 extern std::string   shebang;
-extern fs::path lplexConfig, configDir, dataDir, binDir, tempDir, isoPath, readOnlyPath, projectDotLplex;
+extern fs::path lplexConfig, configDir, dataDir, binDir, isoPath, readOnlyPath, projectDotLplex;
 
 // endian swap macros (from dvdread/bswap.h)
 
@@ -153,8 +153,7 @@ inline bool initPlatform()
     binDir = fs::path ("/usr/bin");
     dataDir = configDir / "data" ;
     readOnlyPath = home;
-    tempDir = home / "temp";
-    fs::create_directories (tempDir);
+
     shebang = "#!/usr/local/bin/lplex -P 1\n";
     endPause = true;
     return true;
@@ -207,11 +206,6 @@ inline bool initPlatform()
     binDir =  fs::path ("bin");
     dataDir = appdata /  fs::path ("lplex/data");
     readOnlyPath = home;
-    tempDir = fs::temp_directory_path() / fs::path ("lplex");
-
-    if (! fs::exists (tempDir))
-        fs::create_directories (tempDir);
-
     shebang = "#!/usr/local/bin/lplex -P 1\n";
     endPause = true;
     return true;
