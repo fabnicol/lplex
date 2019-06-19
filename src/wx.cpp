@@ -55,162 +55,32 @@ std::string fs_GetTempDir()
 #include <sys/stat.h>
 bool fs_DeleteDir (const fs::path& dirName)
 {
-#ifndef USE_C_RMDIR
-    return (fs::remove_all (dirName) > 0);
-#else
+ std::error_code err;
+ long n = fs::remove_all (dirName, err);
+ int res = err.value();
 
-    if (! fs::exists (dirName))
-        return true;
+ if (res == static_cast<uintmax_t>(-1))
+ {
+     std::cerr << "[ERR] Directory " << dirName << " could not be removed." << std::endl;
+ }
+ else
+ {
+     std::cerr << "[MSG] Directory " << dirName << " was removed." << std::endl;
+ }
 
-   std::cerr << "Removing " << dirName << std::endl;
-    typedef struct slist_t
-    {
-        char* name;
-        int is_dir;
-        struct slist_t *next;
-    } slist_t;
-    char* root = normalize_windows_paths (
-                     dirName.parent_path().string().c_str());  // .c_str() does not work directly under mingw64
-    char* dirname = normalize_windows_paths (dirName.filename().string().c_str());
-    char *cwd;
-    cwd = (char*) normalize_windows_paths (fs::current_path().string().c_str());
-
-    if (chdir (dirName.string().c_str()) == -1)
-        {
-           std::cerr << "[ERR] Could not change dir to " << dirName << std::endl;
-
-            if (errno == ENOTDIR)
-                return true;
-
-            //printf ( ERR "chdir() issue with dirname=%s\n", dirname);
-            else
-                return (false);
-        }
-
-        slist_t *names = nullptr;
-    slist_t *sl;
-    DIR *FD;
-    struct dirent *f;
-    char *new_root;
-
-    if (root)
-        {
-            int rootlen = strlen (root);
-            int dirnamelen = strlen (dirname);
-            if (nullptr ==
-                    (new_root = (char*)
-                                malloc ( (rootlen + dirnamelen + 2) * sizeof * new_root)))
-                {
-                   std::cerr <<  "[ERR] malloc issue\n";
-                    exit (EXIT_FAILURE);
-                }
-
-            memcpy (new_root, root, rootlen);
-            new_root[rootlen] = SEPARATOR[0];
-            memcpy (new_root + rootlen + 1, dirname, dirnamelen);
-            new_root[rootlen + dirnamelen + 1] = '\0';
-        }
-    else
-    {
-            new_root = strdup (dirname);
-    }
-
-    if (nullptr == (FD = opendir (".")))
-    {
-       std::cerr << "[ERR] opendir() issue\n";
-        return (-1);
-    }
-
-    sl = names;
-
-    while ( (f = readdir (FD)))
-        {
-            struct stat st;
-            slist_t *n;
-
-            if (!strcmp (f->d_name, "."))
-                continue;
-
-            if (!strcmp (f->d_name, ".."))
-                continue;
-
-            if (stat (f->d_name, &st))
-                continue;
-            if (nullptr == (n = (slist_t*) malloc (sizeof *n)))
-            if (nullptr == (n = (slist_t*) malloc (sizeof * n)))
-                {
-                   std::cerr << "[ERR] memory issue\n";
-                    throw;
-                }
-
-            n->name = strdup (f->d_name);
-
-            if (S_ISDIR (st.st_mode))
-                n->is_dir = 1;
-
-            else
-                n->is_dir = 0;
-            n->next = nullptr;
-
-            if (sl)
-                {
-                    sl->next = n;
-                    sl = n;
-                }
-
-            else
-                {
-                    names = n;
-                    sl = n;
-                }
-        }
-
-    closedir (FD);
-
-    for (sl = names; sl; sl = sl->next)
-        {
-            if (!sl->is_dir)
-                {
-                    remove (sl->name);
-                }
-        }
-
-    for (sl = names; sl; sl = sl->next)
-        {
-            if (sl->is_dir)
-                {
-                    fs_DeleteDir (fs::path (new_root) / fs::path (sl->name));
-                    rmdir (sl->name);
-
-                    if (fs::exists (fs::path (sl->name)))
-                        {
-                           std::cerr << "[ERR] Impossible to erase directory " << sl->name << std::endl ;
-                            throw;
-                        }
-                }
-        }
-
-    free (new_root);
-
-    while (names)
-        {
-            slist_t *prev;
-            free (names->name);
-            prev = names;
-            names = names->next;
-            free (prev);
-        }
-
-    if (fs::exists (cwd) && chdir (cwd) != 0)
-        perror ("[ERR]  chdir");
-
-    rmdir (normalize_windows_paths (dirName.string().c_str()));
-
-    if (fs::exists (dirName))
-       std::cerr << "[ERR] Directory " << dirName << " not deleted" << std::endl;
-
-    return (true);
-#endif
+ if (n == 1)
+ {
+     std::cerr << "[MSG]  " << n << " directory was removed." << std::endl;
+ }
+ else if (n > 1)
+ {
+     std::cerr << "[MSG]  " << n << " files and directories were removed." << std::endl;
+ }
+ else
+ {
+     std::cerr << "[WAR] Directory " << dirName << " did not exist." << std::endl;
+ }
+ return (res == static_cast<uintmax_t>(-1));
 }
 
 // ----------------------------------------------------------------------------

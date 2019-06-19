@@ -83,8 +83,7 @@ int jobs::backward = 0x10;
 int jobs::nearest = 0x20;
 int jobs::forward = 0x40;
 
-#ifdef lplex_console
-
+bool tv_flag = false, jpeg_flag = false;
 
 static int exitct = 0;
 
@@ -169,9 +168,11 @@ int main (int argc, char *argv[])
 
     else
         usage ("No files to process");
+
+        return(0);
 }
 
-#endif
+
 
 
 int deprecated;
@@ -226,7 +227,6 @@ struct option long_opts[] =
     { "isoPath",     1, &deprecated, 'a' },
     { "extractPath", 1, &deprecated, 'E' },
     { "readonlypath",  1, &deprecated, 'D' },
-    { "readonlypath",  1, &deprecated, 'D' },
     { "alignment",   1, &deprecated, 'l' },
 
     { nullptr, 0, nullptr, 0 }
@@ -251,7 +251,7 @@ uint16_t init (int argc, char *argv[])
     logInit ( (configDir / "lplex.log").string());
     projectDotLplex = configDir / "project.lplex";
     cwd = fs::current_path();
-    job.tempPath = tempDir;
+
     // By default output name is : <YYYY-MM-DD_HHMM>_DVD
     job.outPath = cwd ;
     job.isoPath = isoPath;
@@ -263,9 +263,9 @@ uint16_t init (int argc, char *argv[])
 #endif
     job.format = wavef;
     job.flacLevel = 8;
-    job.tv = NTSC;
+    job.tv = PAL;
     job.jpegNow = 0;
-    job.group = -1;
+    job.group = 0;
     job.media = plusR;
     job.trim = static_cast<uint16_t> (jobs::seamless);
     job.trim0 = job.trimCt = 0;
@@ -362,9 +362,6 @@ uint16_t init (int argc, char *argv[])
         splitPaths();
 
     setJobTargets();
-
-    if (jpegs.size() == 0)
-        addJpeg ("black", job);
 
     _affirm = "";
     return (job.params & (auth | unauth));
@@ -570,7 +567,7 @@ uint16_t addFiles (fs::path filespec)
             if (projectFile)
                 {
                     projectFile = false;
-                    getOpts (filespec.string().c_str());
+                    //getOpts (filespec.string().c_str());
                     return 1;
                 }
         }
@@ -1332,17 +1329,43 @@ bool getOpts (int argc, char *argv[])
             optindl = -1;
         }
 
+    if (tv_flag) {
+            std:: cerr << "[PAR] Custom TV standard: " << job.tv << std::endl;
+    }
+    else {
+        std:: cerr << "[PAR] Default TV standard " << job.tv << std::endl;
+    }
+
+
+    if (jpeg_flag) {
+            std:: cerr << "[PAR] Adding custom jpeg path: " << job.jpeg << std::endl;
+            addJpeg (job.jpeg.c_str(), job, true);
+    }
+    else {
+        addJpeg ((fs::current_path() / "data" / (std::string("black_") + (job.tv == PAL ? "PAL_720x576.jpg" : "NTSC_720x480.jpg"))).string().c_str(), job);
+        std:: cerr << "[PAR] Adding standard " << job.tv << " jpeg path  " << std::endl;
+    }
+
+
     if (job.tempPath.empty())
         {
-            std::cerr << "[ERR] Working path is empty." << std::endl;
-            throw;
+            std::cerr << "[WAR] Working path is empty." << std::endl;
+            job.tempPath = fs::current_path() / "temp";
+            std::cerr << "\n[WAR] ***********************\n" << std::endl;
+            std::cerr << "[WAR] Using " << job.tempPath << " ..." << std::endl;
+            std::cerr << "\n[WAR] ***********************\n" << std::endl;
         }
 
-    normalize_windows_paths (job.tempPath);
+    job.tempPath = fs::path(normalize_windows_paths (job.tempPath));
 
     if (! fs::exists (job.tempPath))
         {
             fs_MakeDirs (job.tempPath);
+            std::cerr << "[INF] Creating temporary directory" << job.tempPath << std::endl;
+        }
+        else
+        {
+            std::cerr << "[PAR] Using temporary directory" << job.tempPath << std::endl;
         }
 
     if (job.outPath.empty())
@@ -1351,7 +1374,7 @@ bool getOpts (int argc, char *argv[])
             throw;
         }
 
-    normalize_windows_paths (job.outPath);
+    job.outPath = fs::path(normalize_windows_paths (job.outPath));
 
     if (! fs::exists (job.outPath))
         {
@@ -1547,7 +1570,7 @@ uint16_t setopt (uint16_t opt, const char *optarg)
 {
     uint16_t t = 0;
     char *comma = nullptr;
-    bool ok = true, isTrue = 0, isFalse = 0;
+    bool ok = true, isTrue = false, isFalse = false;
 
     if (optarg && (comma = (char*) strrchr (optarg, ',')))
         comma[0] = '\0';
@@ -1643,6 +1666,7 @@ uint16_t setopt (uint16_t opt, const char *optarg)
                 break;
 
             case 't':
+                tv_flag = true;
                 if (job.params & customized)
                     t = job.tv;
 
@@ -1656,10 +1680,7 @@ uint16_t setopt (uint16_t opt, const char *optarg)
                     else
                         ok = false;
 
-                if (job.params & customized  && t != job.tv)
-                    FATAL ("set --video (-t) prior to specifying any custom jpegs or menus.");
-
-                break;
+                 break;
 
             case 'm':
                 clearbits (job.params, md5);
@@ -1753,7 +1774,8 @@ uint16_t setopt (uint16_t opt, const char *optarg)
                 break;
 
             case 'j':
-                addJpeg (optarg, job, true);
+                jpeg_flag = true;
+                job.jpeg = optarg;
                 break;
 
             case 'N':
@@ -1861,14 +1883,14 @@ uint16_t setopt (uint16_t opt, const char *optarg)
 
                 if (! fs::is_directory (job.tempPath))
                     {
-                        std::cerr << "[INF] " << " Creating directory " << optarg <<  std::endl;
+                        std::cerr << "[INF] " << " Creating temporary directory " << optarg <<  std::endl;
                         fs_MakeDirs (job.tempPath);
                         ok = validatePath (optarg);
                     }
 
                 if (! fs::is_directory (job.tempPath))
                     {
-                        std::cerr << "[ERR] Could not create directory " << optarg << std::endl;
+                        std::cerr << "[ERR] Could not create temporary directory " << optarg << std::endl;
                         throw;
                     }
 
@@ -2055,10 +2077,14 @@ uint16_t setopt (uint16_t opt, const char *optarg)
                 job.skip = (t ? t - 1 : 0);
                 break;
 
+            case '0':
+
+
             default :
                 ok = false;
                 break;
         }
+
 
     if (! ok)
         {

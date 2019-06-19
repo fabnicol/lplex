@@ -122,44 +122,29 @@ void setcolors (int scheme)
 
 std::ofstream xlog;
 std::string xlogName;
-
-void normalize_windows_paths (std::string & path __attribute__ ( (unused)))
+const std::string normalize_windows_paths (const std::string & path )
 {
-#ifndef __linux__
-    replace (path.begin(), path.end(), '/', '\\');
-#endif
-}
-
-void normalize_windows_paths (fs::path &path __attribute__ ( (unused)))
-{
-#ifndef __linux__
-    std::string _path = path.string();
-    replace (_path.begin(), _path.end(), '/', '\\');
-    path = fs::path (_path);
-#endif
-}
-
-
-char* normalize_windows_paths (const char* path)
-{
-#ifndef __linux__
-    std::string _path = std::string (path);
-    char* out = const_cast<char*> (_path.c_str());
-    int i;
-
-    for (i = 0; out[i] != '\0'; ++i)
-        {
-            if (out[i] == '/')
-                out[i] = '\\';
-        }
-
-    char* out2 = new char[i];
-    memcpy (out2, out, i);
-    return (out2);
+#ifdef _WIN32
+    std::string u ( path);
+    std::replace(u.begin(), u.end(), '/', '\\');
+    return u;
 #else
-    return const_cast<char*> (path);
+    return(path);
 #endif
 }
+
+const std::string normalize_windows_paths (const fs::path &path )
+{
+std::string _path = path.string();
+#ifdef _WIN32
+
+    return(normalize_windows_paths(_path) );
+#else
+return(_path);
+#endif
+}
+
+
 
 const char * scrub()
 {
@@ -505,34 +490,17 @@ std::string sizeStr (uint64_t size)
 
 
 // ----------------------------------------------------------------------------
-//    device :
-// ----------------------------------------------------------------------------
-//    Returns device letter of <filename>.
-// ----------------------------------------------------------------------------
-
-
-//char device( const char * filename )
-//{
-//   struct stat filestat;
-//   if( stat( filename, &filestat ) == 0 )
-//      return 'A' + filestat.st_dev;
-//
-//   return -1;
-//}
-
-
-// ----------------------------------------------------------------------------
 //    deviceNum :
 // ----------------------------------------------------------------------------
 //    Returns device number for <filename>.
 // ----------------------------------------------------------------------------
 
 
-dev_t deviceNum (const char * filename)
+dev_t deviceNum (const std::string &filename)
 {
     struct stat filestat;
 
-    if (stat (filename, &filestat) == 0)
+    if (stat (filename.c_str(), &filestat) == 0)
         return filestat.st_dev;
 
     return -1;

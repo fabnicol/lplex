@@ -98,7 +98,6 @@ static inline void trim (std::string &s)
     rtrim (s);
 }
 
-//#define clearbits(val,mask) val |= mask; val ^= mask;
 #define clearbits(val,mask) val = ((val|(mask))^(mask))
 #define matchbits(val,mask) (((!(mask))^val)==(mask))
 #define bEndian32(ptr) bEndian(*(uint32_t*)(ptr))
@@ -117,7 +116,7 @@ int strtomd5 (md5_byte_t *md5Str, const char *txt);
 size_t filesize (const char * filename);
 std::string sizeStr (uint64_t size);
 //char device( const char * filename );
-dev_t deviceNum (const char * filename);
+dev_t deviceNum (const std::string& filename);
 size_t statsize (const char * filename);
 void _pause();
 int progress (int val, int action);
@@ -271,35 +270,27 @@ void setcolors (int scheme = bright);
 
 #endif
 
-#define ECHO(t) std::cerr << t ;
-#define ECHOv(t)std::cerr << t; LOG(t); xlog.flush()
+#define ECHO(t) std::cerr << t  << std::endl;
+#define ECHOv(t) ECHO(t)
 
 
 #define XERRMACRO(tag,tint,t)std::cerr <<  tag << t;
-#define POSTvMACRO(tag,tint,t) do{ scrub();XERRMACRO(tag,tint,t);XLOGMACRO(t);}while(0)
-#define POSTMACRO(tag,tint,t)  do{ scrub();if(_verbose) XERRMACRO(tag,tint,t);XLOGMACRO(t);}while(0)
 
-#define STAT(t) POSTMACRO(STAT_TAG,TINT_STAT,t)
-#define INFO(t) POSTMACRO(INFO_TAG,TINT_INFO,t)
-#define LOG(t)  POSTMACRO(LOG_TAG,TINT_LOG,t)
-#define WARN(t) POSTMACRO(WARN_TAG,TINT_WARN,t)
-#define ERRv(t) POSTMACRO(ERR_TAG,TINT_ERR,t)
+#define STAT(t) ECHO("[MSG] " << t);
+#define INFO(t) ECHO("[INF] " << t );
+#define LOG(t)  ECHO("[LOG] " << t )
+#define WARN(t) ECHO("[WAR] " << t);
+#define ERR(t)  ECHO("[ERR] " << t);
 
-#define STATv(t) POSTvMACRO(STAT_TAG,TINT_STAT,t)
-#define INFOv(t) POSTvMACRO(INFO_TAG,TINT_INFO,t)
-#define LOGv(t)  POSTvMACRO(LOG_TAG,TINT_LOG,t)
-#define WARNv(t) POSTvMACRO(WARN_TAG,TINT_WARN,t)
+#define STATv(t) STAT(t)
+#define INFOv(t) INFO(t)
+#define LOGv(t)  LOG(t)
+#define WARNv(t) WARN(t)
 
-#define ERR(t) std::cerr << (std::string(ERR_TAG) + std::string(t)).c_str();
-
-#ifdef lplex_console
 #define FATAL(t) {  \
-   std::cerr << ERR_TAG << t << std::endl;\
+   ERR(t);\
+   fflush(nullptr);\
     throw;}//must follow 'if' statement
-
-#else
-#define FATAL(t) { gui_mode(messenger::_fatal); ERR(t); }//must follow 'if' statement
-#endif
 
 #define BLIP(t) do{ if(!_verbose) { unblip(true);std::cerr << TINT_BLIP( (_blip + std::string(t)).c_str() ) << std::flush; } }while(0)
 #define SCRN(t) do{ if(!_verbose) { unblip(true);std::cerr << t; } }while(0);
@@ -317,9 +308,9 @@ const char * scrub();
 void blip (const char *msg = nullptr);
 void blip (const std::string& msg);
 
-void normalize_windows_paths (std::string &path);
-char*  normalize_windows_paths (const char* path);
-void   normalize_windows_paths (fs::path &path);
+const std::string normalize_windows_paths (const std::string &path);
+
+const std::string   normalize_windows_paths (const fs::path &path);
 void unblip (bool clear = true);
 
 // ...standardized counter with progress reporting

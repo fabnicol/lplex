@@ -349,7 +349,7 @@ uint16_t rawWriter::open()
     rawFile.open (fName.string(), std::ios::binary);
 
     if (! rawFile.is_open())
-        FATAL ("Can't open output file " + fName.string());
+        FATAL ("rawWriter -> rawFile.open: Can't open output file " + fName.string());
 
     md5_init (&md5);
     md5_init (&md5raw);
@@ -461,7 +461,7 @@ uint16_t waveWriter::open()
     waveFile.open (fName.string(), std::ios::binary);
 
     if (! waveFile.is_open())
-        FATAL ("Can't open output file " + fName.string());
+        FATAL ("waveWrite -> waveFile.open: Can't open output file " + fName.string());
 
     waveHeader::tag (waveFile, &fmeta);
     md5_init (&md5);
