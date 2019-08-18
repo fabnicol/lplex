@@ -2,7 +2,7 @@
 # Attempt to guess a canonical system name.
 #   Copyright 1992-2017 Free Software Foundation, Inc.
 
-timestamp='2017-03-05'
+timestamp='2017-01-01'
 
 # This file is free software; you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by
@@ -837,11 +837,10 @@ EOF
 	UNAME_PROCESSOR=`/usr/bin/uname -p`
 	case ${UNAME_PROCESSOR} in
 	    amd64)
-		UNAME_PROCESSOR=x86_64 ;;
-	    i386)
-		UNAME_PROCESSOR=i586 ;;
+		echo x86_64-unknown-freebsd`echo ${UNAME_RELEASE}|sed -e 's/[-(].*//'` ;;
+	    *)
+		echo ${UNAME_PROCESSOR}-unknown-freebsd`echo ${UNAME_RELEASE}|sed -e 's/[-(].*//'` ;;
 	esac
-	echo ${UNAME_PROCESSOR}-unknown-freebsd`echo ${UNAME_RELEASE}|sed -e 's/[-(].*//'`
 	exit ;;
     i*:CYGWIN*:*)
 	echo ${UNAME_MACHINE}-pc-cygwin
@@ -1058,7 +1057,18 @@ EOF
 	echo ${UNAME_MACHINE}-dec-linux-${LIBC}
 	exit ;;
     x86_64:Linux:*:*)
-	echo ${UNAME_MACHINE}-pc-linux-${LIBC}
+	eval $set_cc_for_build
+	X86_64_ABI=
+	# If there is a compiler, see if it is configured for 32-bit objects.
+	if [ "$CC_FOR_BUILD" != 'no_compiler_found' ]; then
+	    if (echo '#ifdef __ILP32__'; echo IS_X32; echo '#endif') | \
+		(CCOPTS= $CC_FOR_BUILD -E - 2>/dev/null) | \
+		grep IS_X32 >/dev/null
+	    then
+		X86_64_ABI=x32
+	    fi
+	fi
+	echo ${UNAME_MACHINE}-pc-linux-${LIBC}${X86_64_ABI}
 	exit ;;
     xtensa*:Linux:*:*)
 	echo ${UNAME_MACHINE}-unknown-linux-${LIBC}
@@ -1343,9 +1353,6 @@ EOF
 	exit ;;
     NSR-?:NONSTOP_KERNEL:*:*)
 	echo nsr-tandem-nsk${UNAME_RELEASE}
-	exit ;;
-    NSX-?:NONSTOP_KERNEL:*:*)
-	echo nsx-tandem-nsk${UNAME_RELEASE}
 	exit ;;
     *:NonStop-UX:*:*)
 	echo mips-compaq-nonstopux

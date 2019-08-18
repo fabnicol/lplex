@@ -144,13 +144,13 @@ int run (const std::string& application, const std::vector<const char*>&  Args, 
     switch (pid = fork())
         {
             case -1:
-                std::cerr << "[ERR] Could not launch " << application << endl;
+	      std::cerr << "[ERR] Could not launch " << application << std::endl;
                 break;
 
             case 0:
                 close (tube[0]);
                 dup2 (tube[1], STDERR_FILENO);
-                execv (application, (char* const*) args);
+                execv (application.c_str(), (char* const*) args);
                 std::cerr << "[ERR] Runtime failure in " <<  application << " child process" << std::endl;
                 return errno;
 
@@ -259,7 +259,7 @@ int run (const std::string& application,  const std::vector<const char*>& Args,
                 dup2 (tube[1], STDOUT_FILENO);
                 // Piping stdout is required here as STDOUT is not a possible duplicate for stdout
                 dup2 (tubeerr[1], STDERR_FILENO);
-                execv (application, (char* const*) args);
+                execv (application.c_str(), (char* const*) args);
                 std::cerr << "[ERR] Runtime failure in jpeg2yuv child process" << std::endl;
                 return errno;
 
@@ -284,7 +284,7 @@ int run (const std::string& application,  const std::vector<const char*>& Args,
                             close (STDOUT_FILENO);
                             dup2 (tubeerr2[1], STDERR_FILENO);
                             // End of comment
-                            execv (application2, (char* const*) args2);
+                            execv (application2.c_str(), (char* const*) args2);
                             std::cerr << "[ERR] Runtime failure in " << application2 << " parent process" << std::endl;
                             return errno;
 

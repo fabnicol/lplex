@@ -130,7 +130,7 @@ extern int endPause;
 inline void _pause()
 {
     std::cerr << "\npress <enter> to close...";
-    cin.get();
+    std::cin.get();
 }
 //inline void _pause() { system( "echo press any key to close; read -n 1" ); }
 #define device(d) d
